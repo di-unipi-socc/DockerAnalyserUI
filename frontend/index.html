@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>DockerAnalyser</title>
+
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comfortaa:300,400"> 
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" crossorigin="anonymous">
+  <script src="dist/results.bundle.js"></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <div class="main-header">
+    <h1>DockerAnalyser</h1>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="error-container"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-10 offset-sm-1">
+
+        <div style="text-align: center; margin: 20px 0 50px;">
+          <a href="editor.html"><button type="button" class="btn btn-primary">Create Package</button></a>
+          <a href="results.html"><button type="button" class="btn btn-primary">View Results</button></a>
+        </div>
+
+      </div> 
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="main-footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-6">
+          <a href="https://di-unipi-socc.github.io/" target="_blank"><img class="socc_logo" src="imgs/socc-logo.png" /></a>
+          <div class="footer-content-left">
+            <b>Service-Oriented, Cloud and Fog Computing</b> research group<br>
+            <a href="https://di-unipi-socc.github.io/" target="_blank">Website</a> . 
+            <a href="https://github.com/di-unipi-socc" target="_blank">GitHub</a> . 
+            <a href="https://www.youtube.com/channel/UC6Kzupom8lpBc7dO-wcXp_g" target="_blank">YouTube</a>
+          </div>
+        </div>
+        <div class="col-6">
+            <a href="https://www.unipi.it" target="_blank"><img class="unipi_logo" src="imgs/unipi-logo.png" /></a>
+            <div class="footer-content-right">
+            <a href="https://www.di.unipi.it" target="_blank">Department of Computer Science</a><br>
+            <a href="https://www.unipi.it" target="_blank">University of Pisa</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Endpoint Modal -->
+  <div class="modal fade" id="endpoint_modal" tabindex="-1" role="dialog" aria-labelledby="endpoint_modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="endpoint_modal_label">Results Endpoint</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form name="set_endpoint_form" id="set_endpoint_form">
+            <div class="form-group row">
+              <div class="col-sm-8 offset-sm-1">
+                <input type="text" id="endpoint_url" name="endpoint_url" class="form-control" 
+                  placeholder="URL" required />
+              </div>
+              <div class="col-sm-2">
+                <input type="submit" class="btn btn-primary" id="set_endpoint_button" value="Set" />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loader Overlay -->
+  <div class="loading_img"></div>
+</body>
+
+</html>
