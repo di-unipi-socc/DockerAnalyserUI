@@ -10,4 +10,4 @@ db.sqlite3
 node_modules/
 *.hot-update.json
 *.hot-update.js
-
+venv/
