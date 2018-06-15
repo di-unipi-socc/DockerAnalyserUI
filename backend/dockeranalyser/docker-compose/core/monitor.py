@@ -1,9 +1,8 @@
 import pika
 import requests
-from  six import print_
+from six import print_
 
 def count_queue_msg(service="127.0.0.1", queue="images"):
-
     url = "amqp://guest:guest@"+service+":5672"
     #print("connecting to : " +url)
     connection = pika.BlockingConnection(pika.URLParameters(url))

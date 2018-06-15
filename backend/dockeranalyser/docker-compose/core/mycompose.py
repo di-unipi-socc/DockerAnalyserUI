@@ -6,11 +6,9 @@ from compose.cli.docker_client import docker_client
 from compose.const import API_VERSIONS
 from compose.config.config import V2_0
 
-import fnmatch
+import fnmatch # unix file name matching
 import os
-
 import logging
-
 
 def get_project(path):
     """

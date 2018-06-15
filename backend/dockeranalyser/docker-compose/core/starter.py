@@ -1,4 +1,3 @@
-
 from compose.container import Container
 from compose.cli.command import get_project as compose_get_project, get_config_path_from_options, get_config_from_options
 from compose.config.config import get_default_config_files
