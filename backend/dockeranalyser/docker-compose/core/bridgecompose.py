@@ -6,7 +6,7 @@ from compose.cli.utils import get_version_info
 from compose.cli.command import get_project as compose_get_project, get_config_path_from_options, get_config_from_options
 from compose.config.config import get_default_config_files
 from compose.config.environment import Environment
-
+from compose.cli.main import TopLevelCommand
 from compose.cli.docker_client import docker_client
 from compose.const import API_VERSIONS, COMPOSEFILE_V3_0
 
@@ -30,6 +30,38 @@ def ps_(project):
         'is_running': container.is_running} for container in running_containers]
 
     return items
+
+def run(project,service,command, options):
+    # Run a service passing the command OPTIONS
+    # e.g.
+    #     docker-compose run crawler crawl --fp=100 --min-pulls=10  --min-stars=20
+    #       SERVICE = crawler
+    #       COMMAND = crawl
+    #       OPTIONS =  --fp=100 --min-pulls=10  --min-stars=20
+    service = "crawler"
+    service = self.project.get_service(service) #options['SERVICE'])
+    # detach = options.get('--detach')
+    #
+    # if options['--publish'] and options['--service-ports']:
+    #     raise UserError(
+    #         'Service port mapping and manual port mapping '
+    #         'can not be used together'
+    #     )
+
+    # if options['COMMAND'] is not None:
+    #     command = [options['COMMAND']] + options['ARGS']
+    # elif options['--entrypoint'] is not None:
+    #     command = []
+    # else:
+    #     command = service.options.get('command')
+
+    command = "--fp=100 --min-pulls=10  --min-stars=20"
+
+    container_options = None # build_container_options(options, detach, command)
+    run_one_off_container(
+        container_options, self.project, service, options,
+        self.toplevel_options, self.project_dir
+    )
 
 
 def get_container_from_id(my_docker_client, container_id):
@@ -61,9 +93,6 @@ def get_project(path, project_name=None):
     environment = Environment.from_env_file(path)
     config_path = get_config_path_from_options(path, dict(), environment)
     project = compose_get_project(path, config_path, project_name=project_name)
-    # def get_project(project_dir, config_path=None, project_name=None, verbose=False,
-    #             host=None, tls_config=None, environment=None, override_dir=None,
-    #             compatibility=False):
     return project
 
 def containers():
@@ -94,14 +123,58 @@ def project_config(path):
 
 
 if __name__ == "__main__":
-    project = get_project("/home/dido/code/DockerAnalyserUI/DockerAnalyser/", project_name="docker-finder")
-    # docker-compose build --build-arg  DEPLOY_PACKAGE_PATH=/data/examples/deploy-package-dockerfinder scanner
-    d = project.build(service_names=["scanner"], build_args={"DEPLOY_PACKAGE_PATH": "/data/examples/deploy-package-dockerfinder"})
-
-    # service_names=None, no_cache=False, pull=False, force_rm=False, memory=None, build_args=None, gzip=False):
-    containers = project.up() # service_names=["scanner"]
-    c = [ str(d) for i in containers]
-    print(c)
-
-    project.stop()
-    # print(ps_(project))
+    project_dir="/home/dido/code/DockerAnalyserUI/DockerAnalyser/"
+    project = get_project(project_dir, project_name="docker-finder")
+    # # docker-compose build --build-arg  DEPLOY_PACKAGE_PATH=/data/examples/deploy-package-dockerfinder scanner
+    # d = project.build(service_names=["scanner"], build_args={"DEPLOY_PACKAGE_PATH": "/data/examples/deploy-package-dockerfinder"})
+    #
+    # # service_names=None, no_cache=False, pull=False, force_rm=False, memory=None, build_args=None, gzip=False):
+    # containers = project.up() # service_names=["scanner"]
+    # c = [ str(d) for i in containers]
+    # print(c)
+    #
+    # project.stop()
+    topcommand = TopLevelCommand(project, project_dir=project_dir)
+    # tart_deps = not options['--no-deps']
+    #     always_recreate_deps = options['--always-recreate-deps']
+    #     exit_value_from = exitval_from_opts(options, self.project)
+    #     cascade_stop = options['--abort-on-container-exit']
+    #     service_names = options['SERVICE']
+    #     timeout = timeout_from_opts(options)
+    #     remove_orphans = options['--remove-orphans']
+    #     detached = options.get('--detach')
+    #     no_start = options.get('--no-start')
+    # topcommand.build({'SERVICE':['scanner'],
+    #                 '--build-arg': {
+    #                         "DEPLOY_PACKAGE_PATH": "/data/examples/deploy-package-dockerfinder"
+    #                         },
+    #                 '--memory':'1GB'
+    #                     }
+    #
+    # )
+    # topcommand.up()
+    # topcommand.run({'SERVICE':'crawler',
+    #                 'COMMAND':'crawl',
+    #                 'ARGS':['--fp=100', '--min-pulls=10','--min-stars=20', '--policy=pulls_first'],
+    #                 "--no-deps":True,
+    #                 '-e':None,'--label':None,'--rm':True,'--user':None,
+    #                 '--name':None,'--workdir':None,'--volume':None,
+    #                 '--publish':False,'--detach':True,"--service-ports":False,
+    #                  "--use-aliases":None,
+    #                 '--entrypoint':None})
+    # topcommand.stop({'SERVICS':'scanner'})
+    options ={
+        '--no-deps':False,
+        '--always-recreate-deps':False,
+        '--abort-on-container-exit':None,
+        'SERVICE':['crawler','rabbitmq'],
+        '--remove-orphans':False,
+        '--detach':True,
+        '--no-start':False,
+        '--no-recreate':True,
+        '--force-recreate':False,
+        '--no-build':False,
+        '--build':False,
+        '--scale': ['crawler=2']
+    }
+    topcommand.up(options)
