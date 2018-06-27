@@ -2,16 +2,23 @@ from compose.cli.main import TopLevelCommand
 from compose.project import  OneOffFilter
 from compose.cli.command  import project_from_options
 
+from os import path
+import json
+
 from operator import attrgetter
 
 class MyCompose():
 
-    def __init__(self, project_name, project_dir='.'):
+    def __init__(self, project_name, project_dir='.',file_compose='docker-compose.json'):
         self._name = project_name
+        self.file = file_compose
+        self.project_dir = project_dir
+        print("rreading file: {}".format(self.get_compose_file()))
         self._project = self._get_project(project_dir, project_name=self._name)
-        # options = {'--file':'docker-compose.json'}
         self.compose = TopLevelCommand(self._project, project_dir=project_dir)
 
+    def get_compose_file(self):
+        return  path.join(self.project_dir,self.file)
 
     def get_name(self):
         return self._name
@@ -34,7 +41,9 @@ class MyCompose():
 
     def up(self, services=None, scale=None):
         # scale = ['crawler=2']
-        services = list(filter(lambda x: x not in ['crawler','scanner'], self.get_service_names()))
+        # services =  list of services
+        services = services if services else self.get_service_names()
+        scale = scale if scale else []
         options = {
             '--no-deps':False,
             '--always-recreate-deps':False,
@@ -47,10 +56,10 @@ class MyCompose():
             '--force-recreate':False,
             '--no-build':False,
             '--build':False,
-            '--scale': ['crawler=2']
+            '--scale': [] # 'crawler=2'
         }
-        self.compose.up(options)
-        return services
+        print(self.compose.up(options))
+        return "UP services: {}, scale {}".format(services,scale)
 
 
     def run(self,service_name='crawler', command='crawl', args=['--fp=100', '--min-pulls=10','--min-stars=20', '--policy=pulls_first']):
@@ -99,7 +108,7 @@ class MyCompose():
         # config_path = get_config_path_from_options(path, dict(), environment)
         # project = compose_get_project(path, config_path, project_name=project_name)
         options = {
-            '--file': ['docker-compose.json'],
+            '--file': [ self.file],
             '--host':None,
             '--project-name': project_name,
             '--verbose':False,
@@ -108,3 +117,20 @@ class MyCompose():
         }
         project = project_from_options(path, options)
         return project
+
+    def config_command(self, service, command=None, args=None):
+        try :
+            with open(self.get_compose_file(), 'r+') as file_compose:
+                data = json.load(file_compose)
+                actual_command_args = data['services'][service]['command'] # list ['command','args=value', 'arg2=value2']
+                actual_command = actual_command_args[0]
+                actual_args = actual_command_args[0]
+                data['services'][service]['command'] = [command if command else actual_command] + (args if args else actual_args)
+                file_compose.seek(0)  # rewind
+                json.dump(data, file_compose, indent=4)
+                file_compose.truncate()
+            return True
+        except:
+            return False
+    
+    # def config_replicas(self, service, num):
