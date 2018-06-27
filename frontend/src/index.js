@@ -33,6 +33,7 @@ import * as editor from './editor/editor'
 import * as packager from './editor/packager'
 import * as configurator from './configurator/configurator'
 import * as results from './results/results'
+import * as vutils from './common/viewutils'
 
 $(document).ready(function () {
 
@@ -51,11 +52,14 @@ $(document).ready(function () {
         theme: "dots", 
         autoAdjustHeight: true, 
         keyNavigation: false,
+        useURLhash: false, 
+        showStepURLhash: false,
         toolbarSettings: {toolbarPosition: "top"}
     });
+
     /*$("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {
-        alert("You are on step "+stepNumber+" now");
-        $("#smartwizard")._fixHeight(stepNumber);
+        console.log("You are on step "+stepNumber+" now");
+        vutils.fix_height(stepNumber);
      });*/
     $('[data-toggle="tooltip"]').tooltip();
     $('[data-toggle="popover"]').popover({trigger: "hover"});

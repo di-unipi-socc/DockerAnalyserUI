@@ -1,6 +1,9 @@
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
+import * as modal from '../common/modals'
+import * as forms from '../common/forms'
+import * as vutils from '../common/viewutils'
 import * as search_module from './search'
 import Chart from 'chart.js';
 
@@ -35,7 +38,7 @@ var get_reduce_button = function(id) {
     return button;
 };
 
-var forms = {
+var result_forms = {
     get_search_id: function(name) {
         return "search_" + name.replace(/[.]/g, "_");
     },
@@ -79,7 +82,7 @@ var forms = {
         else
             row_container.addClass("form-group row no-gutters");
         let container = $("<div />").attr("class", "col-11 row no-gutters");
-        let id = forms.get_search_id(name);
+        let id = result_forms.get_search_id(name);
         let title = utilities.readable(name);
         let input_type = "text";
         if (type == "number")
@@ -88,13 +91,13 @@ var forms = {
             input_type = "checkbox";
         if (type == "number") {
             let cnt1 = $("<div />").attr("class", "col-6 row no-gutters");
-            forms.get_input(cnt1, input_type, id+"_from", name, title+" from");
+            result_forms.get_input(cnt1, input_type, id+"_from", name, title+" from");
             let cnt2 = $("<div />").attr("class", "col-6 row no-gutters");
-            forms.get_input(cnt2, input_type, id+"_to", name, title+" to");
+            result_forms.get_input(cnt2, input_type, id+"_to", name, title+" to");
             container.append(cnt1);
             container.append(cnt2);
         } else
-            forms.get_input(container, input_type, id, name, title);
+            result_forms.get_input(container, input_type, id, name, title);
         let remove_div = $("<div />").attr({"class": "col-1 text-center"});
         let remove_button = $("<input />").attr({"type": "submit", "class": "btn btn-secondary btn-sm", "value": "-"});
         remove_button.click(function(event) {
@@ -109,7 +112,7 @@ var forms = {
         return row_container;
     },
     get_value: function(name) {
-        let id = forms.get_search_id(name);
+        let id = result_forms.get_search_id(name);
         return $("#"+id).val();
     },
     get_txt_input: function(name, placeholder) {
@@ -182,12 +185,6 @@ var results = {
         });
         $(config.selectors.results_list_id).show();
     },
-    show_endpoint_modal: function() {
-        $(config.selectors.endpoint_modal_id).modal("show");
-    },
-    hide_endpoint_modal: function() {
-        $(config.selectors.endpoint_modal_id).modal("hide");
-    },
     get_chart_card: function(id, type, attribute, approximation) {
         let title = type + " chart for <b>" + attribute + "</b> attribute with <i>" + approximation + "</i> approximation";
         let cnt = $("<div />").attr("class", "card");
@@ -196,18 +193,34 @@ var results = {
         button.click(function(event) {
             event.preventDefault();
             cnt.remove();
+            vutils.fix_height(config.vars.step);
         });
         header.append(button);
         let body_id = "card_body_" + id;
         let body = $("<div />").attr({"class": "card-body collapse show", "id": body_id});
         let div = $("<div />").attr("id", id).attr("class", "graph_container");
         body.append(div);
+        body.on('hidden.bs.collapse', function() {
+            vutils.fix_height(config.vars.step);
+        });
+        body.on('shown.bs.collapse', function() {
+            vutils.fix_height(config.vars.step);
+        });
         let min_button = get_reduce_button(body_id);
         header.append(min_button);
         cnt.append(header);
         cnt.append(body);
         return cnt;
-    }
+    },
+    setup_scale_modal: function() {
+        let body = modal.setup(config.selectors.scale_modal, "Scale Scanners", null, null, false);
+        let form = forms.get_form(config.selectors.scale_form, true);
+        let input = forms.get_input.text(config.selectors.scale_amount, "Number of Scanners", true);
+        let submit = forms.get_button.submit(config.selectors.scale_form + "_button", "Scale");
+        form.append(input);
+        form.append(submit);
+        body.append(form);
+    },
 };
 
 var search = {
@@ -218,13 +231,13 @@ var search = {
         // Custom form first row
         let cnt1 = $("<div />").attr("class", "inline-form-group");
         let cnt2 = $("<div />").attr("class", "inline-form-group");
-        let select = forms.get_select(config.selectors.custom_search_form_select);
-        let add_button = forms.get_submit_button(config.selectors.custom_search_form_add, "+");
+        let select = result_forms.get_select(config.selectors.custom_search_form_select);
+        let add_button = result_forms.get_submit_button(config.selectors.custom_search_form_add, "+");
         add_button.click(function(event) {
             event.preventDefault();
             search.add_field(select.val(), null);
         });
-        let add_all_button = forms.get_submit_button(config.selectors.custom_search_form_add_all, "Add All");
+        let add_all_button = result_forms.get_submit_button(config.selectors.custom_search_form_add_all, "Add All");
         add_all_button.click(function(event) {
             event.preventDefault();
             $(config.selectors.results_search_form_id + " fieldset").empty();
@@ -234,8 +247,8 @@ var search = {
         cnt1.append(add_button);
         cnt1.append(add_all_button);
         // Custom form second row
-        let input_custom = forms.get_txt_input("add_custom_input", "Custom Field");
-        let add_button_custom = forms.get_submit_button(config.selectors.custom_search_form_add, "+");
+        let input_custom = result_forms.get_txt_input("add_custom_input", "Custom Field");
+        let add_button_custom = result_forms.get_submit_button(config.selectors.custom_search_form_add, "+");
         add_button_custom.click(function(event) {
             event.preventDefault();
             search.add_field(input_custom.val(), "string");
@@ -248,7 +261,7 @@ var search = {
         // Search Form setup 
         let search_form = $("<form />").attr({"name": config.selectors.results_search_form, "id": config.selectors.results_search_form});
         let fieldset = $("<fieldset />");
-        let search_button = forms.get_submit_button(config.selectors.results_search_button, "Search");
+        let search_button = result_forms.get_submit_button(config.selectors.results_search_button, "Search");
         search_button.click(function(event) {
             event.preventDefault();
             search_module.search();
@@ -269,6 +282,7 @@ var search = {
             $(config.selectors.results_search_form).show();
         else
             $(config.selectors.results_search_form).hide();
+        vutils.fix_height(config.vars.step);
     },
     setup_search_form: function() {
         // INSERIRE POSSIBILITA DI CERCARE PER RANGE
@@ -293,7 +307,7 @@ var search = {
             attrs.sort();
             $.each(attrs, function(idx, attr) {
                 search.add_field(attr, type);
-                //cnt.append(forms.get_field(type, attr));
+                //cnt.append(result_forms.get_field(type, attr));
             });
             //form.append(cnt);
         });
@@ -310,17 +324,22 @@ var search = {
                 type = "checkbox"; 
             else 
                 return true;  // continue
-            form.append(forms.get_input(type, key));
+            form.append(result_forms.get_input(type, key));
         });*/
     },
     add_field: function(name, type) {
         if (type == null) {
             type = model.get_attribute_type(name);
         }
-        let field = forms.get_field(type, name);
+        let field = result_forms.get_field(type, name);
         $(config.selectors.results_search_form + " fieldset").append(field);
         let len = model.add_search_attribute(name, type);
         search.search_form_visibility(len);
+    },
+    setup_sample_modal: function() {
+        let body = modal.setup(config.selectors.sample_image_modal, "Sample Image", null, null, true);
+        let div = $("<div />").attr({"id": config.selectors.sample_image_div});
+        body.append(div);
     }
 };
 

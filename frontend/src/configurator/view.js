@@ -79,8 +79,8 @@ var forms = {
             $(container).append(div);
         return div;
     },
-    get_submit_button: function(id, value) {
-        return $("<input />").attr({"type": "submit", "class": "btn btn-info", "value": value, "id": id});
+    get_submit_button: function(id, value, btn_class) {
+        return $("<input />").attr({"type": "submit", "class": "btn btn-"+btn_class, "value": value, "id": id});
     }
 }
 
@@ -94,8 +94,8 @@ var configurator = {
                 forms.add_field(item, fieldset);
             });
         });
-        let submit_button = forms.get_submit_button("update_config", "Update Configuration");
-        let clear_button = forms.get_submit_button("default_config", "Reset Defaults");
+        let submit_button = forms.get_submit_button("update_config", "Update Configuration", "info");
+        let clear_button = forms.get_submit_button("default_config", "Reset Defaults", "danger");
         clear_button.click(function(event) {
             event.preventDefault();
             configurator.setup_form()

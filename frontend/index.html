@@ -48,7 +48,7 @@
       </li>
     </ul>
 
-    <div>
+    <div id="smartwizard_container">
 
       <!-- =============== EDITOR =============== -->
       <div class="container" id="step-1">
@@ -69,7 +69,7 @@
 
           <div class="col-4">
             <!-- Requirements / Python Dependencies -->
-            <div class="upload_file_container side_section">
+            <div class="upload_file_container side_section" style="margin-top: 40px;">
               <h3>Python Dependencies</h3>
               <div class="side_section_actions">
                 <span id="requirements_actions"></span>
@@ -191,10 +191,7 @@
 
                 <fieldset>
                   <legend>Create a custom search form</legend>
-
-                  <form class="form-inline" name="custom_search_all" id="custom_search_all" style="float: right">
-                    <input type="submit" class="btn btn-info" value="Add All Fields" id="custom_search_add_all">
-                  </form>
+                  <div id="search_actions" class="side_section_actions" style="float: right"></div>
 
                   <form class="form-inline" name="custom_search" id="custom_search">
                     <div class="inline-form-group">
@@ -202,10 +199,6 @@
                       <input type="text" class="form-control" name="custom_search_subfield" id="custom_search_subfield" placeholder="Sub Field">
                       <input type="submit" class="btn btn-info" value="+" id="custom_search_add">
                     </div>
-                  </form>
-
-                  <form class="form-inline" name="custom_search_clear" id="custom_search_clear" style="float: right">
-                    <input type="submit" class="btn btn-info" value="Remove All Fields" id="custom_search_clear_button">
                   </form>
 
                   <form class="form-inline" name="custom_search_free" id="custom_search_free">

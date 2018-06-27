@@ -1,10 +1,40 @@
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
+import * as vutils from '../common/viewutils'
 import * as view from './view'
 import * as api from './api'
 
-var $ = require("jquery");
+var module_basename = "search";
+var actions = [{
+    name: "sample",
+    title: "Sample Image",
+    icon: "list",
+    style: "info",
+    modal: config.selectors.sample_image_modal,
+    action: null
+}, {
+    name: "add_all",
+    title: "Add All Fields",
+    icon: "plus",
+    style: "info",
+    modal: null,
+    action: function() {
+        // NOTA: se svuoto rimuovo anche i potenziali campi custom gia' aggiunti
+        //view.search.empty_search_form();
+        view.search.setup_search_form();
+    },
+}, {
+    name: "remove_all",
+    title: "Remove All Fields",
+    icon: "minus",
+    style: "danger",
+    modal: null,
+    action: function() {
+        model.clear_search_attributes();
+        view.search.search_form_visibility(0);
+    }
+}];
 
 var is_searchable_field = function(type) {
     return ($.inArray(type, config.vars.not_acceped_fields) == -1);
@@ -32,6 +62,7 @@ var search = function() {
     model.update_search_attributes(attributes);
     api.search(params, function(images) {
         view.results.show_results(images);
+        vutils.fix_height(config.vars.step);
     });
 };
 
@@ -72,7 +103,6 @@ var add_selected_field = function(attribute, subfield) {
                     attribute = attribute + "." + subfield;
                     type = "string";
                 }
-                
             } else {
                 // Show error
                 // return
@@ -100,6 +130,8 @@ var add_custom_field = function(attribute) {
 var init = function(container) {
     //view.search.setup(container);
     // Subfield selection 
+    vutils.setup_action_buttons(module_basename, actions);
+    view.search.setup_sample_modal();
     $(config.selectors.custom_search_form_subfield).hide();
     view.search.search_form_visibility(0);
     $(config.selectors.custom_search_form_select).change(function(event) {
@@ -114,23 +146,10 @@ var init = function(container) {
         event.preventDefault();
         add_selected_field($(config.selectors.custom_search_form_select).val(), $(config.selectors.custom_search_form_subfield).val());
     });
-    // Adds all available fields (string, number, boolean) to the search form
-    $(config.selectors.custom_search_form_all).submit(function(event) {
-        event.preventDefault();
-        // NOTA: se svuoto rimuovo anche i potenziali campi custom gia' aggiunti
-        //view.search.empty_search_form();
-        view.search.setup_search_form();
-    });
     // Adds a totally custom field to the search form. It may be a sub-field
     $(config.selectors.custom_search_form_free).submit(function(event) {
         event.preventDefault();
         add_custom_field($(config.selectors.custom_search_form_free_input).val());
-    });
-    // Remove all fields  Aggiungere clear?
-    $(config.selectors.custom_search_form_clear).submit(function(event) {
-        event.preventDefault();
-        model.clear_search_attributes();
-        view.search.search_form_visibility(0);
     });
     // Search within the analysed images
     $(config.selectors.results_search_form).submit(function(event) {
