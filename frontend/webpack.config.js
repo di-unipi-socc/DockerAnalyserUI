@@ -5,8 +5,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
   mode: 'development',
   entry: {
-    editor: './src/editor/index.js',
-    results: './src/results/index.js'
+    app: './src/index.js',
   },
   devtool: 'inline-source-map',
   devServer: {
@@ -37,10 +36,14 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new webpack.NamedModulesPlugin(),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    })    
   ],
   output: {
-    filename: '[name].bundle.js',
+    filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist')
   },
 };
