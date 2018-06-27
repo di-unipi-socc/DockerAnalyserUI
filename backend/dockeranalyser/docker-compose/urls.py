@@ -6,5 +6,6 @@ urlpatterns = [
     path('config', views.config, name='config'),
     path('up', views.up, name='up'),
     path('stop', views.stop, name='stop'),
+    path('logs', views.logs, name='logs'),
     path('status', views.status, name='status'),
 ]

@@ -4,16 +4,32 @@ from compose.cli.command  import project_from_options
 
 from os import path
 import json
+import io
 
 from operator import attrgetter
 
-class MyCompose():
+def singleton(theClass):
+    """ decorator for a class to make a singleton out of it """
+    classInstances = {}
+
+    def getInstance(*args, **kwargs):
+        """ creating or just return the one and only class instance.
+            The singleton depends on the parameters used in __init__ """
+        key = (theClass, args, str(kwargs))
+        if key not in classInstances:
+            classInstances[key] = theClass(*args, **kwargs)
+        return classInstances[key]
+
+    return getInstance
+
+@singleton
+class MyCompose:
 
     def __init__(self, project_name, project_dir='.',file_compose='docker-compose.json'):
         self._name = project_name
         self.file = file_compose
         self.project_dir = project_dir
-        print("rreading file: {}".format(self.get_compose_file()))
+        print("Reading file: {}".format(self.get_compose_file()))
         self._project = self._get_project(project_dir, project_name=self._name)
         self.compose = TopLevelCommand(self._project, project_dir=project_dir)
 
@@ -45,21 +61,21 @@ class MyCompose():
         services = services if services else self.get_service_names()
         scale = scale if scale else []
         options = {
+            'SERVICE':services,
             '--no-deps':False,
             '--always-recreate-deps':False,
             '--abort-on-container-exit':None,
-            'SERVICE':services,
             '--remove-orphans':False,
             '--detach':True,
             '--no-start':False,
-            '--no-recreate':True,
-            '--force-recreate':False,
+            '--no-recreate':False,
+            '--force-recreate':True,
             '--no-build':False,
             '--build':False,
-            '--scale': [] # 'crawler=2'
+            '--scale': scale # ['crawler=2']
         }
-        print(self.compose.up(options))
-        return "UP services: {}, scale {}".format(services,scale)
+        self.compose.up(options)
+        return (services,scale)
 
 
     def run(self,service_name='crawler', command='crawl', args=['--fp=100', '--min-pulls=10','--min-stars=20', '--policy=pulls_first']):
@@ -87,18 +103,50 @@ class MyCompose():
             self._project.containers(service_names=self.get_service_names(), stopped=True) +
             self._project.containers(service_names=self.get_service_names(), one_off=OneOffFilter.only),
             key=attrgetter('name'))
-
+        running_containers = self._project.containers(service_names=self.get_service_names(), stopped=True)
         items = [{
             'name': container.name,
+            'service': container.service,
             'name_without_project': container.name_without_project,
             'command': container.human_readable_command,
             'state': container.human_readable_state,
+            #'health': container.human_readable_health_status,
             # 'labels': container.labels,
-            'ports': container.ports,
+            'ports': container.human_readable_ports,
             # 'volumes': get_volumes(get_container_from_id(project.client, container.id)),
+            'log': container.log_config,
             'is_running': container.is_running} for container in running_containers]
 
         return items
+
+
+    def logs(self, services=None):
+        # services logs
+        # options =  {'SERVICE': services if services else self.get_service_names(),
+        #             "--no-color":True, "--follow":True,"--timestamps":False, "--tail":'20'}
+        # f = io.StringIO()
+        # with redirect_stdout(f):
+        #     self.compose.logs(options)
+        # s = f.getvalue()
+        # print(s)
+        # import io
+        # from contextlib import redirect_stdout
+        # f = io.StringIO()
+        # with redirect_stdout(f):
+        #     self.compose.logs(options)
+        # out = f.getvalue()
+        # return out # captured output wrapped in a string
+        services_logs = []
+        containers = self._project.containers(service_names=services if services else self.get_service_names(), stopped=True)
+        for container in containers:
+            logs = dict()
+            logs['name'] = container.name
+            logs['service'] = container.service
+            logs['log'] = container.logs().decode("utf-8")
+            services_logs.append(logs)
+        print(logs)
+        return services_logs
+                
 
     def _get_project(self, path, project_name=None):
         """
