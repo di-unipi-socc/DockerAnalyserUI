@@ -1,9 +1,10 @@
 import * as config from './config'
 import * as utilities from './utilities'
-import * as model from './model'
+import * as model from '../common/model'
+import * as vutils from '../common/viewutils'
+import * as modal from '../common/modals'
 import * as view from './view'
 import * as editor from './editor'
-var $ = require("jquery");
 
 var module_basename = "requirements";
 var items = {};  // {"pika": "2.0.5"}
@@ -13,24 +14,24 @@ var actions = [{
         title: "Search Dependencies",
         icon: "search",
         style: "info",
-        modal: "#requirements_modal",
+        modal: config.selectors.req_modal_id,
         action: null,
     }, {
         name: "upload",
         title: "Upload Dependencies File",
         icon: "upload",
         style: "info",
-        modal: "#uploads_modal",
+        modal: config.selectors.uploads_modal,
         action: function() {
-            $(config.selectors.upload_form_id).show();
-            $(config.selectors.upload_package_id).hide();
+            $("#"+config.selectors.upload_form).show();
+            $("#"+config.selectors.upload_package_form).hide();
         },
     }, {
         name: "preview",
         title: "Preview requirements.txt",
         icon: "file-alt",
         style: "info",
-        modal: "#requirements_preview_modal",
+        modal: config.selectors.req_preview_modal,
         action: function() {
             view.requirements.preview(generate_file_content());
         },
@@ -113,7 +114,7 @@ var get_versions = function(libname, callback) {
             if (callback)
                 callback(results);
         }).fail(function() {
-            // Error? 
+            modal.error(config.selectors.req_modal_id, config.msgs.error_generic);
         });
 };
 
@@ -124,6 +125,7 @@ var replace_versions = function(libname, last_version, in_list, callback) {
 };
 
 var search = function(name) {
+    modal.clear_errors(config.selectors.req_modal_id);
     $.getJSON(config.urls.requirements, {"name": name})
         .done(function(data) {
             if (data.results.length > 0) {
@@ -145,11 +147,13 @@ var search = function(name) {
                 });
                 view.requirements.show_modal();
             } else {
-                view.show_error(config.msgs.error_no_results);
+                //view.show_error(config.msgs.error_no_results);
+                modal.error(config.selectors.req_modal_id, config.msgs.error_no_results);
             }
         })
         .fail(function() {
-            view.show_error(config.msgs.error_generic);
+            //view.show_error(config.msgs.error_generic);
+            modal.error(config.selectors.req_modal_id, config.msgs.error_generic);
         });
 };
 
@@ -172,11 +176,13 @@ var from_file = function(content) {
             });
             if (errors.length > 0) {
                 let full_error_msg = config.msgs.error_req_not_found + errors.join();
-                view.show_error(full_error_msg);
+                //view.show_error(full_error_msg);
+                modal.error(config.selectors.uploads_modal, full_error_msg);
             }
         })
         .fail(function() {
-            view.show_error(config.msgs.error_generic);
+            //view.show_error(config.msgs.error_generic);
+            modal.error(config.selectors.uploads_modal, config.msgs.error_generic); 
         });
 };
 
@@ -209,11 +215,13 @@ var reset = function() {
 };
 
 var init = function() {
-    view.setup_action_buttons(module_basename, actions);
+    view.requirements.setup_search_modal();
+    view.requirements.setup_view_modal();
+    vutils.setup_action_buttons(module_basename, actions);
 
-    $(config.selectors.req_add_form_id).submit(function(event) {
+    $("#"+config.selectors.req_add_form).submit(function(event) {
         event.preventDefault();
-        let name = $("#requirement_title").val();
+        let name = $("#"+config.selectors.req_title).val();
         if (name)
             search(name);
     });

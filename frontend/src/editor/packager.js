@@ -1,10 +1,12 @@
 import * as config from './config'
 import * as utilities from './utilities'
-import * as model from './model'
+import * as model from '../common/model'
+import * as vutils from '../common/viewutils'
 import * as view from './view'
+import * as editor from './editor'
 import * as uploader from './uploader'
 import * as requirements from './requirements'
-var $ = require("jquery");
+
 var JSZip = require("jszip");
 var FileSaver = require('file-saver');
 
@@ -14,17 +16,17 @@ var actions = [{
         title: "Upload Package",
         icon: "upload",
         style: "info",
-        modal: "#uploads_modal",
+        modal: config.selectors.uploads_modal,
         action: function() {
-            $(config.selectors.upload_form_id).hide();
-            $(config.selectors.upload_package_id).show();
+            $("#"+config.selectors.upload_form).hide();
+            $("#"+config.selectors.upload_package_form).show();
         },
     }, {
         name: "export",
         title: "Export Package",
         icon: "download",
         style: "info",
-        modal: "#export_modal",
+        modal: config.selectors.export_modal,
         action: null,
     }, {
         name: "reset",
@@ -74,11 +76,11 @@ var reset = function() {
 };
 
 /**
- * Exports all files in a .zip file.
+ * Creates a zip with all files.
  */
-var export_zip = function() {
+var create_zip = function(callback) {
     let zip = new JSZip();
-    let zip_name = config.vars.base_zip_name + utilities.normalise($(config.selectors.export_name).val());
+    let zip_name = config.vars.base_zip_name + utilities.normalise($("#"+config.selectors.export_name).val());
     let folder = zip.folder(zip_name);
     let files = model.get_items();
     let error = false;
@@ -96,8 +98,17 @@ var export_zip = function() {
     });
     validate(analysis_content, function(){
         zip.generateAsync({type: "blob"}).then(function(content) {
-            FileSaver.saveAs(content, zip_name+".zip");
+            callback(content, zip_name);
         });
+    });
+};
+
+/**
+ * Exports all files in a .zip file.
+ */
+var export_zip = function() {
+    create_zip(function(content, zip_name) {
+        FileSaver.saveAs(content, zip_name+".zip");
     });
 };
 
@@ -105,7 +116,7 @@ var export_zip = function() {
  * Resets the work area and uploads a full package provided in a .zip file.
  */
 var upload_package = function() {
-    var uploaded_files = $(config.selectors.upload_package_input_id).prop("files");  // FileList object
+    var uploaded_files = $("#"+config.selectors.upload_package_input).prop("files");  // FileList object
     var uploaded_file = uploaded_files[0];
 
     // Package validation: it must be a .zip file
@@ -150,18 +161,21 @@ var upload_package = function() {
  * Initialises the package manager.
  */
 var init = function() {
-    view.setup_action_buttons(module_basename, actions);
-    
-    $(config.selectors.export_form_id).submit(function(event) {
+    view.packager.setup_export_modal();
+    vutils.setup_action_buttons(module_basename, actions);
+
+    $("#"+config.selectors.export_form).submit(function(event) {
         event.preventDefault();
         requirements.generate_file();
         export_zip();
     });
 
-    $(config.selectors.upload_package_id).submit(function(event) {
+    $("#"+config.selectors.upload_package_form).submit(function(event) {
         event.preventDefault();
         view.confirm(config.msgs.confirm_upload_zip, upload_package, null);
     });
+
+    view.setup_confirm_modal();
 };
 
 export {

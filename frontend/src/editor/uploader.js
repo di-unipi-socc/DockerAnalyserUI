@@ -1,10 +1,11 @@
 import * as config from './config'
 import * as utilities from './utilities'
-import * as model from './model'
+import * as model from '../common/model'
 import * as view from './view'
+import * as vutils from '../common/viewutils'
+import * as modal from '../common/modals'
 import * as editor from './editor'
 import * as requirements from './requirements'
-var $ = require("jquery");
 
 var module_basename = "uploads";
 var actions = [{
@@ -12,10 +13,10 @@ var actions = [{
         title: "Upload Files",
         icon: "upload",
         style: "info",
-        modal: "#uploads_modal",
+        modal: config.selectors.uploads_modal,
         action: function() {
-            $(config.selectors.upload_form_id).show();
-            $(config.selectors.upload_package_id).hide();
+            $("#"+config.selectors.upload_form).show();
+            $("#"+config.selectors.upload_package_form).hide();
         },
     }, {
         name: "reset",
@@ -100,7 +101,7 @@ var reset = function() {
 };
 
 var upload_files = function(event) {
-    var uploaded_files = $(config.selectors.upload_input_id).prop("files");  // FileList object
+    var uploaded_files = $("#"+config.selectors.upload_input).prop("files");  // FileList object
 
     $.each(uploaded_files, function(idx, uploaded_file) {
         var file_type = uploaded_file.type;
@@ -130,9 +131,10 @@ var upload_files = function(event) {
 };
 
 var init = function() {
-    view.setup_action_buttons(module_basename, actions);
+    view.uploader.setup_upload_modal();
+    vutils.setup_action_buttons(module_basename, actions);
     
-    $(config.selectors.upload_form_id).submit(function(event) {
+    $("#"+config.selectors.upload_form).submit(function(event) {
         event.preventDefault();
         view.uploader.hide_modal();
         upload_files();

@@ -1,8 +1,7 @@
 import * as config from './config'
 import * as utilities from './utilities'
-import * as model from './model'
-
-var $ = require("jquery");
+import * as modal from '../common/modals'
+import * as forms from '../common/forms'
 
 /**
  * Shows a general error message.
@@ -16,6 +15,26 @@ var show_error = function(msg) {
     div.append(msg);
     div.append(close_button);
     $(config.selectors.error_container).append(div);
+};
+
+var setup_confirm_modal = function() {
+    let footer = $("<div />");
+    let submit = $("<button />").attr({
+        "type": "button", 
+        "class": "btn btn-primary", 
+        "id": "confirm_button", 
+        "data-dismiss": "modal"
+    }).html("Confirm");
+    let cancel = $("<button />").attr({
+        "type": "button", 
+        "class": "btn btn-secondary", 
+        "data-dismiss": "modal"
+    }).html("Cancel");
+    footer.append(submit);
+    footer.append(cancel);
+    let body = modal.setup(config.selectors.confirm_modal_id, "Confirm", null, footer, false);
+    let div = $("<div />").attr({"id": "confirm_msg"});
+    body.append(div);
 };
 
 /**
@@ -63,34 +82,6 @@ var get_button = function(icon, style) {
     return button;
 };
 
-var create_action_button = function(basename, values) {
-    let button_attributes = {
-        "type": "button",
-        "class": "btn btn-outline-"+values.style,
-        "id": basename+"_"+values.name,
-        "data-toggle": "tooltip",
-        "data-placement": "bottom",
-        "title": values.title,
-    }
-    let icon = $("<i />").attr("class", "fas fa-"+values.icon);
-    let button = $("<button />").attr(button_attributes);
-    button.append(icon);
-    if (values.modal)
-        button.click(function(){ $(values.modal).modal("show"); });
-    if (values.action)
-        button.click(function(){ values.action(); });
-    return button;
-}
-
-var setup_action_buttons = function(basename, actions) {
-    var section_selector = "#"+basename+"_actions";
-    var container = $(section_selector);
-    $.each(actions, function(idx, action) {
-        let button = create_action_button(basename, action);
-        container.append(button);
-    });
-}
-
 /**
  * Returns a string variant of the filename, removing spaces and special 
  * characters, so it can be more easily used as an ID for DOM elements.
@@ -105,7 +96,7 @@ var editor = {
     show_first_tab: function() {
         $(config.selectors.tab_container_id+" li:first-child a").tab("show");
     },
-    add_tab: function(filename) {
+    add_tab: function(filename, on_click) {
         let basename = get_basename(filename);
         let li = $("<li />").attr("class", "nav-item");
         let a_attributes = {
@@ -119,8 +110,20 @@ var editor = {
         let a = $("<a />").attr(a_attributes);
         a.html(filename);
         li.append(a);
+        //let plus = $("#-tab");
         $(config.selectors.tab_container_id).append(li);
-        a.tab("show");
+        if (on_click) {
+            a.on('click', function(event) {
+                event.preventDefault();
+                // event.relatedTarget.tab("show");
+                // e.target // newly activated tab
+                // e.relatedTarget // previous active tab
+                on_click();
+            });
+        }
+            //a.click(on_click);
+        else
+            a.tab("show");
     },
     remove_tab: function(filename) {
         let basename = get_basename(filename);
@@ -164,6 +167,15 @@ var editor = {
         this.add_tab(filename);
         return editor;
     },
+    setup_newfile_modal: function() {
+        let body = modal.setup(config.selectors.add_file_modal, "Add Empty File", config.help.add_file, null, false);
+        let form = forms.get_form(config.selectors.add_file_form, true);
+        let input = forms.get_input.text(config.selectors.add_file_name, "File Name", true);
+        let submit = forms.get_button.submit(config.selectors.add_file_form + "_button", "Add");
+        form.append(input);
+        form.append(submit);
+        body.append(form);
+    },
 };
 
 var uploader = {
@@ -195,6 +207,21 @@ var uploader = {
     hide_modal: function() {
         $(config.selectors.uploads_modal).modal("hide");
     },
+    get_upload_form: function(id, input_id, title, multi) {
+        let form = forms.get_form(id, true);
+        let input = forms.get_input.file(input_id, "Select File", true, multi);
+        let submit = forms.get_button.submit(id + "_button", title);
+        form.append(input);
+        form.append(submit);
+        return form;
+    },
+    setup_upload_modal: function() {
+        let body = modal.setup(config.selectors.uploads_modal, "Upload", null);
+        let form_file = uploader.get_upload_form(config.selectors.upload_form, config.selectors.upload_input, "Upload File", true);
+        let form_package = uploader.get_upload_form(config.selectors.upload_package_form, config.selectors.upload_package_input, "Upload Package", false);
+        body.append(form_file);
+        body.append(form_package);
+    }
 };
 
 var requirements = {
@@ -269,17 +296,46 @@ var requirements = {
         $("#"+select_name).val(version);
     },
     preview: function(lines) {
-        $(config.selectors.req_preview_div).html(lines.join("<br>"));
+        $("#"+config.selectors.req_preview_div).html(lines.join("<br>"));
+    },
+    setup_search_modal: function() {
+        let body = modal.setup(config.selectors.req_modal_id, "Search Python Dependencies", null, null, true);
+        let form = forms.get_form(config.selectors.req_add_form, true);
+        let input = forms.get_input.text(config.selectors.req_title, "Package Name", true);
+        let submit = forms.get_button.submit(config.selectors.req_add_form + "_button", "Search");
+        let table = $("<submit />").attr({"id": "requirements_search_results"});
+        form.append(input);
+        form.append(submit);
+        body.append(form);
+        body.append(table);
+    },
+    setup_view_modal: function() {
+        let body = modal.setup(config.selectors.req_preview_modal, "requirements.txt", null);
+        let div = $("<div />").attr({"id": config.selectors.req_preview_div});
+        body.append(div);
     }
 };
 
+var packager = {
+    setup_export_modal: function() {
+        let body = modal.setup(config.selectors.export_modal, "Export", null, null, false);
+        let form = forms.get_form(config.selectors.export_form, true);
+        let input = forms.get_input.text(config.selectors.export_name, "Analyser Name", true);
+        let submit = forms.get_button.submit(config.selectors.export_form + "_button", "Export");
+        form.append(input);
+        form.append(submit);
+        body.append(form);
+    },
+}
+
 export {
     show_error,
+    setup_confirm_modal,
     confirm,
     get_text_button,
     get_button,
-    setup_action_buttons,
     editor,
     requirements,
     uploader,
+    packager
 };

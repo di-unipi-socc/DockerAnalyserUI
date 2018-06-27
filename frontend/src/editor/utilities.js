@@ -18,7 +18,7 @@ export function normalise(str) {
  */
 export function identify_language(file_type) {
     if (config.languages.hasOwnProperty(file_type))
-        return config.languages[file_type];
+        return config.languages[file_type].value;
     return "plain_text";
 }
 
