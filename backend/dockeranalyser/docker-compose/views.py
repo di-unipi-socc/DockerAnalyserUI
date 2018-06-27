@@ -17,8 +17,9 @@ PATH_TOSAVE_DEPLOY_PACKAGE="/home/dido/code/DockerAnalyserUI/DockerAnalyser/data
 
 @csrf_exempt
 def build(request):
-    # /build
+    # POST /build
     # BODY: 
+    #    deploy-package : DEPLOY-PACKAGE.zip   
     #    name: <NAME>  # nome dell'analizzatore 
     if request.method == 'POST':
         uploaded_file = request.FILES['deploy-package']
@@ -43,8 +44,8 @@ def build(request):
                                 })
 
 def up(request):
-    # /up?service=<X>&scale=<NUM>
-    # /up?scanner=100&crawler=2
+    # GET /up?service=<X>&scale=<NUM>
+    # GET /up?scanner=100&crawler=2
     service = request.GET.get('service')
     scale = request.GET.get('scale')
     ##print(request.GET)
@@ -58,7 +59,7 @@ def up(request):
 
 
 def config(request): #self, service, command, args):
-    # POST
+    # POST /config
     # body:
     #     {
     #               "service": "crawler",  
