@@ -91,16 +91,18 @@ class MyCompose:
         self.compose.stop({'SERVICE':self.get_service_names()})
         return  self.get_service_names()
 
-    def ps(self):
+    def ps(self, services=None):
         """
         containers status
         """
         # running_containers = self._project.containers(stopped=False)
-        running_containers =   sorted(
-            self._project.containers(service_names=self.get_service_names(), stopped=True) +
-            self._project.containers(service_names=self.get_service_names(), one_off=OneOffFilter.only),
-            key=attrgetter('name'))
-        running_containers = self._project.containers(service_names=self.get_service_names(), stopped=True)
+        services_name = [services] if services else self.get_service_names()
+        running_containers =self._project.containers(service_names=services_name, stopped=True)
+        #sorted(
+            # self._project.cosntainers(service_names=self.get_service_names(), stopped=True)
+            #self._project.containers(service_names=self.get_service_names(), one_off=OneOffFilter.only),
+            # key=attrgetter('name'))
+        # running_containers = self._project.containers(service_names=self.get_service_names(), stopped=True)
         items = [{
             'name': container.name,
             'service': container.service,

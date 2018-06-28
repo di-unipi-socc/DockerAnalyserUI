@@ -37,12 +37,10 @@ def build(request):
         if not files_extracted:
             options = "Name:{} \t Bytes:{} \t Content-type:{}".format(uploaded_file.name, uploaded_file.size, uploaded_file.content_type)
             return JsonResponse({"err":1, "msg":"{} :uploaded zip file is empty".format(uploaded_file.name), "detatil":options})
-
         mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR)
         try:
             res = mycompose.build_scanner(scanner_name="scanner",
                                       path_deploypackage="/data/examples/{}".format(folder_name_deploy_package))
-            print(files_extracted)
             msg = utils.success_msg("{} DockerAnalyser built succesfuly. Selected deploy package: {}"
                                     .format(mycompose.get_name(), uploaded_file.name),files_extracted)
             return JsonResponse(msg)
@@ -129,7 +127,7 @@ def config(request):
                 mycompose.config_command(service,command, args)
                 return JsonResponse({"err":0,
                                     "msg":"{} configured succesfully".format(service),
-                                    "detail": "command: {} args: {}".format(command, args)})
+                                    "detail": "{}".format(command, args)})
             except Exception as e:
                 return JsonResponse({"err":1,"msg": traceback.format_exc()})
     if request.method == 'GET':
@@ -139,17 +137,18 @@ def config(request):
         return JsonResponse(
                     utils.success_msg(
                             "{} configuration options".format(service if service else "All the services"),
-                            res)
-                            )
+                            res))
 
 def logs(request):
     # GET /logs?service=<SERVICE_NAME>
+    mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR)
     service = request.GET.get('service')
     res = mycompose.logs(services=[service] if service else None)
     return JsonResponse({"err":0,"msg":"Logs of services", "services": res})
 
 def stop(request):
     # GET /stop
+    mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR)
     try:
         services = mycompose.stop() # service_names=["scanner"]
         return JsonResponse({"err": 0, "msg":"stop {} services".format(services)})
@@ -158,8 +157,10 @@ def stop(request):
 
 def status(request):
     # GET /status
+    service = request.GET.get('service')
+    mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR)
     try:
-        services = mycompose.ps()
+        services = mycompose.ps(services=service)
         return JsonResponse({"err":0, "msg": "status of the services", "services":services, "num":len(services)}, safe=False)
     except Exception as e:
         return JsonResponse({"err":1,"msg": traceback.format_exc()})
