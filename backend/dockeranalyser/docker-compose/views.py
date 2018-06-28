@@ -103,6 +103,8 @@ def config(request):
     #             "only-official": false
     #         }
     #     }
+    mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR) #file_compose="docker-analyser.json"
+
     if request.method == 'POST':
         if request.body:
             body = json.loads(request.body)
@@ -130,11 +132,15 @@ def config(request):
                                     "detail": "command: {} args: {}".format(command, args)})
             except Exception as e:
                 return JsonResponse({"err":1,"msg": traceback.format_exc()})
-
-
-# def run(request):
-#     mycompose.run()
-#     return JsonResponse({"Run":"ok"})
+    if request.method == 'GET':
+        # GET  /config?service=<NAME>
+        service = request.GET.get('service')
+        res = mycompose.get_config(service if service else None, key="command")
+        return JsonResponse(
+                    utils.success_msg(
+                            "{} configuration options".format(service if service else "All the services"),
+                            res)
+                            )
 
 def logs(request):
     # GET /logs?service=<SERVICE_NAME>

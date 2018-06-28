@@ -118,21 +118,6 @@ class MyCompose:
 
 
     def logs(self, services=None):
-        # services logs
-        # options =  {'SERVICE': services if services else self.get_service_names(),
-        #             "--no-color":True, "--follow":True,"--timestamps":False, "--tail":'20'}
-        # f = io.StringIO()
-        # with redirect_stdout(f):
-        #     self.compose.logs(options)
-        # s = f.getvalue()
-        # print(s)
-        # import io
-        # from contextlib import redirect_stdout
-        # f = io.StringIO()
-        # with redirect_stdout(f):
-        #     self.compose.logs(options)
-        # out = f.getvalue()
-        # return out # captured output wrapped in a string
         services_logs = []
         containers = self._project.containers(service_names=services if services else self.get_service_names(), stopped=True)
         for container in containers:
@@ -161,6 +146,15 @@ class MyCompose:
         }
         project = project_from_options(path, options)
         return project
+
+    def get_config(self, service=None, key='command'):
+        with open(self.get_compose_file(), 'r+') as file_compose:
+            data = json.load(file_compose)
+        if (service):
+            return  data['services'][service][key] # list ['command','args=value', 'arg2=value2']
+        else:
+            return data['services']
+
 
     def config_command(self, service, command=None, args=None):
         try :
