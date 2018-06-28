@@ -16,13 +16,12 @@ PROJECT_NAME="docker-analyser"
 
 mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR) #file_compose="docker-analyser.json"
 
-
 @csrf_exempt
 def build(request):
     # POST /build
     # BODY: 
     #    deploy-package : DEPLOY-PACKAGE.zip   
-    #    name: <NAME>  # nome dell'analizzatore 
+    #    name: <NAME>     # nome dell'analizzatore 
     if request.method == 'POST':
         #print(json.loads(request.body))
         uploaded_file = request.FILES['deploy-package']
