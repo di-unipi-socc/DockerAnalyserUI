@@ -1,6 +1,6 @@
 var form_fields = [{
     "name": "crawler",
-    "title": "Crawler",
+    "title": "Crawler Configuration",
     "items": [
         {
             "name": "si",
@@ -20,19 +20,6 @@ var form_fields = [{
             "help": "Consider pages like having this size",
             "type": "number",
             "default": 100
-        }, {
-            "name": "random",
-            "label": "Method",
-            "help": "Crawl images randomly or sequentially",
-            "type": "radio",
-            "default": "False",
-            "values": [{
-                "value": "False", 
-                "label": "Random"
-            }, {
-                "value": "True",
-                "label": "Sequential"
-            }]
         }, {
             "name": "policy",
             "label": "Policy",
@@ -59,6 +46,12 @@ var form_fields = [{
             "type": "number",
             "default": 0
         }, {
+            "name": "random",
+            "label": "Random",
+            "help": "Crawl images randomly instead of sequentially",
+            "type": "checkbox",
+            "default": false
+        }, {
             "name": "only-official",  // Valid if set
             "label": "Only Official",
             "help": "Crawl only the official images",
@@ -71,9 +64,10 @@ var form_fields = [{
             "type": "checkbox",
             "default": false
         }, 
-    ]}, {
+    ]}, 
+    /*{
     "name": "scanner",
-    "title": "Scanner",
+    "title": "Scanner Configuration",
     "items": [
         {
             "name": "replicas",
@@ -82,7 +76,7 @@ var form_fields = [{
             "type": "number",
             "default": 5
         }
-    ]},
+    ]}, */
 ]
 
 var selectors = {

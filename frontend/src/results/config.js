@@ -7,6 +7,7 @@ var vars = {
     concurrent_calls: 10,
     max_chart_groups: 5,
     not_acceped_fields: [null, undefined, "undefined", "null", "array", "date_string"],
+    step: 2,
 };
 
 var selectors = {
@@ -22,10 +23,8 @@ var selectors = {
     custom_search_form: "#custom_search",
     custom_search_form_select: "#custom_search_select",
     custom_search_form_subfield: "#custom_search_subfield",
-    custom_search_form_all: "#custom_search_all",
     custom_search_form_free: "#custom_search_free",
     custom_search_form_free_input: "#add_custom_input",
-    custom_search_form_clear: "#custom_search_clear",
     results_search_form: "#results_search",
     add_chart_form: "#add_chart",
     export_menu: ".export-dropdown-menu",
@@ -33,6 +32,11 @@ var selectors = {
     confirm_modal_id: "#confirm_modal",
     confirm_msg_id: "#confirm_msg",
     confirm_button_id: "#confirm_button",
+    scale_modal: "#scale_modal",
+    scale_form: "scale_form",
+    scale_amount: "scale_amount",
+    sample_image_modal: "#sample_image_modal",
+    sample_image_div: "sample_image_container"
 };
 
 /*var selectors = {
@@ -77,8 +81,10 @@ var urls = {
     search: "http://neri.di.unipi.it:4000/search/",  // https://github.com/di-unipi-socc/DockerAnalyser/blob/master/storage/README.md
     compose: {
         build: "http://127.0.0.1:8000/compose/build", 
+        config: "http://127.0.0.1:8000/compose/config",
         up: "http://127.0.0.1:8000/compose/up",
-        stop: "http://127.0.0.1:8000/compose/stop"
+        stop: "http://127.0.0.1:8000/compose/stop",
+        stats: "http://127.0.0.1:8000/compose/stats"
     }
 };
 

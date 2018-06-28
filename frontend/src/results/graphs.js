@@ -1,5 +1,6 @@
 import * as config from './config'
 import * as utilities from './utilities'
+import * as vutils from '../common/viewutils'
 import * as model from '../common/model'
 import * as view from './view'
 import * as api from './api'
@@ -54,6 +55,7 @@ var show_graph = function(type, attribute, approx) {
         let card = view.results.get_chart_card(id, type, attribute, approx);
         $("#graph_container").append(card);
         view.charts.chart(type, "#"+id, output, attribute, approx);
+        vutils.fix_height(config.vars.step);
     });
 };
 

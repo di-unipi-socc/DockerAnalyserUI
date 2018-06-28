@@ -38,7 +38,10 @@ var create_action_button = function(basename, values) {
         "data-placement": "bottom",
         "title": values.title,
     }
-    let icon = $("<i />").attr("class", "fas fa-"+values.icon);
+    let base_class = values.base_class;
+    if (!base_class)
+        base_class = "fas";  // solid
+    let icon = $("<i />").attr("class", base_class + " fa-" + values.icon);
     let button = $("<button />").attr(button_attributes);
     button.append(icon);
     if (values.modal)
@@ -57,9 +60,20 @@ var setup_action_buttons = function(basename, actions) {
     });
 }
 
+var fix_height = function(idx) {
+    let main = $('#smartwizard');
+    let nav = main.children('ul');
+    let steps = $("li > a", nav);
+    let container = $('#smartwizard_container');
+    let page = $(steps.eq(idx).attr("href"), main);
+    let height = page.outerHeight();
+    container.finish().animate({ minHeight: height }, 400, function(){});
+}
+
 export {
     generate_error,
     get_close_button,
     get_help_icon,
-    setup_action_buttons
+    setup_action_buttons, 
+    fix_height
 }
