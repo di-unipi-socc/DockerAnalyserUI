@@ -25,3 +25,6 @@ def get_project(path, project_name=None):
     }
     project = project_from_options(path, options)
     return project
+
+def success_msg(msg, detail):
+    return {"err":0,"msg":msg, "detail": "{}".format(detail)}

@@ -43,17 +43,14 @@ class MyCompose:
         return self._project.service_names
 
     def build_scanner(self, scanner_name='scanner', path_deploypackage='/data/examples/deploy-package-dockerfinder'):
-        try:
-            print("building....")
-            self.compose.build({'SERVICE':[scanner_name],
-                        '--build-arg': {
-                                "DEPLOY_PACKAGE_PATH": path_deploypackage
-                                },
-                        '--memory':'1GB'})
-            print("finieshed building")
-            return True
-        except compose.service.BuildError as err:
-             return False
+        print("Building the scanner....")
+        self.compose.build({'SERVICE':[scanner_name],
+                    '--build-arg': {
+                            "DEPLOY_PACKAGE_PATH": path_deploypackage
+                            },
+                    '--memory':'1GB'})
+        print("Finished building")
+
 
     def up(self, services=None, scale=None):
         # scale = ['crawler=2']
@@ -144,9 +141,8 @@ class MyCompose:
             logs['service'] = container.service
             logs['log'] = container.logs().decode("utf-8")
             services_logs.append(logs)
-        print(logs)
         return services_logs
-                
+
 
     def _get_project(self, path, project_name=None):
         """
@@ -180,5 +176,5 @@ class MyCompose:
             return True
         except:
             return False
-    
+
     # def config_replicas(self, service, num):

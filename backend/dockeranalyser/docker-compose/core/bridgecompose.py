@@ -163,18 +163,4 @@ if __name__ == "__main__":
     #                  "--use-aliases":None,
     #                 '--entrypoint':None})
     # topcommand.stop({'SERVICS':'scanner'})
-    options ={
-        '--no-deps':False,
-        '--always-recreate-deps':False,
-        '--abort-on-container-exit':None,
-        'SERVICE':['crawler','rabbitmq'],
-        '--remove-orphans':False,
-        '--detach':True,
-        '--no-start':False,
-        '--no-recreate':True,
-        '--force-recreate':False,
-        '--no-build':False,
-        '--build':False,
-        '--scale': ['crawler=2']
-    }
-    topcommand.up(options)
+    m ''
