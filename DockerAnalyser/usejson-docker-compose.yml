@@ -40,7 +40,7 @@ services:
   scanner:
     image: diunipisocc/docker-finder:scanner
     build:
-      context: .
+      context: ../
       dockerfile: analysis/Dockerfile_scanner
       args:
         DEPLOY_PACKAGE_PATH:

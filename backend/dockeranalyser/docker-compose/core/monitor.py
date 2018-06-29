@@ -2,6 +2,7 @@ import pika
 import requests
 from six import print_
 
+
 def count_queue_msg(service="127.0.0.1", queue="images"):
     url = "amqp://guest:guest@"+service+":5672"
     #print("connecting to : " +url)
@@ -9,12 +10,12 @@ def count_queue_msg(service="127.0.0.1", queue="images"):
     # Open the channel
     channel = connection.channel()
     # Declare the queue
-    queue =  channel.queue_declare(queue=queue,
-                    passive=True,
-                    durable=True,
-                    exclusive=False,
-                    auto_delete=False
-                    )
+    queue = channel.queue_declare(queue=queue,
+                                  passive=True,
+                                  durable=True,
+                                  exclusive=False,
+                                  auto_delete=False
+                                  )
 
     connection.close()
     c = queue.method.message_count
@@ -29,12 +30,14 @@ def count_analysed_images():
         if res.status_code == requests.codes.ok:
             return res.json()['count']
         else:
-            self.logger.error(str(res.status_code) + " Error code. " + res.text)
+            self.logger.error(str(res.status_code) +
+                              " Error code. " + res.text)
     except requests.exceptions.ConnectionError as e:
         logger.exception("ConnectionError: ")
     except:
         logger.exception("Unexpected error:")
         raise
+
 
 def get_images():
     """Get all the images descriptions."""
