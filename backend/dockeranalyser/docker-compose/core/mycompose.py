@@ -4,7 +4,9 @@ from compose.cli.command import project_from_options
 
 from os import path
 import json
+import yaml
 import io
+#import yaml
 
 from operator import attrgetter
 
@@ -27,7 +29,7 @@ def singleton(theClass):
 @singleton
 class MyCompose:
 
-    def __init__(self, project_name, project_dir='.', file_compose='docker-compose.json'):
+    def __init__(self, project_name, project_dir='.', file_compose='docker-compose.yml'):
         self._name = project_name
         self.file = file_compose
         self.project_dir = project_dir
@@ -153,7 +155,7 @@ class MyCompose:
 
     def get_config(self, service=None, key='command'):
         with open(self.get_compose_file(), 'r+') as file_compose:
-            data = json.load(file_compose)
+            data = yaml.load(file_compose)
         if (service):
             # list ['command','args=value', 'arg2=value2']
             return data['services'][service][key]
@@ -163,7 +165,7 @@ class MyCompose:
     def config_command(self, service, command=None, args=None):
         try:
             with open(self.get_compose_file(), 'r+') as file_compose:
-                data = json.load(file_compose)
+                data = yaml.load(file_compose)
                 # list ['command','args=value', 'arg2=value2']
                 actual_command_args = data['services'][service]['command']
                 actual_command = actual_command_args[0]
@@ -171,7 +173,7 @@ class MyCompose:
                 data['services'][service]['command'] = [
                     command if command else actual_command] + (args if args else actual_args)
                 file_compose.seek(0)  # rewind
-                json.dump(data, file_compose, indent=4)
+                yaml.dump(data, file_compose, indent=4)
                 file_compose.truncate()
             return True
         except:
