@@ -36,13 +36,12 @@ def upload(request):
         # POST /upload:
         #    deploy-package : DEPLOY-PACKAGE.zip
         if key not in request.FILES:
-            options = "Name:{} \t Bytes:{} \t Content-type:{}".format(
-                uploaded_file.name, uploaded_file.size, uploaded_file.content_type)
-            return JsonResponse({"err": 0, "msg": "NO {} key set into body request".format(key), "detail": options})
+            return JsonResponse({"err": 0, "msg": "NO {} key set into body request".format(key),"detail":"Specify the key POST body"})
         uploaded_file = request.FILES[key]  # deploy-pacakge: .zip fi
-        _delete_all_zip_files()
-        store_zip_file(uploaded_file)
-        name_deploy_package, files_extracted = extract_zip_file(uploaded_file,path=settings.DOCKER_ANALYSER_PATH_DEPLOY_PACKAGE)
+        _delete_all_files()
+        # store_zip_file(uploaded_file)
+        name_deploy_package, files_extracted = extract_zip_file(uploaded_file,path=settings.MEDIA_ROOT)
+        print(name_deploy_package, files_extracted)
         if not files_extracted:
             options = "Name:{} \t Bytes:{} \t Content-type:{}".format(
                 uploaded_file.name, uploaded_file.size, uploaded_file.content_type)
@@ -56,13 +55,12 @@ def upload(request):
         If the latest is missing, it resturn the zip file containing the default
         deploy package.
         """
-        if exist_zip_file():
-            path_to_zip = get_path_zip_file()
-        else:  # return the defualt deploy-package present into DockerAnalyser
-            file_path = os.path.join(
+        # default deploy-package path
+        file_path = os.path.join(
                 settings.DOCKER_ANALYSER_EXAMPLES, settings.DOCKER_ANALYSER_DEPLOY_PACKAGE_DEFAULT)
-            path_to_zip = make_archive(file_path, "zip", file_path)
-
+        if exist_folder(path=settings.MEDIA_ROOT):
+            file_path = os.path.join(settings.MEDIA_ROOT,get_deploy_packge_name())
+        path_to_zip = make_archive(file_path, "zip", file_path)
         with open(path_to_zip, 'rb') as file_zip:
             print("Open file zip {}".format(file_zip.name))
             response = HttpResponse(FileWrapper(
@@ -77,19 +75,20 @@ def build(request):
     if request.method == 'GET':
         try:
             # TODO: path to deploy package is relative to the build context of DockerAnalyserfolder
-            res = mycompose.build_scanner(scanner_name="scanner",path_deploypackage="/data/examples/{}".format(name_deploy_package))
-            msg = utils.success_msg("{} DockerAnalyser built succesfuly. Selected deploy package: {}"
-                                    .format(mycompose.get_name(), uploaded_file.name), files_extracted)
+            # /home/dido/code/DockerAnalyserUI/DockerAnalyser/backend/dockeranalyser/media/default-deploy-package
+
+            res = mycompose.build_scanner(scanner_name="scanner",path_deploypackage=settings.MEDIA_REL_PATH)
+            msg = utils.success_msg("{} DockerAnalyser built succesfuly. Selected deploy package:","pero")
             return JsonResponse(msg)
         except compose.service.BuildError as err:
             return JsonResponse({"err": 1,
-                                 "msg": "{} DockerAnalyser not built. Error occurs when building with {}".format(mycompose.get_name(), uploaded_file.name),
+                                 "msg": "DockerAnalyser not built. Error occurs when building with",
                                  "detail": str(err)
                                  })
         except Exception as e:
             return JsonResponse({"err": 1, "msg": traceback.format_exc()})
 
-    
+
 
 def up(request):
     # GET /up?service=<SERVICE_NAME>&scale=<NUM>
@@ -197,35 +196,43 @@ def status(request):
         return JsonResponse({"err": 1, "msg": traceback.format_exc()})
 
 
-def get_path_zip_file(path=settings.MEDIA_ROOT):
+def exist_folder(path=settings.MEDIA_ROOT):
     fs = FileSystemStorage()
     directories, files = fs.listdir(path)
-    return fs.path(files[0])
+    print("Directories {} Files: {}".format(directories, files))
+    return len(directories) > 0
 
 
-def exist_zip_file(path=settings.MEDIA_ROOT):
-    fs = FileSystemStorage()
-    directories, files = fs.listdir(path)
-    return len(files) > 0
-
-
-def _delete_all_zip_files(path=settings.MEDIA_ROOT):
+def _delete_all_files(path=settings.MEDIA_ROOT):
     # delete all the zip files stored into the path
     fs = FileSystemStorage()
     directories, files = fs.listdir(path)
     for file in files:
+        print("deleted file")
         fs.delete(file)
+    for dir in directories:
+        print("deleted diectories")
+        fs.delete(directories)
+
+def get_deploy_packge_name(path=settings.MEDIA_ROOT):
+    fs = FileSystemStorage()
+    directories, files = fs.listdir(path)
+    return directories[0]
 
 def store_zip_file(file, path=settings.MEDIA_ROOT):
     # write the .zip file into /Media directory
+    print("Store zip file into {}".format(path))
     fs = FileSystemStorage()
     filename = fs.save(file.name, file)
 
-def extract_zip_file(file, path=settings.MEDIA_ROOT): 
+def extract_zip_file(file, path=settings.MEDIA_ROOT):
     # extract the files into path
+    print("Extracting zip file into {}".format(path))
+    print(file.name)
     filenames_extracted = []
     with zipfile.ZipFile(file, "r") as zip_ref:
         zip_ref.printdir()
         zip_ref.extractall(path)
         filenames_extracted = [zip.filename for zip in zip_ref.infolist()]
+    print(filenames_extracted)
     return filenames_extracted[0], filenames_extracted[1:]

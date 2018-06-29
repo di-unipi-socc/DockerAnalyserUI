@@ -127,9 +127,10 @@ STATIC_URL = '/static/'
 # Path where to save media file and deploy-package as .zip
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_REL_PATH = "/backend/dockeranalyser/media"
 
 # DockerAnalyser 
-DOCKER_ANALYSER_DIR = os.path.join(BASE_DIR, "../../DockerAnalyser")
+DOCKER_ANALYSER_DIR = os.path.join(BASE_DIR, "../../")
 DOCKER_ANALYSER_EXAMPLES = os.path.join(DOCKER_ANALYSER_DIR,"data/examples/")
 DOCKER_ANALYSER_DEPLOY_PACKAGE_DEFAULT = "default-deploy-package"
 # path to save the deploy package extracted
