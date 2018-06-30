@@ -2,6 +2,7 @@ import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
 import * as vutils from '../common/viewutils'
+import * as modal from '../common/modals'
 import * as view from './view'
 import * as editor from './editor'
 import * as uploader from './uploader'
@@ -55,14 +56,14 @@ var validate = function(content, callback) {
             var errors = data.errors;
             if (errors.length > 0) {
                 let full_error_msg = errors.join("<br>");
-                view.show_error(config.msgs.error_validation);
-                view.show_error(full_error_msg);
+                errors.push(full_error_msg);
+                modal.error(config.selectors.export_modal, config.msgs.error_validation);
             } else {
                 callback();
             }
         })
         .fail(function() {
-            view.show_error(config.msgs.error_generic);
+            modal.error(config.selectors.export_modal, config.msgs.error_server);
         });
 };
 
@@ -122,7 +123,7 @@ var upload_package = function() {
     // Package validation: it must be a .zip file
     var zip_type = uploaded_file.type;
     if (zip_type != "application/zip") {
-        view.show_error(config.msgs.error_wrong_type);
+        moda.error(config.selectors.uploads_modal, config.msgs.error_wrong_type);
         return;
     }
     var zipname = uploaded_file.name; 

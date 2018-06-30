@@ -198,12 +198,12 @@ var generate_file_content = function() {
 
 var generate_file = function() {
     var keys = Object.keys(items);
-    if (keys.length == 0)
-        return;
+    /*if (keys.length == 0)
+        return;*/
     let content = generate_file_content().join("\n");
     let req = config.req_file;
     model.add_item(req.name, req.type, content, false, true);
-    editor.add_item(req.name, req.type, content);
+    //editor.add_item(req.name, req.type, content);
 };
 
 var reset = function() {

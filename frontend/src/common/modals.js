@@ -63,7 +63,7 @@ var hide = function(id) {
 
 var error = function(id, msg) {
     let error = vutils.generate_error(msg);
-    modal.clear_errors(id);
+    clear_errors(id);
     $(id + " .error-container").append(error);
 };
 

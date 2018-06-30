@@ -36,7 +36,7 @@ var selectors = {
     req_preview_modal: "#requirements_preview_modal",
     export_modal: "#export_modal",
     export_name: "export_title",
-    export_form_id: "export_form",
+    export_form: "export_form",
     error_container: ".error-container",
     confirm_modal_id: "#confirm_modal",
     confirm_msg_id: "#confirm_msg",
@@ -66,6 +66,7 @@ var urls = {
 
 var msgs = {
     error_generic: "An error occurred",
+    error_server: "Unable to reach server",
     error_no_results: "No results found",
     error_file_exists: "The file already exists",
     error_wrong_type: "Wrong File Type",

@@ -33,8 +33,8 @@ var actions = [{
 var update_length = function() {
     let items = model.get_items();
     let len = 0;
-    $.each(items, function(idx, item) {
-        if (item.uploaded && item.filename != config.req_file.name && item.filename != config.analysis_file.name)
+    $.each(items, function(key, item) {
+        if (item.uploaded && key != config.req_file.name && key != config.analysis_file.name)
             len++;
     })
     $(config.selectors.uploaded_list_len).html(len);
