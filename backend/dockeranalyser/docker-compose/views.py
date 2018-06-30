@@ -26,7 +26,6 @@ PROJECT_NAME = "docker-analyser"
 
 mycompose = MyCompose(project_name=PROJECT_NAME,project_dir=settings.DOCKER_ANALYSER_DIR)
 
-
 @csrf_exempt
 def upload(request):
     key = "deploy-package"
