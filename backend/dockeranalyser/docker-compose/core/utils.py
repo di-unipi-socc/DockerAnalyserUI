@@ -28,5 +28,5 @@ def get_project(path, project_name=None):
     return project
 
 
-def success_msg(msg, detail):
+def success_msg(msg, detail=None):
     return {"err": 0, "msg": msg, "detail": "{}".format(detail)}

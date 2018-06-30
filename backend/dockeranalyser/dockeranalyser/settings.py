@@ -131,9 +131,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # DockerAnalyser
 DOCKER_ANALYSER_DIR = os.path.join(BASE_DIR, "../../DockerAnalyser")
 DOCKER_ANALYSER_EXAMPLES = os.path.join(DOCKER_ANALYSER_DIR,"data/examples/")
-DOCKER_ANALYSER_DEPLOY_PACKAGE_DEFAULT = "default-deploy-package"
 # path to save the deploy package extracted
-DOCKER_ANALYSER_PATH_DEPLOY_PACKAGE = DOCKER_ANALYSER_EXAMPLES
+DOCKER_ANALYSER_PATH_DEPLOY_PACKAGE = os.path.join(DOCKER_ANALYSER_DIR,"data/media/")
+
+DOCKER_ANALYSER_DEPLOY_PACKAGE_DEFAULT = "default-deploy-package"
+# relative path from docker-compose used to build the scanner
+DOCKER_ANALYSER_RELATIVE_PATH_DEPLOY_PACKAGE = "/data/media"
 
 DEFAULT_DEPLOY_PACKAGE = "default-deploy-package"
 UPLOADED_DEPLOY_PACKAGE = "uploaded-deploy-package"

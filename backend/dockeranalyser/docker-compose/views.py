@@ -6,6 +6,7 @@ import os.path
 import compose
 from shutil import make_archive
 import shutil
+import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -63,16 +64,18 @@ def upload(request):
 
 def build(request):
     # GET  /build
+    # Build the scanner with the deploy-package uploaded.
     if request.method == 'GET':
         try:
-            # TODO: path to deploy package is relative to the build context of DockerAnalyserfolder
-            res = mycompose.build_scanner(scanner_name="scanner",path_deploypackage="/data/examples/{}".format(name_deploy_package))
+            deploy_package = get_latest_uploaded_deploy_package()
+            path = os.path.join(settings.DOCKER_ANALYSER_RELATIVE_PATH_DEPLOY_PACKAGE,deploy_package)
+            res = mycompose.build_scanner(scanner_name="scanner",path_deploypackage=path)
             msg = utils.success_msg("{} DockerAnalyser built succesfuly. Selected deploy package: {}"
-                                    .format(mycompose.get_name(), uploaded_file.name), files_extracted)
+                                    .format(mycompose.get_name(),deploy_package))
             return JsonResponse(msg)
         except compose.service.BuildError as err:
             return JsonResponse({"err": 1,
-                                 "msg": "{} DockerAnalyser not built. Error occurs when building with {}".format(mycompose.get_name(), uploaded_file.name),
+                                 "msg": "{} DockerAnalyser not built. Error occurs when building with {}".format(mycompose.get_name(), deploy_package),
                                  "detail": str(err)
                                  })
         except Exception as e:
@@ -190,9 +193,9 @@ def exist_uploaded_deploy_package():
     fs = FileSystemStorage()
     directories, files = fs.listdir(settings.MEDIA_ROOT)
     print("Directories {} Files: {}".format(directories, files))
-    return settings.UPLOADED_DEPLOY_PACKAGE in directories
+    return len(directories) > 0#ettings.UPLOADED_DEPLOY_PACKAGE in directories
 
-def extract_zip_file(file, path_folder):
+def _extract_zip_file(file, path_folder):
     filenames_extracted = []
     print("Extracting {} into {}".format(file.name,path_folder))
     with zipfile.ZipFile(file, "r") as zip_ref:
@@ -206,23 +209,37 @@ def get_zip_deploy_package():
     print("Getting deploy package")
     name_deploy_package = ""
     if exist_uploaded_deploy_package():
-        name_deploy_package = settings.UPLOADED_DEPLOY_PACKAGE
+        name_deploy_package = get_latest_uploaded_deploy_package()
     else:
         name_deploy_package = settings.DEFAULT_DEPLOY_PACKAGE
         shutil.copytree(os.path.join(settings.DOCKER_ANALYSER_EXAMPLES,settings.DEFAULT_DEPLOY_PACKAGE),
                         os.path.join(settings.MEDIA_ROOT,settings.DEFAULT_DEPLOY_PACKAGE))
-        print("Copied  default aanalser in MEDIA")
-    print(name_deploy_package)
+        shutil.copytree(os.path.join(settings.DOCKER_ANALYSER_EXAMPLES,settings.DEFAULT_DEPLOY_PACKAGE),
+                        os.path.join(settings.DOCKER_ANALYSER_PATH_DEPLOY_PACKAGE,settings.DEFAULT_DEPLOY_PACKAGE))
     file_path = os.path.join(settings.MEDIA_ROOT,name_deploy_package)
-    print(file_path)
     path_to_zip = make_archive(file_path, "zip", file_path)
     return path_to_zip
 
+def get_deploy_packages_name():
+    fs = FileSystemStorage()
+    directories, files = fs.listdir(settings.MEDIA_ROOT)
+    dir_creation_time = [(fs.get_created_time(directory),directory) for directory in directories]
+    dir_creation_time.sort(key=lambda tup: tup[0], reverse=True)
+    uploaded_package = [d[1] for d in dir_creation_time]
+    return uploaded_package
+
+def get_latest_uploaded_deploy_package():
+    dp = get_deploy_packages_name()
+    return dp[0]
 
 def handle_uploaded_deploy_package(uploaded_file):
-    path = os.path.join(settings.DOCKER_ANALYSER_PATH_DEPLOY_PACKAGE,settings.UPLOADED_DEPLOY_PACKAGE)
-    files_extracted = extract_zip_file(uploaded_file,path_folder=path)
+    date_upload = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    # copy to /data/examples in DockerAnalyser
+    # TODO: remove this copy when UI is inserted into DockerAnalyser because
+    # the scanner will be built by looking in the media folder directly.
+    path = os.path.join(settings.DOCKER_ANALYSER_PATH_DEPLOY_PACKAGE) #,date_upload+settings.UPLOADED_DEPLOY_PACKAGE)
+    files_extracted = _extract_zip_file(uploaded_file,path_folder=path)
     # copy to /media
-    path_media = os.path.join(settings.MEDIA_ROOT,settings.UPLOADED_DEPLOY_PACKAGE)
-    files_extracted = extract_zip_file(uploaded_file,path_folder=path_media)
+    path_media = os.path.join(settings.MEDIA_ROOT)#,date_upload+settings.UPLOADED_DEPLOY_PACKAGE)
+    files_extracted = _extract_zip_file(uploaded_file,path_folder=path_media)
     return files_extracted

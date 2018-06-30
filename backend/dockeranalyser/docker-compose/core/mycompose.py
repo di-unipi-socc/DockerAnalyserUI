@@ -38,6 +38,11 @@ class MyCompose:
         self._project = self._get_project(project_dir, project_name=self._name)
         self.compose = TopLevelCommand(self._project, project_dir=project_dir)
 
+    def reload_project():
+        self._project = self._get_project(self.project_dir, project_name=self._name)
+        self.compose = TopLevelCommand(self._project, project_dir=self.project_dir )
+
+
     def get_compose_file(self):
         return path.join(self.project_dir, self.file)
 
@@ -175,6 +180,7 @@ class MyCompose:
                 file_compose.seek(0)  # rewind
                 yaml.dump(data, file_compose, indent=4)
                 file_compose.truncate()
+            self.reload_project()
             return True
         except:
             return False
