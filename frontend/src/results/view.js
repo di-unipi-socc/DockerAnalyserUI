@@ -44,7 +44,8 @@ var result_forms = {
     },
     get_input: function(container, type, id, name, title) {
         let is_checkbox = (type == "checkbox");
-        let is_number = (type == "number");
+        //let is_number = (type == "number");   // Deactivated until ranges search is available
+        let is_number = false;
         let input_class = "col-sm-10";
         let label_class = "col-sm-2";
         if (is_number) {
@@ -89,22 +90,24 @@ var result_forms = {
             input_type = "number";
         else if (type == "boolean")
             input_type = "checkbox";
-        if (type == "number") {
+        // Deactivated until ranges search is available
+        /*if (type == "number") {
             let cnt1 = $("<div />").attr("class", "col-6 row no-gutters");
             result_forms.get_input(cnt1, input_type, id+"_from", name, title+" from");
             let cnt2 = $("<div />").attr("class", "col-6 row no-gutters");
             result_forms.get_input(cnt2, input_type, id+"_to", name, title+" to");
             container.append(cnt1);
             container.append(cnt2);
-        } else
+        } else */
             result_forms.get_input(container, input_type, id, name, title);
         let remove_div = $("<div />").attr({"class": "col-1 text-center"});
         let remove_button = $("<input />").attr({"type": "submit", "class": "btn btn-secondary btn-sm", "value": "-"});
         remove_button.click(function(event) {
             event.preventDefault();
             row_container.remove();
-            let len = model.remove_search_attribute(name);
-            search.search_form_visibility(len);
+            let result = model.remove_search_attribute(name);
+            if (result > 0)
+                search.search_form_visibility();
         });
         remove_div.append(remove_button);
         row_container.append(container);
@@ -151,9 +154,24 @@ var results = {
         });
         return cnt;
     },
-    show_results: function(items) {
+    get_pagination: function(pages) {
+        let nav = $("<nav />").attr({"aria-label": "Search Results Navigation"});
+        let ul = $("<nav />").attr({"class": "pagination justify-content-end"});
+        let prev = $('<li class="page-item"><a class="page-link disabled" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>');
+        let next = $('<li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>');
+        ul.append(prev);
+        for (let i=1; i<=pages; i++) {
+            let li = $('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
+            ul.append(li);
+        }
+        ul.append(next);
+        nav.append(ul);
+        return nav;
+    },
+    show_results: function(items, count, pages) {
         let len = items.length;
         let title = $("<h4 />").html(len + " results found");
+        $(config.selectors.results_list_id).empty();
         $(config.selectors.results_list_id).append(title);
         $.each(items, function(idx, item) {
             let div = $("<div />").attr({"class": "card"});
@@ -183,6 +201,10 @@ var results = {
             div.append(body_container);
             $(config.selectors.results_list_id).append(div);
         });
+        if (items.length < count) {
+            let pagination = results.get_pagination(pages);
+            $(config.selectors.results_list_id).append(pagination);
+        }
         $(config.selectors.results_list_id).show();
     },
     get_chart_card: function(id, type, attribute, approximation) {
@@ -277,7 +299,8 @@ var search = {
     empty_search_form: function() {
         $(config.selectors.results_search_form + " fieldset").empty();
     },
-    search_form_visibility: function(len) {
+    search_form_visibility: function() {
+        let len = model.len_search_attributes();
         if (len > 0)
             $(config.selectors.results_search_form).show();
         else
@@ -285,14 +308,7 @@ var search = {
         vutils.fix_height(config.vars.step);
     },
     setup_search_form: function() {
-        // INSERIRE POSSIBILITA DI CERCARE PER RANGE
-        // Sarebbe molto bello se, quando si può cercare per range, i campi fossero
-        // precompilati con minimo e massimo, anche se forse è eccessivo
-        // Distinguere anche le date!!!
-        // Si potrebbe prima presentare all'utente l'elenco dei campi e chiedere A LUI
-        // in quali vorrebbe cercare e COME ci vorrebbe cercare, per evitare di presentargli 
-        // un form enorme 
-        let form = $(config.selectors.results_search_form + " fieldset");
+        // Al momento non si ricerca per data e per range
         let attributes = model.get_attributes();
         let groups = {"string": [], "number": [], "boolean": []};
         // Raggruppo i campi per tipo, per renderli più leggibili e gradevoli visivamente
@@ -307,34 +323,19 @@ var search = {
             attrs.sort();
             $.each(attrs, function(idx, attr) {
                 search.add_field(attr, type);
-                //cnt.append(result_forms.get_field(type, attr));
             });
-            //form.append(cnt);
         });
-        /*$.each(attributes, function(key, value) {
-            if (key[0] == "_")
-                return true;  // continue
-            let field_type = $.type(value);
-            let type;
-            if (field_type == "string")
-                type = "text";
-            else if (field_type == "number")
-                type = "number";
-            else if (field_type == "boolean")
-                type = "checkbox"; 
-            else 
-                return true;  // continue
-            form.append(result_forms.get_input(type, key));
-        });*/
     },
     add_field: function(name, type) {
         if (type == null) {
             type = model.get_attribute_type(name);
         }
         let field = result_forms.get_field(type, name);
-        $(config.selectors.results_search_form + " fieldset").append(field);
-        let len = model.add_search_attribute(name, type);
-        search.search_form_visibility(len);
+        let result = model.add_search_attribute(name, type);
+        if (result > 0) {
+            $(config.selectors.results_search_form + " fieldset").append(field);
+            search.search_form_visibility();
+        }
     },
     setup_sample_modal: function() {
         let body = modal.setup(config.selectors.sample_image_modal, "Sample Image", null, null, true);
@@ -507,5 +508,5 @@ export {
     exporter,
     charts,
     search,
-    forms
+    result_forms
 };

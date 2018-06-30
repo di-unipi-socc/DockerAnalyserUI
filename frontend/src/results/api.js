@@ -1,5 +1,5 @@
 import * as config from './config'
-import * as utilities from './utilities'
+import * as view from './view'
 
 var $ = require("jquery");
 

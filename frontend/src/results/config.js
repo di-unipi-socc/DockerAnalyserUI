@@ -1,13 +1,14 @@
 
 var vars = {
+    step: 3,
+    step_id: "visual",
     action_btn_class: "btn btn-sm action_button",
     uploaded_editing_class: "uploaded_editing",
     base_zip_name: "deploy-package-",
-    page_size: 50,
+    page_size: 20,
     concurrent_calls: 10,
     max_chart_groups: 5,
     not_acceped_fields: [null, undefined, "undefined", "null", "array", "date_string"],
-    step: 2,
 };
 
 var selectors = {
@@ -39,53 +40,10 @@ var selectors = {
     sample_image_div: "sample_image_container"
 };
 
-/*var selectors = {
-    endpoint_modal_id: "#endpoint_modal",
-    endpoint_url_input: "#endpoint_url",
-    endpoint_form: "#set_endpoint_form",
-    results_container: "#results_container",
-    results_list: "results_list",
-    results_list_id: "#results_list",
-    num_images_id: "#num_images",
-    endpoint_set_button: "#set_endpoint",
-    refresh_button: "#refresh",
-    custom_search_form: "custom_search",
-    custom_search_form_select: "custom_search_select",
-    custom_search_form_add: "custom_search_add",
-    custom_search_form_add_all: "custom_search_add_all",
-    results_search_form: "results_search",
-    results_search_form_id: "#results_search",
-    results_search_button: "results_search_button",
-    add_chart_form: "#add_chart",
-    export_menu: ".export-dropdown-menu",
-    upload_package_id: "#upload_package_form",
-    uploaded_show_list: "#upload_edit",
-    uploaded_list_len: "#uploads_length",
-    req_add_form_id: "#add_requirement_form",
-    req_container_id: "#requirements_list",
-    req_search_results_id: "#requirements_search_results",
-    req_modal_id: "#requirements_modal",
-    req_show_list: "#requirements_edit",
-    req_list_len: "#requirements_length",
-    export_name: "#export_title",
-    export_form_id: "#export_form",
-    error_container: ".error-container",
-    confirm_modal_id: "#confirm_modal",
-    confirm_msg_id: "#confirm_msg",
-    confirm_button_id: "#confirm_button",
-};*/
-
 var urls = {
     images: "http://neri.di.unipi.it:4000/api/images",  // "http://127.0.0.1:8000/suggestions/images",
     stats: "http://neri.di.unipi.it:4000/stats/",
     search: "http://neri.di.unipi.it:4000/search/",  // https://github.com/di-unipi-socc/DockerAnalyser/blob/master/storage/README.md
-    compose: {
-        build: "http://127.0.0.1:8000/compose/build", 
-        config: "http://127.0.0.1:8000/compose/config",
-        up: "http://127.0.0.1:8000/compose/up",
-        stop: "http://127.0.0.1:8000/compose/stop",
-        stats: "http://127.0.0.1:8000/compose/stats"
-    }
 };
 
 var msgs = {

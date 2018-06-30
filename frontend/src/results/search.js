@@ -32,7 +32,8 @@ var actions = [{
     modal: null,
     action: function() {
         model.clear_search_attributes();
-        view.search.search_form_visibility(0);
+        view.search.empty_search_form();
+        view.search.search_form_visibility();
     }
 }];
 
@@ -47,11 +48,11 @@ var search = function() {
     $.each(attributes, function(attribute, vals) {
         let value = null;
         if (vals.type == "string")
-            value = view.forms.get_value(attribute);
+            value = view.result_forms.get_value(attribute);
         else if (vals.type == "number")  // Gestire tutti i casi
-            value = [view.forms.get_value(attribute+"_from"), view.forms.get_value(attribute+"_to")];
+            value = [view.result_forms.get_value(attribute+"_from"), view.result_forms.get_value(attribute+"_to")];
         else if (vals.type == "boolean")
-            value = (view.forms.get_value(attribute) == 't');
+            value = (view.result_forms.get_value(attribute) == 't');
         attributes[attribute].value = value;
         console.log(attribute, value);
         if (value != null)
@@ -60,8 +61,8 @@ var search = function() {
     console.log("search params");
     console.log(params);
     model.update_search_attributes(attributes);
-    api.search(params, function(images) {
-        view.results.show_results(images);
+    api.search(params, function(images, count, pages) {
+        view.results.show_results(images, count, pages);
         vutils.fix_height(config.vars.step);
     });
 };
@@ -133,7 +134,7 @@ var init = function(container) {
     vutils.setup_action_buttons(module_basename, actions);
     view.search.setup_sample_modal();
     $(config.selectors.custom_search_form_subfield).hide();
-    view.search.search_form_visibility(0);
+    view.search.search_form_visibility();
     $(config.selectors.custom_search_form_select).change(function(event) {
         let attribute = $(config.selectors.custom_search_form_select).val();
         if (has_subfield(attribute))

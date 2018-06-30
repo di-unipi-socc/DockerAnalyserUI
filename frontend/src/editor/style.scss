@@ -1,7 +1,3 @@
-.upload_file_container {
-    //margin-top: 40px;
-    //margin-top: 85px;
-}
 
 .action_button {
     margin-left: 10px;
@@ -19,9 +15,16 @@
     font-weight: bold;
 }
 
+.side_section:first-child {
+    margin-top: 40px;
+}
+
+.side_section_actions {
+    text-align: left;
+}
+
 .side_section_actions .btn {
     padding: 0.275rem 0.55rem;
-    margin: 0.2rem 0.4rem 0.2rem 0;
 }
 
 #requirements_list .btn, #uploaded_list .btn {

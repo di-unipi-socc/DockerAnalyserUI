@@ -33,6 +33,7 @@ import * as editor from './editor/editor'
 import * as packager from './editor/packager'
 import * as configurator from './configurator/configurator'
 import * as results from './results/results'
+import * as dashboard from './manage/dashboard'
 import * as vutils from './common/viewutils'
 
 $(document).ready(function () {
@@ -46,15 +47,17 @@ $(document).ready(function () {
     requirements.init();
     packager.init();
     configurator.init();
+    dashboard.init();
     results.init();
 
     $('#smartwizard').smartWizard({
         theme: "dots", 
         autoAdjustHeight: true, 
         keyNavigation: false,
-        useURLhash: false, 
-        showStepURLhash: false,
-        toolbarSettings: {toolbarPosition: "top"}
+        useURLhash: true, 
+        showStepURLhash: true,
+        toolbarSettings: {toolbarPosition: "top"},
+        anchorSettings: {enableAllAnchors: true}
     });
 
     /*$("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {

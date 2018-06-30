@@ -137,26 +137,30 @@ var get_attribute_type = function(name) {
 }
 
 /**
- * Adds a new search attribute to the list
+ * Adds a new search attribute to the list, if not already present
  * @param {string} attribute the new search attribute
- * @returns {number} the total number of search attributes
+ * @returns {number} 1 if the attribute was added, 0 otherwise
  */
 var add_search_attribute = function(attribute, type) {
     // Se l'attributo che sto cercando di aggiungere è già presente, non lo aggiungo
-    if (!search_attributes.hasOwnProperty(attribute))
+    if (!search_attributes.hasOwnProperty(attribute)) {
         search_attributes[attribute] = {type: type, value: null};
-    return Object.keys(search_attributes).length;
+        return 1;
+    }
+    return 0;
 };
 
 /**
  * Removes an existing search attribute
  * @param {string} attribute the attribute to remove
- * @returns {number} the total number of search attributes
+ * @returns {number} 1 if the attribute was removed, 0 otherwise
  */
 var remove_search_attribute = function(attribute) {
-    if (search_attributes.hasOwnProperty(attribute))
+    if (search_attributes.hasOwnProperty(attribute)) {
         delete search_attributes[attribute];
-    return Object.keys(search_attributes).length;
+        return 1;
+    }
+    return 0;
 };
 
 /**
@@ -165,6 +169,15 @@ var remove_search_attribute = function(attribute) {
  */
 var get_search_attributes = function() {
     return search_attributes;
+};
+
+
+/**
+ * Returns the number of search attributes
+ * @returns {number} the number of search attributes
+ */
+var len_search_attributes = function() {
+    return Object.keys(search_attributes).length;
 };
 
 /**
@@ -239,6 +252,7 @@ export {
     remove_search_attribute,
     clear_search_attributes,
     get_search_attributes,
+    len_search_attributes,
     update_search_attributes,
     add_chart,
     remove_chart,

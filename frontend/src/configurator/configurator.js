@@ -34,6 +34,27 @@ var init = function() {
     });
 }
 
+/*
+POST /compose/config
+content-type: application/json
+{
+    "service": "crawler",  
+    "command": "crawl",
+    "args": {
+            "force-page":true,
+            "si": 0,
+            "random": false,
+            "fp": 10,
+            "ps": 0,
+            "policy": "pulls_first",
+            "min-stars" : 0,
+            "min-pulls" : 0,
+            "only-automated": true,
+            "only-official": false    
+        }          
+    }
+*/
+
 export {
     init
 }

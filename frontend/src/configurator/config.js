@@ -1,22 +1,25 @@
 var form_fields = [{
     "name": "crawler",
-    "title": "Crawler Configuration",
+    "title": "Crawling Options",
     "items": [
         {
             "name": "si",
             "label": "Sample Images",
+            "placeholder": "All",
             "help": "Total number of images to crawl",
             "type": "number",
-            "default": 50
+            "default": null
         }, {
             "name": "fp",
             "label": "From Page",
+            "placeholder": "From Page",
             "help": "Start crawling form this page",
             "type": "number",
             "default": 1
         }, {
             "name": "ps",
             "label": "Page Size",
+            "placeholder": "Page Size",
             "help": "Consider pages like having this size",
             "type": "number",
             "default": 100
@@ -36,12 +39,14 @@ var form_fields = [{
         }, {
             "name": "min-stars",
             "label": "Minimum Stars",
+            "placeholder": "Minimum Stars",
             "help": "The minimum number of stars that an image must have",
             "type": "number",
-            "default": 3
+            "default": 0
         }, {
             "name": "min-pulls",
             "label": "Minimum Pulls",
+            "placeholder": "Minimum Pulls",
             "help": "The minimum number of pulls that an image must have",
             "type": "number",
             "default": 0
@@ -79,11 +84,18 @@ var form_fields = [{
     ]}, */
 ]
 
+
+var vars = {
+    step: 1,
+    step_id: "config",
+}
+
 var selectors = {
     config_form: "#config_form"
 }
 
 export {
     form_fields,
+    vars,
     selectors
 }

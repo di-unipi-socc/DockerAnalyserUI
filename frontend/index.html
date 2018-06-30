@@ -29,19 +29,25 @@
   <div id="smartwizard">
     <ul>
       <li>
-        <a href="#step-1">Scanner Editor
+        <a href="#step-edit">Edit
           <br />
-          <small>Customize the Scanner analysis function</small>
+          <small>Customize the analysis function</small>
         </a>
       </li>
       <li>
-        <a href="#step-2">Compose Configurator
+        <a href="#step-config">Config
           <br />
-          <small>Configure Docker Compose arguments</small>
+          <small>Customize the crawling options</small>
         </a>
       </li>
       <li>
-        <a href="#step-3">Results Explorer
+        <a href="#step-manage">Manage
+          <br />
+          <small>Dashboard</small>
+        </a>
+      </li>
+      <li>
+        <a href="#step-visual">Visualize
           <br />
           <small>Explore the results through search &amp; charts</small>
         </a>
@@ -51,10 +57,10 @@
     <div id="smartwizard_container">
 
       <!-- =============== EDITOR =============== -->
-      <div class="container" id="step-1">
+      <div class="container" id="step-edit">
         <div class="row">
           <div class="col-12">
-            <h1>Scanner Editor</h2>
+            <h1>Editor</h2>
               <div class="error-container"></div>
           </div>
         </div>
@@ -69,9 +75,9 @@
 
           <div class="col-4">
             <!-- Requirements / Python Dependencies -->
-            <div class="upload_file_container side_section" style="margin-top: 40px;">
+            <div class="side_section">
               <h3>Python Dependencies</h3>
-              <div class="side_section_actions">
+              <div class="side_section_actions action_buttons">
                 <span id="requirements_actions"></span>
                 <button type="button" class="btn btn-outline-info" id="requirements_edit" data-toggle="button" aria-pressed="false">
                   Show List
@@ -83,13 +89,13 @@
             <br>
 
             <!-- File Upload -->
-            <div class="upload_file_container">
+            <div class="side_section">
               <h3>Additional Files
                 <!-- <a tabindex="0" class="badge badge-secondary btn" role="button" data-toggle="popover" data-trigger="focus" 
             title="Additional Files" data-content="Additional Files Help Message"
             >?</a> -->
               </h3>
-              <div class="side_section_actions">
+              <div class="side_section_actions action_buttons">
                 <span id="uploads_actions"></span>
                 <button type="button" class="btn btn-outline-info" id="upload_edit" data-toggle="button" aria-pressed="false">
                   Show List
@@ -102,19 +108,19 @@
             <br>
 
             <!-- Package Manager -->
-            <div class="upload_file_container">
+            <div class="side_section">
               <h3>Package</h3>
-              <div class="side_section_actions" id="package_actions"></div>
+              <div class="side_section_actions action_buttons" id="package_actions"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- =============== CONFIGURATOR =============== -->
-      <div class="container" id="step-2">
+      <!-- =============== CONFIG =============== -->
+      <div class="container" id="step-config">
         <div class="row">
           <div class="col-12">
-            <h1>Compose Configurator</h1>
+            <h1>Configurator</h1>
             <div class="error-container"></div>
           </div>
         </div>
@@ -125,8 +131,24 @@
         </div>
       </div>
 
+      <!-- =============== MANAGE =============== -->
+      <div class="container" id="step-manage">
+        <div class="row">
+          <div class="col-12">
+            <h1>Dashboard</h1>
+            <div class="error-container"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 offset-sm-0">
+            <div id="manage_actions" class="action_buttons"></div>
+            <div id="dashboard"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- =============== RESULTS =============== -->
-      <div class="container" id="step-3">
+      <div class="container" id="step-visual">
         <div class="row">
           <div class="col-12">
             <h1>Results Explorer</h1>
@@ -135,7 +157,7 @@
         </div>
         <div class="row">
           <div class="col-12 offset-sm-0">
-            <div id="results_actions"></div>
+            <div id="results_actions" class="action_buttons"></div>
 
             <!-- Possibilità di esportare i risultati in qualche formato, ad esempio: json, csv, xml 
              Potrebbe anche farlo il backend e restituirmi il file pronto.
@@ -191,7 +213,7 @@
 
                 <fieldset>
                   <legend>Create a custom search form</legend>
-                  <div id="search_actions" class="side_section_actions" style="float: right"></div>
+                  <div id="search_actions" class="side_section_actions action_buttons" style="float: right"></div>
 
                   <form class="form-inline" name="custom_search" id="custom_search">
                     <div class="inline-form-group">

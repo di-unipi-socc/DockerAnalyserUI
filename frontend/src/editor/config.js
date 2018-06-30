@@ -3,6 +3,8 @@ var mimetype = require('mimetype');
 var analysis_content = "def analysis(image_json, context):\n    logger = context['logger']\n    client_images = context['images']\n    logger.info('Received image from rabbitMQ: {}'.format(image_json))\n    client_images.post_image(image_json)\n    return True"
 
 var vars = {
+    step: 0,
+    step_id: "edit",
     action_btn_class: "btn btn-sm action_button",
     uploaded_editing_class: "uploaded_editing",
     base_zip_name: "deploy-package-",
@@ -60,11 +62,6 @@ var urls = {
     suggestions: "http://127.0.0.1:8000/suggestions/images_service",
     code_validate: "http://127.0.0.1:8000/suggestions/validate",
     versions: "https://pypi.org/pypi/LIB/json",
-    compose: {
-        build: "http://127.0.0.1:8000/compose/build", 
-        up: "http://127.0.0.1:8000/compose/up",
-        stop: "http://127.0.0.1:8000/compose/stop"
-    }
 };
 
 var msgs = {

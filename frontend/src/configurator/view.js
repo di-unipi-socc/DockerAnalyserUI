@@ -1,4 +1,5 @@
 import * as config from './config'
+import * as vutils from '../common/viewutils'
 
 var forms = {
     add_fieldset: function(label, container) {
@@ -55,7 +56,7 @@ var forms = {
                 "name": field.name,
                 "id": field.name,
                 "class": is_checkbox ? "form-check-input" : "form-control form-control-sm", 
-                "placeholder": field.label
+                "placeholder": field.placeholder
             });    
             if (is_checkbox) {
                 input.attr("value", "t");
@@ -71,7 +72,8 @@ var forms = {
             }
         }
         let help_container = $("<div />").attr({"class": help_class});
-        let help = $("<small />").attr({"class": "form-text text-muted"}).html(field.help);
+        //let help = $("<small />").attr({"class": "form-text text-muted"}).html(field.help);
+        let help = vutils.get_help_icon(field.help);
         help_container.append(help);
         div.append(input_container);
         div.append(help_container);

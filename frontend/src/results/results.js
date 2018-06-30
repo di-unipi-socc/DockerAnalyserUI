@@ -10,43 +10,6 @@ import * as exporter from './exporter'
 
 var module_basename = "results";
 var actions = [{
-    name: "build",
-    title: "Build",
-    icon: "docker",
-    base_class: "fab",
-    style: "info",
-    modal: null,
-    action: function() {
-        docker_build();
-    },
-}, {
-    name: "play",
-    title: "Start Analyser",
-    icon: "play",
-    style: "info",
-    modal: null,
-    action: function() {
-        docker_up();
-    },
-}, {
-    name: "stop",
-    title: "Stop Analyser",
-    icon: "stop",
-    style: "danger",
-    modal: null,
-    action: function() {
-        docker_stop();
-    },
-}, {
-    name: "scale",
-    title: "Scale Scanners",
-    icon: "arrows-alt-v ",
-    style: "info",
-    modal: config.selectors.scale_modal,
-    action: function() {
-        docker_stop();
-    },
-}, {
     name: "refresh",
     title: "Refresh",
     icon: "sync",
@@ -96,36 +59,6 @@ var load_first_page = function() {
     });
 };
 
-var docker_build = function() {
-    console.log("building");
-    $(config.selectors.docker_up_button).show();
-    /*create_zip(function(content, zip_name) {
-        $.getJSON(config.urls.compose.build, {"package": content})
-            .done(function(data) {
-                $(config.selectors.docker_build_up).show();
-            })
-            .fail(function() {
-                view.show_error(config.msgs.error_generic);
-            });
-    });*/
-};
-
-var docker_up = function() {
-    // Dovrebbe lanciare la build in automatico??
-    console.log("up");
-    /*$.getJSON(config.urls.compose.up)
-        .done(function(data) {
-            window.location.href = "results.html";
-            //document.location.href = "results.html";
-        })
-        .fail(function() {
-            view.show_error(config.msgs.error_generic);
-        });*/
-};
-
-var docker_stop = function() {
-};
-
 var refresh = function() {
     // Reload first page, to get new total
     load_first_page();
@@ -139,6 +72,7 @@ var refresh = function() {
 var init = function() {
     $(config.selectors.results_container).hide();
     vutils.setup_action_buttons(module_basename, actions);
+    //$("#results_stop").hide();
     view.results.setup_scale_modal();
     search.init(config.selectors.results_container);
     graphs.init(config.selectors.results_container);
