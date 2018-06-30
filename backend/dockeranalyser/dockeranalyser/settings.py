@@ -128,9 +128,12 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# DockerAnalyser 
+# DockerAnalyser
 DOCKER_ANALYSER_DIR = os.path.join(BASE_DIR, "../../DockerAnalyser")
 DOCKER_ANALYSER_EXAMPLES = os.path.join(DOCKER_ANALYSER_DIR,"data/examples/")
 DOCKER_ANALYSER_DEPLOY_PACKAGE_DEFAULT = "default-deploy-package"
 # path to save the deploy package extracted
 DOCKER_ANALYSER_PATH_DEPLOY_PACKAGE = DOCKER_ANALYSER_EXAMPLES
+
+DEFAULT_DEPLOY_PACKAGE = "default-deploy-package"
+UPLOADED_DEPLOY_PACKAGE = "uploaded-deploy-package"
