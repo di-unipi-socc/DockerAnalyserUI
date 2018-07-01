@@ -1,6 +1,7 @@
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
+import * as settings from '../common/settings'
 import * as vutils from '../common/viewutils'
 import * as modal from '../common/modals'
 import * as view from './view'
@@ -36,7 +37,7 @@ var actions = [{
         style: "danger",
         modal: null,
         action: function() {
-            view.confirm(config.msgs.confirm_reset, reset);
+            view.confirm(settings.msgs.confirm_reset, reset);
         },
     }
 ];
@@ -51,19 +52,19 @@ var validate = function(content, callback) {
     if (def_idx < 0)
         return false;
     return true;*/
-    $.getJSON(config.urls.code_validate, {"code": JSON.stringify(content)})
+    $.getJSON(settings.urls.code_validate, {"code": JSON.stringify(content)})
         .done(function(data) {
             var errors = data.errors;
             if (errors.length > 0) {
                 let full_error_msg = errors.join("<br>");
                 errors.push(full_error_msg);
-                modal.error(config.selectors.export_modal, config.msgs.error_validation);
+                modal.error(config.selectors.export_modal, settings.msgs.error_validation);
             } else {
                 callback();
             }
         })
         .fail(function() {
-            modal.error(config.selectors.export_modal, config.msgs.error_server);
+            modal.error(config.selectors.export_modal, settings.msgs.error_server);
         });
 };
 
@@ -113,6 +114,29 @@ var export_zip = function() {
     });
 };
 
+var load_from_zip = function(data) {
+    console.log("load_from_zip");
+    var new_zip = new JSZip();
+    new_zip.loadAsync(data).then(function(zip) {
+        zip.forEach(function (relativePath, file){
+            if (!file.dir) {
+                let filename = utilities.get_filename(relativePath);
+                console.log(filename);
+                let file_type = utilities.get_filetype(filename);
+                if (utilities.is_editable(file_type)) {
+                    file.async("string").then(function(content) {
+                        uploader.add_uploaded_file(filename, file_type, content, true, true);
+                    });
+                } else {
+                    file.async("binarystring").then(function(content) {
+                        uploader.add_uploaded_file(filename, file_type, content, false, true);
+                    });
+                }
+            }
+        });
+    });
+}
+
 /**
  * Resets the work area and uploads a full package provided in a .zip file.
  */
@@ -123,7 +147,7 @@ var upload_package = function() {
     // Package validation: it must be a .zip file
     var zip_type = uploaded_file.type;
     if (zip_type != "application/zip") {
-        moda.error(config.selectors.uploads_modal, config.msgs.error_wrong_type);
+        moda.error(config.selectors.uploads_modal, settings.msgs.error_wrong_type);
         return;
     }
     var zipname = uploaded_file.name; 
@@ -134,34 +158,52 @@ var upload_package = function() {
             reset();
             let file_content = event.target.result;
             // Apertura zip e lettura contenuto
-            var new_zip = new JSZip();
-            new_zip.loadAsync(file_content)
-                .then(function(zip) {
-                    zip.forEach(function (relativePath, file){
-                        if (!file.dir) {
-                            let filename = utilities.get_filename(relativePath);
-                            let file_type = utilities.get_filetype(filename);
-                            if (utilities.is_editable(file_type)) {
-                                file.async("string").then(function(content) {
-                                    uploader.add_uploaded_file(filename, file_type, content, true, true);
-                                });
-                            } else {
-                                file.async("binarystring").then(function(content) {
-                                    uploader.add_uploaded_file(filename, file_type, content, false, true);
-                                });
-                            }
-                        }
-                    });                            
-                });
+            load_from_zip(file_content);
         };
     })(uploaded_file);
     reader.readAsBinaryString(uploaded_file);
 };
 
+var get_package = function() {
+    console.log("get_package");
+    /*$.ajax({
+        url: "http://127.0.0.1:8000/compose/upload",
+        type: "GET",
+        dataType: "application/zip",
+        processData: true,
+        
+      })
+  .done(function(data) {
+    console.log( "success" );
+    load_from_zip(data);
+  })
+  .fail(function(xhr, status, error) {
+    var err = eval("(" + xhr.responseText + ")");
+    console.log(err.Message);
+  })
+  .always(function(data) {
+    console.log( "complete" );
+  });
+
+    var jqxhr = $.ajax("http://127.0.0.1:8000/compose/upload", "application/zip")  // "binary"
+        .done(function(data) {
+          console.log( "success" );
+          load_from_zip(data);
+        })
+        .fail(function(xhr, status, error) {
+            var err = eval("(" + xhr.responseText + ")");
+            console.log(err.Message);
+        })
+        .always(function() {
+          console.log( "finished" );
+        });*/
+}
+
 /**
  * Initialises the package manager.
  */
 var init = function() {
+    get_package();
     view.packager.setup_export_modal();
     vutils.setup_action_buttons(module_basename, actions);
 
@@ -173,12 +215,13 @@ var init = function() {
 
     $("#"+config.selectors.upload_package_form).submit(function(event) {
         event.preventDefault();
-        view.confirm(config.msgs.confirm_upload_zip, upload_package, null);
+        view.confirm(settings.msgs.confirm_upload_zip, upload_package, null);
     });
 
     view.setup_confirm_modal();
 };
 
 export {
-    init
+    init,
+    create_zip
 };

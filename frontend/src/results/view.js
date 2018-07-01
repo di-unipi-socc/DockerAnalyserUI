@@ -9,15 +9,6 @@ import Chart from 'chart.js';
 
 var $ = require("jquery");
 
-var get_main_box = function(id, title) {
-    let div = $("<div />").attr({"id": id, "class": "border rounded results_container_box"});
-    if (title) {
-        let h3 = $("<h3 />").html(title);
-        div.append(h3);
-    }
-    return div;
-};
-
 var get_close_button = function() {
     let icon = $("<span />").attr({"aria-hidden": "true"}).html("&times;");
     let button = $("<button />").attr({"type": "button", "class": "close", "aria-label": "Close"});
@@ -133,27 +124,6 @@ var results = {
     show_total: function(num) {
         $(config.selectors.num_images_id).html(num);
     },
-    show_object: function(item, lv) {
-        let cnt = $("<div />");
-        $.each(item, function(key, val) {
-            // Non mostriamo i campi che iniziano con un underscore
-            if (key[0] == "_")
-                return true;  // continue
-            // Se il campo contiene un oggetto, lo rappresentiamo ricorsivamente
-            if ($.type(val) == "object")
-                val = results.show_object(val, lv+1);
-            let k = $("<strong />").html(key + ": ");
-            let el = $("<div />");
-            for (let i=0; i<lv; i++) {
-                let space = $("<div />").attr("class", "space");
-                el.append(space);
-            }
-            el.append(k);
-            el.append(val);
-            cnt.append(el);
-        });
-        return cnt;
-    },
     get_pagination: function(pages) {
         let nav = $("<nav />").attr({"aria-label": "Search Results Navigation"});
         let ul = $("<nav />").attr({"class": "pagination justify-content-end"});
@@ -195,7 +165,7 @@ var results = {
                 "aria-labelledby": header_id,
             });
             let body = $("<div />").attr({"class": "card-body"});
-            body.append(results.show_object(item, 0));
+            body.append(vutils.display_object(item, 0));
             body_container.append(body);
             div.append(header_container);
             div.append(body_container);
@@ -234,20 +204,11 @@ var results = {
         cnt.append(body);
         return cnt;
     },
-    setup_scale_modal: function() {
-        let body = modal.setup(config.selectors.scale_modal, "Scale Scanners", null, null, false);
-        let form = forms.get_form(config.selectors.scale_form, true);
-        let input = forms.get_input.text(config.selectors.scale_amount, "Number of Scanners", true);
-        let submit = forms.get_button.submit(config.selectors.scale_form + "_button", "Scale");
-        form.append(input);
-        form.append(submit);
-        body.append(form);
-    },
 };
 
 var search = {
     setup: function(container) {
-        let div = get_main_box("results_search_container", "Image Search");  // Spostare in config o in variabili
+        let div = vutils.get_main_box("results_search_container", "Image Search");  // Spostare in config o in variabili
         // Search Form generator setup
         let custom_form = $("<form />").attr({"class": "form-inline", "name": config.selectors.custom_search_form, "id": config.selectors.custom_search_form});
         // Custom form first row

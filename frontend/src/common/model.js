@@ -220,23 +220,6 @@ var get_charts = function() {
     return charts;
 };
 
-var init_configuration = function(fields) {
-    $.each(fields, function(i, values) {
-        configuration[values.name] = {};
-        $.each(values.items, function(j, item) {
-            configuration[values.name][item.name] = null;
-        });
-    });
-}
-
-var update_configuration = function(new_config) {
-    configuration = new_config;
-}
-
-var get_configuration = function() {
-    return configuration;
-}
-
 export {
     add_item,
     get_items,
@@ -256,8 +239,5 @@ export {
     update_search_attributes,
     add_chart,
     remove_chart,
-    get_charts,
-    init_configuration,
-    update_configuration,
-    get_configuration
+    get_charts
 };

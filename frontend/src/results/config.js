@@ -33,31 +33,8 @@ var selectors = {
     confirm_modal_id: "#confirm_modal",
     confirm_msg_id: "#confirm_msg",
     confirm_button_id: "#confirm_button",
-    scale_modal: "#scale_modal",
-    scale_form: "scale_form",
-    scale_amount: "scale_amount",
     sample_image_modal: "#sample_image_modal",
     sample_image_div: "sample_image_container"
-};
-
-var urls = {
-    images: "http://neri.di.unipi.it:4000/api/images",  // "http://127.0.0.1:8000/suggestions/images",
-    stats: "http://neri.di.unipi.it:4000/stats/",
-    search: "http://neri.di.unipi.it:4000/search/",  // https://github.com/di-unipi-socc/DockerAnalyser/blob/master/storage/README.md
-};
-
-var msgs = {
-    error_generic: "An error occurred",
-    error_no_results: "No results found",
-    error_file_exists: "File Exists",
-    error_wrong_type: "Wrong File Type",
-    error_req_not_found: "Libraries not found: ",
-    error_validation: "Validation Error. Please check your analysis.py. code",
-    confirm_upload_zip: "Be aware that uploading a new package you will overwrite your current work!",
-    confirm_remove_file: "You modified this file, if you remove it your work will be lost!",
-    confirm_clear_requirements: "All inserted requirements will be removed!",
-    confirm_clear_uploads: "All uploaded files will be removed",
-    confirm_reset: "All your current work will be lost!",
 };
 
 var graphs = {
@@ -86,7 +63,5 @@ var graphs = {
 export {
     vars,
     selectors,
-    urls,
-    msgs,
     graphs
 }

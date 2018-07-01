@@ -1,0 +1,53 @@
+$service_width: 130px;
+$service_height: 100px;
+
+#dashboard_status {
+    margin-top: 20px;
+    padding-bottom: 20px;
+}
+
+#dashboard_status_icons {
+    text-align: center;
+}
+
+.service_container {
+    display: inline-block;
+    width: $service_width;
+    margin-left: 20px;
+    vertical-align: top;
+}
+
+.service_display {
+    display: inline-block;
+    width: $service_width;
+    height: $service_height;
+}
+
+.service_details {
+    width: $service_width;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.service_name {
+    margin: 10px auto 0;
+    text-align: center;
+}
+
+.service_action {
+    //color: white;
+    cursor: pointer;
+    display: inline-block;
+    margin: 5px auto 0;
+    padding: 10px;
+}
+
+.service_down .service_stop,
+.service_up .service_start {
+    display: none;
+}
+
+.service_down .service_start,
+.service_up .service_stop {
+    display: inline;
+}

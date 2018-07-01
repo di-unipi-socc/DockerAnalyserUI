@@ -1,5 +1,6 @@
 import * as config from './config'
 import * as utilities from './utilities'
+import * as settings from '../common/settings'
 import * as model from '../common/model'
 import * as vutils from '../common/viewutils'
 import * as modal from '../common/modals'
@@ -42,7 +43,7 @@ var actions = [{
         style: "danger",
         modal: null,
         action: function() {
-            view.confirm(config.msgs.confirm_clear_requirements, reset);
+            view.confirm(settings.msgs.confirm_clear_requirements, reset);
         },
     }
 ];
@@ -95,7 +96,7 @@ var get_versions = function(libname, callback) {
         return;
     }
     
-    $.getJSON(config.urls.versions.replace("LIB", libname))
+    $.getJSON(settings.urls.versions.replace("LIB", libname))
         .done(function(data){
             var versions = [];
             $.each(data.releases, function(ver, val) {
@@ -114,7 +115,7 @@ var get_versions = function(libname, callback) {
             if (callback)
                 callback(results);
         }).fail(function() {
-            modal.error(config.selectors.req_modal_id, config.msgs.error_generic);
+            modal.error(config.selectors.req_modal_id, settings.msgs.error_generic);
         });
 };
 
@@ -126,7 +127,7 @@ var replace_versions = function(libname, last_version, in_list, callback) {
 
 var search = function(name) {
     modal.clear_errors(config.selectors.req_modal_id);
-    $.getJSON(config.urls.requirements, {"name": name})
+    $.getJSON(settings.urls.requirements, {"name": name})
         .done(function(data) {
             if (data.results.length > 0) {
                 view.requirements.empty_modal_container();
@@ -147,13 +148,13 @@ var search = function(name) {
                 });
                 view.requirements.show_modal();
             } else {
-                //view.show_error(config.msgs.error_no_results);
-                modal.error(config.selectors.req_modal_id, config.msgs.error_no_results);
+                //view.show_error(settings.msgs.error_no_results);
+                modal.error(config.selectors.req_modal_id, settings.msgs.error_no_results);
             }
         })
         .fail(function() {
-            //view.show_error(config.msgs.error_generic);
-            modal.error(config.selectors.req_modal_id, config.msgs.error_generic);
+            //view.show_error(settings.msgs.error_generic);
+            modal.error(config.selectors.req_modal_id, settings.msgs.error_generic);
         });
 };
 
@@ -166,7 +167,7 @@ var from_file = function(content) {
             tmp.push({"name": parts[0], "version": parts[1]});
         }
     });
-    $.getJSON(config.urls.requirements_validate, {"requirements": JSON.stringify(tmp)})
+    $.getJSON(settings.urls.requirements_validate, {"requirements": JSON.stringify(tmp)})
         .done(function(data) {
             var errors = data.errors;
             $.each(tmp, function(idx, item) {
@@ -175,14 +176,14 @@ var from_file = function(content) {
                 }
             });
             if (errors.length > 0) {
-                let full_error_msg = config.msgs.error_req_not_found + errors.join();
+                let full_error_msg = settings.msgs.error_req_not_found + errors.join();
                 //view.show_error(full_error_msg);
                 modal.error(config.selectors.uploads_modal, full_error_msg);
             }
         })
         .fail(function() {
-            //view.show_error(config.msgs.error_generic);
-            modal.error(config.selectors.uploads_modal, config.msgs.error_generic); 
+            //view.show_error(settings.msgs.error_generic);
+            modal.error(config.selectors.uploads_modal, settings.msgs.error_generic); 
         });
 };
 

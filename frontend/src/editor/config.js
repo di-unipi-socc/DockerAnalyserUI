@@ -56,34 +56,6 @@ var analysis_file = {
     content: analysis_content
 };
 
-var urls = {
-    requirements: "http://127.0.0.1:8000/requirements/search",
-    requirements_validate: "http://127.0.0.1:8000/requirements/validate",
-    suggestions: "http://127.0.0.1:8000/suggestions/images_service",
-    code_validate: "http://127.0.0.1:8000/suggestions/validate",
-    versions: "https://pypi.org/pypi/LIB/json",
-};
-
-var msgs = {
-    error_generic: "An error occurred",
-    error_server: "Unable to reach server",
-    error_no_results: "No results found",
-    error_file_exists: "The file already exists",
-    error_wrong_type: "Wrong File Type",
-    error_req_not_found: "Libraries not found: ",
-    error_validation: "Validation Error. Please check your analysis.py. code",
-    error_empty_filename: "Please specify a file name",
-    confirm_upload_zip: "Be aware that uploading a new package you will overwrite your current work!",
-    confirm_remove_file: "You modified this file, if you remove it your work will be lost!",
-    confirm_clear_requirements: "All inserted requirements will be removed!",
-    confirm_clear_uploads: "All uploaded files will be removed",
-    confirm_reset: "All your current work will be lost!",
-};
-
-var help = {
-    add_file: "Please specify a name for the new file, including its extension"
-};
-
 var languages = {
     "text/plain": {name: "Plain Text", value: "plain_text"},
     "text/x-python": {name: "Python", value: "python"},
@@ -104,8 +76,5 @@ export {
     selectors,
     req_file,
     analysis_file,
-    urls,
-    msgs,
-    help,
     languages
 }

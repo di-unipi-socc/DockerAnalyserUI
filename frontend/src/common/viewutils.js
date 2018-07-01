@@ -1,3 +1,12 @@
+var get_main_box = function(id, title) {
+    let div = $("<div />").attr({"id": id, "class": "border rounded results_container_box"});
+    if (title) {
+        let h3 = $("<h3 />").html(title);
+        div.append(h3);
+    }
+    return div;
+};
+
 /**
  * Shows a general error message.
  * @param {string} msg the error message
@@ -11,6 +20,13 @@ var generate_error = function(msg) {
     div.append(close_button);
     return div;
 };
+
+var show_error = function(msg, step_id) {
+    let error = generate_error(msg);
+    let container = $("#step-" + step_id + " .error-container");
+    container.empty();
+    container.append(error);
+}
 
 var get_close_button = function(dismiss) {
     let button = $("<button />").attr({"type": "button", "class": "close", "data-dismiss": dismiss, "aria-label": "Close"});
@@ -60,6 +76,30 @@ var setup_action_buttons = function(basename, actions) {
     });
 }
 
+var display_object = function(item, lv) {
+    let cnt = $("<div />");
+    $.each(item, function(key, val) {
+        // Non mostriamo i campi che iniziano con un underscore
+        if (key[0] == "_")
+            return true;  // continue
+        // Se il campo contiene un oggetto, lo rappresentiamo ricorsivamente
+        if ($.type(val) == "object")
+            val = display_object(val, lv+1);
+        let k = $("<strong />").html(key + ": ");
+        let el = $("<div />");
+        for (let i=0; i<lv; i++) {
+            let space = $("<div />").attr("class", "space");
+            el.append(space);
+        }
+        el.append(k);
+        if ($.type(val) != "object")
+            val = ""+val;
+        el.append(val);
+        cnt.append(el);
+    });
+    return cnt;
+};
+
 var fix_height = function(idx) {
     let main = $('#smartwizard');
     let nav = main.children('ul');
@@ -71,9 +111,13 @@ var fix_height = function(idx) {
 }
 
 export {
+    get_main_box,
     generate_error,
+    show_error,
     get_close_button,
     get_help_icon,
+    create_action_button,
     setup_action_buttons, 
+    display_object,
     fix_height
 }

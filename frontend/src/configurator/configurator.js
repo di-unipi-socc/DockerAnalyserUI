@@ -1,12 +1,16 @@
 import * as config from './config'
+import * as settings from '../common/settings'
 import * as model from '../common/model'
 import * as view from './view'
 
 // La validazione viene già fatta dal form, ma andrebbe ripetuta
 var save_configuration = function() {
-    let configuration = {};
     $.each(config.form_fields, function(i, values) {
-        configuration[values.name] = {};
+        let configuration = {
+            service: values.name,
+            command: values.command,
+            args: {}
+        };
         $.each(values.items, function(j, item) {
             let value = null;
             if (item.type == "radio")
@@ -18,21 +22,41 @@ var save_configuration = function() {
                 if (item.type == "number")
                     value = parseInt(value, 10);
             }
-            configuration[values.name][item.name] = value;
+            configuration["args"][item.name] = value;
         });
+        post_configuration(configuration);
     });
-    console.log(configuration);
-    model.update_configuration(configuration);
+};
+
+var post_configuration = function(data) {
+    $.post(settings.urls.compose.config, JSON.stringify(data))
+        .done(function(response) {
+            if (response.err != 0)
+                view.show_error(response.msg);
+        })
+        .fail(function(xhr, status, error) {
+            var err = eval("(" + xhr.responseText + ")");
+            console.log(err.Message);
+            view.show_error(settings.msgs.error_server);
+        }); 
 }
 
+var get_configuration = function() {
+    $.getJSON(settings.urls.compose.config)
+        .done(function(response) {
+            if (response.err == 0)
+                view.configurator.setup_form(response, save_configuration);
+            else 
+                view.show_error(response.msg);
+        })
+        .fail(function() {
+            view.show_error(settings.msgs.error_server);
+        }); 
+};
+
 var init = function() {
-    model.init_configuration(config.form_fields);
-    view.configurator.setup_form();
-    $(config.selectors.config_form).submit(function(event) {
-        event.preventDefault();
-        save_configuration();
-    });
-}
+    get_configuration();
+};
 
 /*
 POST /compose/config

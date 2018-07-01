@@ -1,6 +1,10 @@
 import * as config from './config'
 import * as vutils from '../common/viewutils'
 
+var show_error = function(msg) {
+    vutils.show_error(msg, config.vars.step_id);
+}
+
 var forms = {
     add_fieldset: function(label, container) {
         let fieldset = $("<fieldset />").attr({"class": "container"});
@@ -10,7 +14,9 @@ var forms = {
             $(container).append(fieldset);
         return fieldset;
     },
-    add_field: function(field, container) {
+    add_field: function(field, container, default_value) {
+        if (!default_value)
+            default_value = "";
         let div = $("<div />").attr({"class": "row"});
         let is_checkbox = (field.type == "checkbox");
         //let is_number = (type == "number");
@@ -44,7 +50,7 @@ var forms = {
                     "for": id,
                     "class": "form-check-label", 
                 }).html(values.label);
-                if (values.value == field.default)
+                if (values.value == default_value)
                     input.attr("checked", "checked");
                 radio_container.append(input);
                 radio_container.append(lbl);
@@ -60,13 +66,13 @@ var forms = {
             });    
             if (is_checkbox) {
                 input.attr("value", "t");
-                if (field.default == true)
+                if (default_value == true)
                     input.attr("checked", "checked");
                 input_container.addClass("form-check checkbox-row");
                 input_container.append(input);
                 input_container.append(label);
             } else {
-                input.attr("value", field.default);
+                input.attr("value", default_value);
                 input_container.append(input);
                 div.append(label);
             }
@@ -87,27 +93,65 @@ var forms = {
 }
 
 var configurator = {
-    setup_form: function() {
+    /*get_args: function(defaults, service) {
+        let args = null;
+        $.each(defaults, function(idx, item) {
+            if (item.service == service) {
+                args = item.args;
+                return false;
+            }
+        });
+        return args;
+    },*/
+    get_args: function(defaults, service) {
+        let detail = defaults.detail;
+        detail = detail.replace(/None/g, "null");
+        detail = detail.replace(/'/g, '"');
+        detail = JSON.parse(detail);
+        let command = detail[service].command;
+        let args = {};
+        $.each(command, function(idx, arg) {
+            let parts = arg.split("=");
+            let name = parts[0].replace("--", "")
+            let value = true;  // If present, is set
+            if (parts.length > 1) 
+                value = parts[1];
+            if (value == "True")
+                value = true;
+            if (value == "False")
+                value = false;
+            args[name] = value;
+        });
+        return args;
+    },
+    setup_form: function(defaults, save_configuration) {
         let form = $(config.selectors.config_form);
         form.empty();
         $.each(config.form_fields, function(i, values) {
             let fieldset = forms.add_fieldset(values.title, form);
+            let args = configurator.get_args(defaults, values.name);
             $.each(values.items, function(j, item) {
-                forms.add_field(item, fieldset);
+                forms.add_field(item, fieldset, args[item.name]);
             });
         });
         let submit_button = forms.get_submit_button("update_config", "Update Configuration", "info");
         let clear_button = forms.get_submit_button("default_config", "Reset Defaults", "danger");
         clear_button.click(function(event) {
             event.preventDefault();
-            configurator.setup_form()
+            configurator.setup_form(defaults, save_configuration);
         });
         form.append(clear_button);
         form.append(submit_button);
+        form.submit(function(event) {
+            event.preventDefault();
+            save_configuration();
+        });
+        $('[data-toggle="popover"]').popover({trigger: "hover"});
     }
 }
 
 export {
+    show_error,
     forms,
     configurator
 }

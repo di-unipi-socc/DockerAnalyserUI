@@ -3,7 +3,7 @@ import * as utilities from './utilities'
 import * as model from '../common/model'
 import * as view from './view'
 import * as vutils from '../common/viewutils'
-import * as modal from '../common/modals'
+import * as settings from '../common/settings'
 import * as editor from './editor'
 import * as requirements from './requirements'
 
@@ -25,7 +25,7 @@ var actions = [{
         style: "danger",
         modal: null,
         action: function() {
-            view.confirm(config.msgs.confirm_clear_uploads, reset);
+            view.confirm(settings.msgs.confirm_clear_uploads, reset);
         },
     }
 ];
@@ -70,7 +70,7 @@ var add_uploaded_file = function(filename, file_type, file_content, file_editabl
             let remove_values = {filename: filename};
             if (content.editor && content.editor.getValue() != file_content)
                 // If the file was modified, user must confirm he want to remove it
-                view.confirm(config.msgs.confirm_remove_file, remove_file, remove_values);
+                view.confirm(settings.msgs.confirm_remove_file, remove_file, remove_values);
             else
                 remove_file(remove_values);
         });
@@ -107,7 +107,7 @@ var upload_files = function(event) {
         var file_type = uploaded_file.type;
         var filename = uploaded_file.name;
         if (model.get_item(filename) != null && filename != config.req_file.name) {
-            view.show_error(config.msgs.error_file_exists);
+            view.show_error(settings.msgs.error_file_exists);
             return;
         }
         

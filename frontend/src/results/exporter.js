@@ -1,9 +1,8 @@
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
+import * as settings from '../common/settings'
 import * as view from './view'
-
-var $ = require("jquery");
 
 var formats = [{
     name: "CSV",

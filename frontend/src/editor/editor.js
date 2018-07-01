@@ -1,6 +1,7 @@
 import * as config from './config'
 import * as model from '../common/model'
 import * as view from './view'
+import * as settings from '../common/settings'
 import * as forms from '../common/forms'
 import * as vutils from '../common/viewutils'
 import * as modal from '../common/modals'
@@ -41,11 +42,11 @@ var remove_item = function(filename) {
 var add_empty_file = function() {
     let filename = $.trim($("#"+config.selectors.add_file_name).val());
     if (filename == "") {
-        modal.error(config.selectors.add_file_modal, config.msgs.error_empty_filename);
+        modal.error(config.selectors.add_file_modal, settings.msgs.error_empty_filename);
         return;
     }
     if (model.get_item(filename) != null) {
-        modal.error(config.selectors.add_file_modal, config.msgs.error_file_exists);
+        modal.error(config.selectors.add_file_modal, settings.msgs.error_file_exists);
         return;
     }
     modal.hide(config.selectors.add_file_modal);

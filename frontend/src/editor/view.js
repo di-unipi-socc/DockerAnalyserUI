@@ -2,6 +2,7 @@ import * as config from './config'
 import * as utilities from './utilities'
 import * as modal from '../common/modals'
 import * as forms from '../common/forms'
+import * as settings from '../common/settings'
 
 /**
  * Shows a general error message.
@@ -168,7 +169,7 @@ var editor = {
         return editor;
     },
     setup_newfile_modal: function() {
-        let body = modal.setup(config.selectors.add_file_modal, "Add Empty File", config.help.add_file, null, false);
+        let body = modal.setup(config.selectors.add_file_modal, "Add Empty File", settings.help.add_file, null, false);
         let form = forms.get_form(config.selectors.add_file_form, true);
         let input = forms.get_input.text(config.selectors.add_file_name, "File Name", true);
         let submit = forms.get_button.submit(config.selectors.add_file_form + "_button", "Add");

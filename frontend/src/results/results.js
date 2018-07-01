@@ -53,7 +53,8 @@ var load_first_page = function() {
             model.set_attributes(images[0]);
             graphs.set_charts_attribute_list();
             search.set_search_attribute_list();
-            $("#"+config.selectors.sample_image_div).append(view.results.show_object(images[0], 0));
+            $("#"+config.selectors.sample_image_div).empty();
+            $("#"+config.selectors.sample_image_div).append(vutils.display_object(images[0], 0));
         }
         vutils.fix_height(config.vars.step);
     });
@@ -73,7 +74,6 @@ var init = function() {
     $(config.selectors.results_container).hide();
     vutils.setup_action_buttons(module_basename, actions);
     //$("#results_stop").hide();
-    view.results.setup_scale_modal();
     search.init(config.selectors.results_container);
     graphs.init(config.selectors.results_container);
     

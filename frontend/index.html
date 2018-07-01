@@ -2,13 +2,13 @@
 <html>
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <title>DockerAnalyser</title>
 
   <!-- Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comfortaa:300,400">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comfortaa:300,400" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" crossorigin="anonymous" />
 
   <script src="dist/bundle.js"></script>
 </head>
@@ -60,7 +60,7 @@
       <div class="container" id="step-edit">
         <div class="row step_title">
           <div class="col-12">
-            <h1>Editor</h2>
+            <h1>Editor</h1>
             <div class="error-container"></div>
           </div>
         </div>
@@ -86,7 +86,7 @@
               </div>
               <table class="table table-sm collapse" id="requirements_list"></table>
             </div>
-            <br>
+            <br />
 
             <!-- File Upload -->
             <div class="side_section">
@@ -105,7 +105,7 @@
               </div>
               <table class="table table-sm collapse" id="uploaded_list"></table>
             </div>
-            <br>
+            <br />
 
             <!-- Package Manager -->
             <div class="side_section">
@@ -142,6 +142,13 @@
         <div class="row step_content">
           <div class="col-12 offset-sm-0">
             <div id="manage_actions" class="action_buttons"></div>
+            
+            <!-- Status -->
+            <div id="dashboard_status" class="border rounded results_container_box">
+              <h3>Service Status</h3>
+              <div id="dashboard_status_icons"></div>
+            </div>
+
             <div id="dashboard"></div>
           </div>
         </div>
@@ -185,7 +192,7 @@
               <!-- Header -->
               <h2>
                 <span id="num_images">0</span> Images Analysed</h2>
-              <br>
+              <br />
 
               <!-- Overview -->
               <div id="results_overview" class="border rounded row no-gutters results_container_box">
@@ -218,15 +225,15 @@
                   <form class="form-inline" name="custom_search" id="custom_search">
                     <div class="inline-form-group">
                       <select class="custom-select" name="custom_search_select" id="custom_search_select"></select>
-                      <input type="text" class="form-control" name="custom_search_subfield" id="custom_search_subfield" placeholder="Sub Field">
-                      <input type="submit" class="btn btn-info" value="+" id="custom_search_add">
+                      <input type="text" class="form-control" name="custom_search_subfield" id="custom_search_subfield" placeholder="Sub Field" />
+                      <input type="submit" class="btn btn-info" value="+" id="custom_search_add" />
                     </div>
                   </form>
 
                   <form class="form-inline" name="custom_search_free" id="custom_search_free">
                     <div class="inline-form-group">
-                      <input type="text" class="form-control" name="add_custom_input" id="add_custom_input" placeholder="Custom Field">
-                      <input type="submit" class="btn btn-info" value="+" id="custom_search_add_free">
+                      <input type="text" class="form-control" name="add_custom_input" id="add_custom_input" placeholder="Custom Field" />
+                      <input type="submit" class="btn btn-info" value="+" id="custom_search_add_free" />
                     </div>
                   </form>
                 </fieldset>
@@ -235,7 +242,7 @@
                   <fieldset>
                     <legend>Search within the analised images</legend>
                   </fieldset>
-                  <input type="submit" class="btn btn-info" value="Search" id="results_search_button">
+                  <input type="submit" class="btn btn-info" value="Search" id="results_search_button" />
                 </form>
               </div>
 
