@@ -8,16 +8,18 @@ var show_error = function(msg) {
 }
 
 var status = {
-    setup_icons: function(services, start, stop) {
+    setup_icons: function(services, start, stop, logs) {
         let container = $(config.selectors.status_icons);
         container.empty();
         let all_started = true;
         let all_stopped = true;
         $.each(services, function(idx, item) {
+            if (item.name == "scanner")
+                $("#"+config.selectors.scale_amount).val(item.num);
             let div = $("<div />").attr("class", "service_container");
             let display = $("<div />").attr("class", "service_display rounded");
             let details = $("<div />").attr("class", "service_details");
-            let name = $("<div />").attr("class", "service_name").html(item.service);
+            let name = $("<div />").attr("class", "service_name").html(item.name);
             let action = $("<div />").attr("class", "service_action");
             let icon_play = $("<i />").attr({
                 "class": "fas fa-play service_start",
@@ -31,7 +33,7 @@ var status = {
                 "data-placement": "bottom",
                 "title": "Stop Service",
             });
-            if (item.is_running) {
+            if (item.container[0].is_running) {
                 all_stopped = false;
                 div.addClass("service_up");
                 display.addClass("btn btn-outline-success");
@@ -53,16 +55,16 @@ var status = {
                 "class": "fas fa-bars service_info",
                 "data-toggle": "tooltip",
                 "data-placement": "bottom",
-                "title": "Logs",
+                "title": "Log",
             });
             icon_logs.click(function() {
-                status.show_logs(item.service);
+                logs(item.name);
             });
             icon_play.click(function() {
-                start(item.service);
+                start(item.name);
             });
             icon_stop.click(function() {
-                stop(item.service);
+                stop(item.name);
             });
             details.append(icon_info);
             details.append(icon_logs);
@@ -95,9 +97,9 @@ var status = {
         $("#"+config.selectors.service_detail_div).append(vutils.display_object(service, 0));
         modal.show(config.selectors.service_detail_modal);
     },
-    show_logs: function(service) {
-        $("#"+config.selectors.service_logs_div).empty();
-        $("#"+config.selectors.service_logs_div).append(vutils.display_object(service, 0));
+    show_logs: function(txt) {
+        txt = txt.replace(/\n/g, "<br />");
+        $("#"+config.selectors.service_logs_div).html(txt);
         modal.show(config.selectors.service_logs_modal);
     },
     setup_service_modal: function() {

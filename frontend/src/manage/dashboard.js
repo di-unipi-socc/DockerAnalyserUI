@@ -108,14 +108,15 @@ var docker_build = function() {
     });*/
 };
 
-var docker_command = function(url, service) {
+var docker_command = function(url, service, callback) {
     let data = {};
     if (service)
         data["service"] = service;
     $.getJSON(url, data)
         .done(function(response) {
             if (response.err == 0)
-                docker_status();
+                if (callback)
+                    callback(response);
             else 
                 view.show_error(response.msg);
         })
@@ -125,11 +126,17 @@ var docker_command = function(url, service) {
 };
 
 var docker_up = function(service) {
-    docker_command(settings.urls.compose.up, service);
+    docker_command(settings.urls.compose.up, service, docker_status);
 };
 
 var docker_stop = function(service) {
-    docker_command(settings.urls.compose.stop, service);
+    docker_command(settings.urls.compose.stop, service, docker_status);
+};
+
+var docker_logs = function(service) {
+    docker_command(settings.urls.compose.logs, service, function(data) {
+        view.status.show_logs(data.services[0].log);
+    });
 };
 
 // GET /compose/status
@@ -138,7 +145,7 @@ var docker_status = function() {
     $.getJSON(settings.urls.compose.status)
         .done(function(response) {
             if (response.err == 0)
-                view.status.setup_icons(response.services, docker_up, docker_stop);
+                view.status.setup_icons(response.services, docker_up, docker_stop, docker_logs);
             else 
                 view.show_error(response.msg);
         })

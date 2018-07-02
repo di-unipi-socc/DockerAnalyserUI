@@ -94,7 +94,9 @@ var display_object = function(item, lv) {
         if (key[0] == "_")
             return true;  // continue
         // Se il campo contiene un oggetto, lo rappresentiamo ricorsivamente
-        if ($.type(val) == "object")
+        let type = $.type(val);
+        let has_children = (type == "object" || type == "array");
+        if (has_children)
             val = display_object(val, lv+1);
         let k = $("<strong />").html(key + ": ");
         let el = $("<div />");
@@ -103,7 +105,7 @@ var display_object = function(item, lv) {
             el.append(space);
         }
         el.append(k);
-        if ($.type(val) != "object")
+        if (!has_children)
             val = ""+val;
         el.append(val);
         cnt.append(el);
