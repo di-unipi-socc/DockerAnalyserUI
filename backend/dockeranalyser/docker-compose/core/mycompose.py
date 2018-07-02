@@ -133,7 +133,7 @@ class MyCompose:
 
         return items
 
-    def logs(self, services=None):
+    def logs(self, services=None, tail=4):
         services_logs = []
         containers = self._project.containers(
             service_names=services if services else self.get_service_names(), stopped=True)
@@ -141,7 +141,8 @@ class MyCompose:
             logs = dict()
             logs['name'] = container.name
             logs['service'] = container.service
-            logs['log'] = container.logs().decode("utf-8")
+            print(tail)
+            logs['log'] = container.logs(tail=tail).decode("utf-8")
             services_logs.append(logs)
         return services_logs
 

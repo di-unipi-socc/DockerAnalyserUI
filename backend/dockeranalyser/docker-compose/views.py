@@ -163,7 +163,8 @@ def logs(request):
     # GET /logs?service=<SERVICE_NAME>
     # mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR)
     service = request.GET.get('service')
-    res = mycompose.logs(services=[service] if service else None)
+    tail = request.GET.get('tail')
+    res = mycompose.logs(services=[service] if service else None, tail=int(tail) if tail else 10)
     return JsonResponse({"err": 0, "msg": "Logs of services", "services": res})
 
 
