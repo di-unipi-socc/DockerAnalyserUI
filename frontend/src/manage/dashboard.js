@@ -4,6 +4,7 @@ import * as settings from '../common/settings'
 import * as vutils from '../common/viewutils'
 import * as view from './view'
 import * as packager from '../editor/packager'
+import * as api from '../results/api'
 
 var module_basename = "manage";
 var actions = [{
@@ -42,6 +43,15 @@ var actions = [{
     modal: config.selectors.scale_modal,
     action: function() {
         docker_scale();
+    },
+}, {
+    name: "drop",
+    title: "Remove All Images",
+    icon: "trash-alt",
+    style: "danger",
+    modal: null,
+    action: function() {
+        vutils.confirm(settings.msgs.confirm_drop_images, drop_images);
     },
 }];
 
@@ -87,7 +97,6 @@ var upload_package = function() {
 
 var docker_build = function() {
     console.log("building");
-    $(config.selectors.docker_up_button).show();
     /*create_zip(function(content, zip_name) {
         $.getJSON(settings.urls.compose.build, {"package": content})
             .done(function(response) {
@@ -99,22 +108,11 @@ var docker_build = function() {
     });*/
 };
 
-//up?service=scanner&scale=3
-var docker_up = function(service) {
+var docker_command = function(url, service) {
     let data = {};
     if (service)
         data["service"] = service;
-    $.getJSON(settings.urls.compose.up, data)
-        .done(function(response) {
-            docker_status();
-        })
-        .fail(function() {
-            view.show_error(settings.msgs.error_generic);
-        });
-};
-
-var docker_stop = function(service) {
-    $.getJSON(settings.urls.compose.stop)
+    $.getJSON(url, data)
         .done(function(response) {
             if (response.err == 0)
                 docker_status();
@@ -126,8 +124,17 @@ var docker_stop = function(service) {
         });  
 };
 
+var docker_up = function(service) {
+    docker_command(settings.urls.compose.up, service);
+};
+
+var docker_stop = function(service) {
+    docker_command(settings.urls.compose.stop, service);
+};
+
 // GET /compose/status
 var docker_status = function() {
+    load_first_page();
     $.getJSON(settings.urls.compose.status)
         .done(function(response) {
             if (response.err == 0)
@@ -155,16 +162,34 @@ var docker_scale = function(service, scale) {
         });
 };
 
+var drop_images = function() {
+    $.getJSON(settings.urls.images.drop)
+        .done(function(response) {
+            console.log("drop ok");
+            if (response.err != 0)
+                view.show_error(response.msg);
+        })
+        .fail(function() {
+            //view.show_error(settings.msgs.error_generic);
+        });
+}
+
+var load_first_page = function() {
+    api.get_page(1, function(images, count, pages) {
+        view.manage.show_total(count);
+    });
+};
+
 var init = function() {
     vutils.setup_action_buttons(module_basename, actions);
     docker_status();
     view.status.setup_service_modal();
+    view.status.setup_logs_modal();
     view.manage.setup_scale_modal();
     $("#"+config.selectors.scale_form).submit(function(event) {
         event.preventDefault();
         docker_scale("scanner", $("#"+config.selectors.scale_amount).val());
     });
-    
 };
 
 export {

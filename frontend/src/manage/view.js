@@ -19,8 +19,18 @@ var status = {
             let details = $("<div />").attr("class", "service_details");
             let name = $("<div />").attr("class", "service_name").html(item.service);
             let action = $("<div />").attr("class", "service_action");
-            let icon_play = $("<i />").attr("class", "fas fa-play service_start");
-            let icon_stop = $("<i />").attr("class", "fas fa-stop service_stop");
+            let icon_play = $("<i />").attr({
+                "class": "fas fa-play service_start",
+                "data-toggle": "tooltip",
+                "data-placement": "bottom",
+                "title": "Start Service",
+            });
+            let icon_stop = $("<i />").attr({
+                "class": "fas fa-stop service_stop",
+                "data-toggle": "tooltip",
+                "data-placement": "bottom",
+                "title": "Stop Service",
+            });
             if (item.is_running) {
                 all_stopped = false;
                 div.addClass("service_up");
@@ -30,21 +40,36 @@ var status = {
                 div.addClass("service_down");
                 display.addClass("btn btn-outline-danger");
             }
-            let icon_info = $("<i />").attr("class", "fas fa-info service_info");
-            display.click(function() {
+            let icon_info = $("<i />").attr({
+                "class": "fas fa-info service_info",
+                "data-toggle": "tooltip",
+                "data-placement": "bottom",
+                "title": "Details",
+            });
+            icon_info.click(function() {
                 status.show_status_details(item);
             })
+            let icon_logs = $("<i />").attr({
+                "class": "fas fa-bars service_info",
+                "data-toggle": "tooltip",
+                "data-placement": "bottom",
+                "title": "Logs",
+            });
+            icon_logs.click(function() {
+                status.show_logs(item.service);
+            });
             icon_play.click(function() {
                 start(item.service);
             });
             icon_stop.click(function() {
                 stop(item.service);
             });
-            action.append(icon_info);
+            details.append(icon_info);
+            details.append(icon_logs);
             details.append(icon_play);
             details.append(icon_stop);
             display.append(name);
-            display.append(action);
+            //display.append(action);
             //details.append(icon_info);
             div.append(display);
             div.append(details);
@@ -63,15 +88,26 @@ var status = {
                 $("#manage_scale").removeClass("disabled");
             }
         });
+        $(config.selectors.status_icons + ' [data-toggle="tooltip"]').tooltip();
     },
     show_status_details: function(service) {
         $("#"+config.selectors.service_detail_div).empty();
         $("#"+config.selectors.service_detail_div).append(vutils.display_object(service, 0));
         modal.show(config.selectors.service_detail_modal);
     },
+    show_logs: function(service) {
+        $("#"+config.selectors.service_logs_div).empty();
+        $("#"+config.selectors.service_logs_div).append(vutils.display_object(service, 0));
+        modal.show(config.selectors.service_logs_modal);
+    },
     setup_service_modal: function() {
         let body = modal.setup(config.selectors.service_detail_modal, "Service Details", null, null, true);
         let div = $("<div />").attr({"id": config.selectors.service_detail_div});
+        body.append(div);
+    },
+    setup_logs_modal: function() {
+        let body = modal.setup(config.selectors.service_logs_modal, "Service Log", null, null, true);
+        let div = $("<div />").attr({"id": config.selectors.service_logs_div});
         body.append(div);
     }
 }
@@ -86,6 +122,11 @@ var manage = {
         form.append(input);
         form.append(submit);
         body.append(form);
+    },
+    show_total: function(num) {
+        $(config.selectors.num_images_id).html(num);
+        var d = new Date();
+        $(config.selectors.timestamp_id).html(d.toLocaleString());
     },
 }
 

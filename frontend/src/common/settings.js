@@ -6,9 +6,13 @@ var urls = {
     suggestions: backend_url + "/suggestions/images_service",
     code_validate: backend_url + "/suggestions/validate",
     versions: "https://pypi.org/pypi/LIB/json",
-    images: "http://neri.di.unipi.it:4000/api/images",  // "http://127.0.0.1:8000/suggestions/images",
-    stats: "http://neri.di.unipi.it:4000/stats/",
-    search: "http://neri.di.unipi.it:4000/search/",  // https://github.com/di-unipi-socc/DockerAnalyser/blob/master/storage/README.md
+    images: {
+        list: backend_url + "/images/list",
+        stats: backend_url + "/images/stats",
+        search: backend_url + "/images/search",  // https://github.com/di-unipi-socc/DockerAnalyser/blob/master/storage/README.md
+        drop: backend_url + "/images/drop",
+        export: backend_url + "/images/export",
+    },
     compose: {
         upload: backend_url + "/compose/upload", 
         build: backend_url + "/compose/build", 
@@ -34,6 +38,7 @@ var msgs = {
     confirm_clear_requirements: "All inserted requirements will be removed!",
     confirm_clear_uploads: "All uploaded files will be removed",
     confirm_reset: "All your current work will be lost!",
+    confirm_drop_images: "All images will be removed!"
 };
 
 var help = {

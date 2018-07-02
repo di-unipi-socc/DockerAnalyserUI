@@ -43,7 +43,7 @@ var actions = [{
         style: "danger",
         modal: null,
         action: function() {
-            view.confirm(settings.msgs.confirm_clear_requirements, reset);
+            vutils.confirm(settings.msgs.confirm_clear_requirements, reset);
         },
     }
 ];

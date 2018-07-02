@@ -22,4 +22,5 @@ urlpatterns = [
     path('requirements/', include('requirements.urls')),
     path('suggestions/', include('suggestions.urls')),
     path('compose/', include('docker-compose.urls')),
+    path('images/', include('images.urls')),
 ]

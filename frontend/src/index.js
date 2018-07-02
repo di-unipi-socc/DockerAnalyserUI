@@ -49,6 +49,7 @@ $(document).ready(function () {
     configurator.init();
     dashboard.init();
     results.init();
+    vutils.setup_confirm_modal();
 
     $('#smartwizard').smartWizard({
         theme: "dots", 

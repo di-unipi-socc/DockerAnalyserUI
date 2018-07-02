@@ -37,7 +37,7 @@ var actions = [{
         style: "danger",
         modal: null,
         action: function() {
-            view.confirm(settings.msgs.confirm_reset, reset);
+            vutils.confirm(settings.msgs.confirm_reset, reset);
         },
     }
 ];
@@ -48,10 +48,6 @@ var actions = [{
  * @returns {boolean} true if code is valid, false otherwise
  */
 var validate = function(content, callback) {
-    /*let def_idx = content.indexOf("def analysis");
-    if (def_idx < 0)
-        return false;
-    return true;*/
     $.getJSON(settings.urls.code_validate, {"code": JSON.stringify(content)})
         .done(function(data) {
             var errors = data.errors;
@@ -165,38 +161,26 @@ var upload_package = function() {
 };
 
 var get_package = function() {
-    console.log("get_package");
-    /*$.ajax({
-        url: "http://127.0.0.1:8000/compose/upload",
-        type: "GET",
-        dataType: "application/zip",
-        processData: true,
-        
+    let options = {
+        url: settings.urls.compose.upload,
+        processData: false,
+        xhrFields: {responseType: 'arraybuffer'}
+    };
+    $.get(options).done(function(data, status, xhr) {
+        /*var type = xhr.getResponseHeader('Content-Type');
+        var disposition = xhr.getResponseHeader('Content-Disposition');
+        if (disposition && disposition.indexOf('attachment') !== -1) {
+            var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            var matches = filenameRegex.exec(disposition);
+            if (matches != null && matches[1]) 
+                filename = matches[1].replace(/['"]/g, '');
+            console.log("filename", filename);
+        }*/
+        load_from_zip(data);
       })
-  .done(function(data) {
-    console.log( "success" );
-    load_from_zip(data);
-  })
-  .fail(function(xhr, status, error) {
-    var err = eval("(" + xhr.responseText + ")");
-    console.log(err.Message);
-  })
-  .always(function(data) {
-    console.log( "complete" );
-  });
-
-    var jqxhr = $.ajax("http://127.0.0.1:8000/compose/upload", "application/zip")  // "binary"
-        .done(function(data) {
-          console.log( "success" );
-          load_from_zip(data);
-        })
-        .fail(function(xhr, status, error) {
-            var err = eval("(" + xhr.responseText + ")");
-            console.log(err.Message);
-        })
-        .always(function() {
-          console.log( "finished" );
-        });*/
+      .fail(function(xhr, status, error) {
+          console.log(xhr.responseText);
+      });
 }
 
 /**
@@ -215,10 +199,8 @@ var init = function() {
 
     $("#"+config.selectors.upload_package_form).submit(function(event) {
         event.preventDefault();
-        view.confirm(settings.msgs.confirm_upload_zip, upload_package, null);
+        vutils.confirm(settings.msgs.confirm_upload_zip, upload_package, null);
     });
-
-    view.setup_confirm_modal();
 };
 
 export {

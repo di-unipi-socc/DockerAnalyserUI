@@ -140,3 +140,5 @@ DOCKER_ANALYSER_RELATIVE_PATH_DEPLOY_PACKAGE = "/data/media"
 
 DEFAULT_DEPLOY_PACKAGE = "default-deploy-package"
 UPLOADED_DEPLOY_PACKAGE = "uploaded-deploy-package"
+
+IMAGES_SERVER_URL = "http://127.0.0.1:4000"

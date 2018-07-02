@@ -25,7 +25,7 @@ var actions = [{
         style: "danger",
         modal: null,
         action: function() {
-            view.confirm(settings.msgs.confirm_clear_uploads, reset);
+            vutils.confirm(settings.msgs.confirm_clear_uploads, reset);
         },
     }
 ];
@@ -70,7 +70,7 @@ var add_uploaded_file = function(filename, file_type, file_content, file_editabl
             let remove_values = {filename: filename};
             if (content.editor && content.editor.getValue() != file_content)
                 // If the file was modified, user must confirm he want to remove it
-                view.confirm(settings.msgs.confirm_remove_file, remove_file, remove_values);
+                vutils.confirm(settings.msgs.confirm_remove_file, remove_file, remove_values);
             else
                 remove_file(remove_values);
         });

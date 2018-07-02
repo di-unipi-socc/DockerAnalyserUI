@@ -18,42 +18,6 @@ var show_error = function(msg) {
     $(config.selectors.error_container).append(div);
 };
 
-var setup_confirm_modal = function() {
-    let footer = $("<div />");
-    let submit = $("<button />").attr({
-        "type": "button", 
-        "class": "btn btn-primary", 
-        "id": "confirm_button", 
-        "data-dismiss": "modal"
-    }).html("Confirm");
-    let cancel = $("<button />").attr({
-        "type": "button", 
-        "class": "btn btn-secondary", 
-        "data-dismiss": "modal"
-    }).html("Cancel");
-    footer.append(submit);
-    footer.append(cancel);
-    let body = modal.setup(config.selectors.confirm_modal_id, "Confirm", null, footer, false);
-    let div = $("<div />").attr({"id": "confirm_msg"});
-    body.append(div);
-};
-
-/**
- * Shows a confirmation modal with the message provided.
- * If the user confirms, it calls the callback provided with the values provided.
- * @param {string} msg file mime type
- * @param {function} callback file mime type
- * @param {Object} values file mime type
- */
-var confirm = function(msg, callback, values) {
-    $(config.selectors.confirm_msg_id).html(msg);
-    $(config.selectors.confirm_modal_id).modal("show");
-    $(config.selectors.confirm_button_id).unbind("click");  // Removing previous bindings
-    $(config.selectors.confirm_button_id).click(function() {
-        callback(values);
-    });
-};
-
 /**
  * Returns a new button with the provided text.
  * It can be an "info" button or a "danger" button. Info is the default.
@@ -331,8 +295,6 @@ var packager = {
 
 export {
     show_error,
-    setup_confirm_modal,
-    confirm,
     get_text_button,
     get_button,
     editor,

@@ -62,7 +62,7 @@ var hide = function(id) {
 };
 
 var error = function(id, msg) {
-    let error = vutils.generate_error(msg);
+    let error = vutils.generate_message("danger", msg);
     clear_errors(id);
     $(id + " .error-container").append(error);
 };

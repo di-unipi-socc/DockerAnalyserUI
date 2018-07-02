@@ -6,7 +6,7 @@ var get_page = function(page, callback, url, params) {
     if (params == null || params == undefined)
         params = {};
     if (url == undefined)
-        url = settings.urls.images;
+        url = settings.urls.images.list;
     params.page = page;
     params.limit = config.vars.page_size;
     $.getJSON(url, params).done(function(data) {
@@ -18,8 +18,8 @@ var get_page = function(page, callback, url, params) {
 };
 
 var get_stats = function(attribute, callback) {
-    let url = settings.urls.stats + attribute;
-    $.getJSON(url).done(function(data) {
+    let params = {attribute: attribute};
+    $.getJSON(settings.urls.images.stats, params).done(function(data) {
         let output = {};
         $.each(data.values, function(idx, item) {
             output[item.value] = item.count;
@@ -34,7 +34,7 @@ var get_stats = function(attribute, callback) {
 var search = function(params, callback, page) {
     if (page == undefined)
         page = 1;
-    get_page(page, callback, settings.urls.search, params);
+    get_page(page, callback, settings.urls.images.search, params);
 };
 
 export {

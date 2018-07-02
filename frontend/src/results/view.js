@@ -7,7 +7,9 @@ import * as vutils from '../common/viewutils'
 import * as search_module from './search'
 import Chart from 'chart.js';
 
-var $ = require("jquery");
+var show_error = function(msg) {
+    vutils.show_error(msg, config.vars.step_id);
+}
 
 var get_close_button = function() {
     let icon = $("<span />").attr({"aria-hidden": "true"}).html("&times;");

@@ -1,3 +1,6 @@
+import * as config from './config'
+import * as modal from './modals'
+
 var get_main_box = function(id, title) {
     let div = $("<div />").attr({"id": id, "class": "border rounded results_container_box"});
     if (title) {
@@ -11,8 +14,8 @@ var get_main_box = function(id, title) {
  * Shows a general error message.
  * @param {string} msg the error message
  */
-var generate_error = function(msg) {
-    let div = $("<div />").attr({"role": "alert", "class": "alert alert-danger alert-dismissible fade show"});
+var generate_message = function(type, msg) {
+    let div = $("<div />").attr({"role": "alert", "class": "alert alert-" + type + " alert-dismissible fade show"});
     let close_button = $("<button />").attr({"type": "button", "class": "close", "data-dismiss": "alert", "aria-label": "Close"});
     let close_icon = $("<span />").attr("aria-hidden", "true").html("&times;");
     close_button.append(close_icon);
@@ -21,11 +24,19 @@ var generate_error = function(msg) {
     return div;
 };
 
-var show_error = function(msg, step_id) {
-    let error = generate_error(msg);
+var show_message = function(type, msg, step_id) {
+    let error = generate_message(type, msg);
     let container = $("#step-" + step_id + " .error-container");
     container.empty();
     container.append(error);
+}
+
+var show_error = function(msg, step_id) {
+    show_message("danger", msg, step_id);
+}
+
+var show_info = function(msg, step_id) {
+    show_message("info", msg, step_id);
 }
 
 var get_close_button = function(dismiss) {
@@ -110,14 +121,54 @@ var fix_height = function(idx) {
     container.finish().animate({ minHeight: height }, 400, function(){});
 }
 
+var setup_confirm_modal = function() {
+    let footer = $("<div />");
+    let submit = $("<button />").attr({
+        "type": "button", 
+        "class": "btn btn-primary", 
+        "id": "confirm_button", 
+        "data-dismiss": "modal"
+    }).html("Confirm");
+    let cancel = $("<button />").attr({
+        "type": "button", 
+        "class": "btn btn-secondary", 
+        "data-dismiss": "modal"
+    }).html("Cancel");
+    footer.append(submit);
+    footer.append(cancel);
+    let body = modal.setup(config.selectors.confirm_modal_id, "Confirm", null, footer, false);
+    let div = $("<div />").attr({"id": "confirm_msg"});
+    body.append(div);
+};
+
+/**
+ * Shows a confirmation modal with the message provided.
+ * If the user confirms, it calls the callback provided with the values provided.
+ * @param {string} msg file mime type
+ * @param {function} callback file mime type
+ * @param {Object} values file mime type
+ */
+var confirm = function(msg, callback, values) {
+    $(config.selectors.confirm_msg_id).html(msg);
+    $(config.selectors.confirm_modal_id).modal("show");
+    $(config.selectors.confirm_button_id).unbind("click");  // Removing previous bindings
+    $(config.selectors.confirm_button_id).click(function() {
+        callback(values);
+    });
+};
+
 export {
     get_main_box,
-    generate_error,
+    generate_message,
+    show_message,
     show_error,
+    show_info,
     get_close_button,
     get_help_icon,
     create_action_button,
     setup_action_buttons, 
     display_object,
-    fix_height
+    fix_height,
+    setup_confirm_modal,
+    confirm
 }
