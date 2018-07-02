@@ -6,6 +6,8 @@ from os import path
 import json
 import yaml
 import io
+from itertools import groupby
+
 #import yaml
 
 from operator import attrgetter
@@ -53,6 +55,11 @@ class MyCompose:
         return self._project.service_names
 
 
+    def build(self, services=None):
+        services = services if services else self.get_service_names()
+        services_no_scanner = list(filter(lambda x: x != "scanner", services))
+        self.compose.build({'SERVICE': services_no_scanner, '--memory': '1GB'})
+
     def build_scanner(self, scanner_name='scanner', path_deploypackage='/data/examples/deploy-package-dockerfinder'):
         print("Building the scanner....")
         self.compose.build({'SERVICE': [scanner_name],
@@ -65,6 +72,7 @@ class MyCompose:
     def up(self, services=None, scale=None):
         # scale = ['crawler=2']
         # services =  list of services
+        print(scale)
         services = services if services else self.get_service_names()
         scale = scale if scale else []
         options = {
@@ -79,7 +87,7 @@ class MyCompose:
             '--force-recreate': True,
             '--no-build': False,
             '--build': False,
-            '--scale': scale  # ['crawler=2']
+            '--scale': [scale] if scale else []  # ['crawler=2']
         }
         self.compose.up(options)
         return (services, scale)
@@ -102,33 +110,37 @@ class MyCompose:
 
     def ps(self, services=None):
         """
-        containers status
+        services status
         """
         # running_containers = self._project.containers(stopped=False)
         services_name = [services] if services else self.get_service_names()
         running_containers = self._project.containers(
             service_names=services_name, stopped=True)
-        # sorted(
-        # self._project.cosntainers(service_names=self.get_service_names(), stopped=True)
-        #self._project.containers(service_names=self.get_service_names(), one_off=OneOffFilter.only),
-        # key=attrgetter('name'))
-        # running_containers = self._project.containers(service_names=self.get_service_names(), stopped=True)
+
         items = [{
             'name': container.name,
             'service': container.service,
             'name_without_project': container.name_without_project,
             'command': container.human_readable_command,
             'state': container.human_readable_state,
-            # 'health': container.human_readable_health_status,
+            'health': container.human_readable_health_status,
             # 'labels': container.labels,
             'ports': container.human_readable_ports,
             # 'volumes': get_volumes(get_container_from_id(project.client, container.id)),
             'log': container.log_config,
             'is_running': container.is_running} for container in running_containers]
 
-        return items
+        service_per_container = list()
+        for key, group in groupby(items, lambda x: x['service']):
+            l = list(group)
+            service_per_container.append({'name': key,
+                                          'num': len(l),
+                                          'container': l,
+                                          })
 
-    def logs(self, services=None):
+        return service_per_container
+
+    def logs(self, services=None, tail=4):
         services_logs = []
         containers = self._project.containers(
             service_names=services if services else self.get_service_names(), stopped=True)
@@ -136,7 +148,8 @@ class MyCompose:
             logs = dict()
             logs['name'] = container.name
             logs['service'] = container.service
-            logs['log'] = container.logs().decode("utf-8")
+            print(tail)
+            logs['log'] = container.logs(tail=tail).decode("utf-8")
             services_logs.append(logs)
         return services_logs
 
