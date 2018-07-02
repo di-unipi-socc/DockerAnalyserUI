@@ -6,6 +6,8 @@ from os import path
 import json
 import yaml
 import io
+from itertools import groupby
+
 #import yaml
 
 from operator import attrgetter
@@ -70,6 +72,7 @@ class MyCompose:
     def up(self, services=None, scale=None):
         # scale = ['crawler=2']
         # services =  list of services
+        print(scale)
         services = services if services else self.get_service_names()
         scale = scale if scale else []
         options = {
@@ -84,7 +87,7 @@ class MyCompose:
             '--force-recreate': True,
             '--no-build': False,
             '--build': False,
-            '--scale': scale  # ['crawler=2']
+            '--scale': [scale] if scale else []  # ['crawler=2']
         }
         self.compose.up(options)
         return (services, scale)
@@ -107,31 +110,35 @@ class MyCompose:
 
     def ps(self, services=None):
         """
-        containers status
+        services status
         """
         # running_containers = self._project.containers(stopped=False)
         services_name = [services] if services else self.get_service_names()
         running_containers = self._project.containers(
             service_names=services_name, stopped=True)
-        # sorted(
-        # self._project.cosntainers(service_names=self.get_service_names(), stopped=True)
-        #self._project.containers(service_names=self.get_service_names(), one_off=OneOffFilter.only),
-        # key=attrgetter('name'))
-        # running_containers = self._project.containers(service_names=self.get_service_names(), stopped=True)
+
         items = [{
             'name': container.name,
             'service': container.service,
             'name_without_project': container.name_without_project,
             'command': container.human_readable_command,
             'state': container.human_readable_state,
-            # 'health': container.human_readable_health_status,
+            'health': container.human_readable_health_status,
             # 'labels': container.labels,
             'ports': container.human_readable_ports,
             # 'volumes': get_volumes(get_container_from_id(project.client, container.id)),
             'log': container.log_config,
             'is_running': container.is_running} for container in running_containers]
 
-        return items
+        service_per_container = list()
+        for key, group in groupby(items, lambda x: x['service']):
+            l = list(group)
+            service_per_container.append({'name': key,
+                                          'num': len(l),
+                                          'container': l,
+                                          })
+
+        return service_per_container
 
     def logs(self, services=None, tail=4):
         services_logs = []

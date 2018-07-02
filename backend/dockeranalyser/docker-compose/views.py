@@ -182,7 +182,12 @@ def status(request):
     service = request.GET.get('service')
     try:
         services = mycompose.ps(services=service)
-        return JsonResponse({"err": 0, "msg": "status of the services", "services": services, "num": len(services)}, safe=False)
+        if(service):
+            return JsonResponse({"err": 0, "msg": "Status of {}".format(service),
+                                "replicas": len(services), "services": services}, safe=False)
+        else:
+            return JsonResponse({"err": 0, "msg": "status of the services", "services": services}, safe=False)
+
     except Exception as e:
         return JsonResponse({"err": 1, "msg": traceback.format_exc()})
 
