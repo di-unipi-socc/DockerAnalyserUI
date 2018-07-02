@@ -66,7 +66,9 @@ def build(request):
     # GET  /build
     # Build the scanner with the deploy-package uploaded.
     if request.method == 'GET':
+
         try:
+            mycompose.build() # build the services aprt scanner
             deploy_package = get_latest_uploaded_deploy_package()
             path = os.path.join(settings.DOCKER_ANALYSER_RELATIVE_PATH_DEPLOY_PACKAGE,deploy_package)
             res = mycompose.build_scanner(scanner_name="scanner",path_deploypackage=path)
@@ -87,7 +89,6 @@ def up(request):
     # GET /up?service=<SERVICE_NAME>&scale=<NUM>
     service = request.GET.get('service')
     scale = request.GET.get('scale')
-    # mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR) #file_compose="docker-analyser.json"
     try:
         (services_up, scale) = mycompose.up(services=([service] if service else None), scale=(
             "{}={}".format(service, scale) if scale else None))  # service_names=["scanner"]
@@ -118,8 +119,6 @@ def config(request):
        #          "only-official": false
        #      }
        #  }
-    # mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR) #file_compose="docker-analyser.json"
-
     if request.method == 'POST':
         if request.body:
             body = json.loads(request.body)
@@ -170,7 +169,6 @@ def logs(request):
 
 def stop(request):
     # GET /stop
-    #    mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR)
     try:
         services = mycompose.stop()  # service_names=["scanner"]
         return JsonResponse({"err": 0, "msg": "stop {} services".format(services)})
@@ -181,7 +179,6 @@ def stop(request):
 def status(request):
     # GET /status
     service = request.GET.get('service')
-    #mycompose = MyCompose(project_name=PROJECT_NAME, project_dir=PROJECT_DIR)
     try:
         services = mycompose.ps(services=service)
         return JsonResponse({"err": 0, "msg": "status of the services", "services": services, "num": len(services)}, safe=False)

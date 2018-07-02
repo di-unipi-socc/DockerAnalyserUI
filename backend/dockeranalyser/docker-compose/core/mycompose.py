@@ -53,6 +53,11 @@ class MyCompose:
         return self._project.service_names
 
 
+    def build(self, services=None):
+        services = services if services else self.get_service_names()
+        services_no_scanner = list(filter(lambda x: x != "scanner", services))
+        self.compose.build({'SERVICE': services_no_scanner, '--memory': '1GB'})
+
     def build_scanner(self, scanner_name='scanner', path_deploypackage='/data/examples/deploy-package-dockerfinder'):
         print("Building the scanner....")
         self.compose.build({'SERVICE': [scanner_name],
