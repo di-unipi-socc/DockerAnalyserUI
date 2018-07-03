@@ -5,9 +5,6 @@ import * as model from '../common/model'
 import * as view from './view'
 import * as api from './api'
 
-var $ = require("jquery");
-
-
 var setup_charts_form = function() {
     let form = $(config.selectors.add_chart_form);
     //let form = $("<fieldset />").attr("class", "form-group");

@@ -170,7 +170,6 @@
         </div>
         <div class="row step_content">
           <div class="col-12 offset-sm-0">
-            <div id="results_actions" class="action_buttons"></div>
 
             <!-- Possibilità di esportare i risultati in qualche formato, ad esempio: json, csv, xml 
              Potrebbe anche farlo il backend e restituirmi il file pronto.
@@ -192,9 +191,13 @@
 
             <!-- Results -->
             <div id="results_not_ready">
-              Analyser not running or an error occurred.
+              The Image Server seeems to be unreachable.<br />
+              Check in the Manage section to make sure it is up or wait a few moments and try reloading the page.<br />
+              <br />
+              <button type="submit" class="btn btn-info" id="reload">Reload Page</button>
             </div>
             <div id="results_container">
+              <div id="results_actions" class="action_buttons"></div>
               <!-- Header -->
               <h2>
                 <span id="num_images">0</span> Images Analysed</h2>

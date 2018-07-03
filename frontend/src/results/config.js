@@ -6,8 +6,7 @@ var vars = {
     uploaded_editing_class: "uploaded_editing",
     base_zip_name: "deploy-package-",
     page_size: 20,
-    concurrent_calls: 10,
-    max_chart_groups: 5,
+    max_chart_groups: 10,
     not_acceped_fields: [null, undefined, "undefined", "null", "array", "date_string"],
 };
 
@@ -34,7 +33,8 @@ var selectors = {
     confirm_msg_id: "#confirm_msg",
     confirm_button_id: "#confirm_button",
     sample_image_modal: "#sample_image_modal",
-    sample_image_div: "sample_image_container"
+    sample_image_div: "sample_image_container",
+    reload_button: "#reload",
 };
 
 var graphs = {

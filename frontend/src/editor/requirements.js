@@ -115,7 +115,7 @@ var get_versions = function(libname, callback) {
             if (callback)
                 callback(results);
         }).fail(function() {
-            modal.error(config.selectors.req_modal_id, settings.msgs.error_generic);
+            modal.error(config.selectors.req_modal_id, settings.msgs.error_server);
         });
 };
 
@@ -148,13 +148,11 @@ var search = function(name) {
                 });
                 view.requirements.show_modal();
             } else {
-                //view.show_error(settings.msgs.error_no_results);
                 modal.error(config.selectors.req_modal_id, settings.msgs.error_no_results);
             }
         })
         .fail(function() {
-            //view.show_error(settings.msgs.error_generic);
-            modal.error(config.selectors.req_modal_id, settings.msgs.error_generic);
+            modal.error(config.selectors.req_modal_id, settings.msgs.error_server);
         });
 };
 
@@ -177,13 +175,11 @@ var from_file = function(content) {
             });
             if (errors.length > 0) {
                 let full_error_msg = settings.msgs.error_req_not_found + errors.join();
-                //view.show_error(full_error_msg);
                 modal.error(config.selectors.uploads_modal, full_error_msg);
             }
         })
         .fail(function() {
-            //view.show_error(settings.msgs.error_generic);
-            modal.error(config.selectors.uploads_modal, settings.msgs.error_generic); 
+            modal.error(config.selectors.uploads_modal, settings.msgs.error_server); 
         });
 };
 

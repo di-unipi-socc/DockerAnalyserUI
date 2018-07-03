@@ -102,15 +102,16 @@ var reset = function() {
 
 var upload_files = function(event) {
     var uploaded_files = $("#"+config.selectors.upload_input).prop("files");  // FileList object
-
+    let errors = [];
+    
     $.each(uploaded_files, function(idx, uploaded_file) {
         var file_type = uploaded_file.type;
         var filename = uploaded_file.name;
         if (model.get_item(filename) != null && filename != config.req_file.name) {
-            view.show_error(settings.msgs.error_file_exists);
-            return;
+            errors.push(filename);
+            return true;  // continue
         }
-        
+
         var file_editable = utilities.is_editable(file_type);
         var reader = new FileReader();
 
@@ -128,6 +129,11 @@ var upload_files = function(event) {
         else
             reader.readAsBinaryString(uploaded_file);
     });
+
+    if (errors.length > 0) {
+        let full_error_msg = settings.msgs.error_file_exists + ": " + errors.join();
+        modal.error(config.selectors.uploads_modal, full_error_msg);
+    }
 };
 
 var init = function() {

@@ -32,9 +32,12 @@ var show_results_overview = function(attribute, container_id) {
     api.get_stats(attribute, function(min, max, avg, output) {
         let container = $(container_id);
         container.empty();
-        container.append("<li><strong>Min</strong>: " + utilities.format_number(min) + "</li>");
-        container.append("<li><strong>Max</strong>: " + utilities.format_number(max) + "</li>");
-        container.append("<li><strong>Average</strong>: " + utilities.format_number(avg) + "</li>");
+        if (min)
+            container.append("<li><strong>Min</strong>: " + utilities.format_number(min) + "</li>");
+        if (max)
+            container.append("<li><strong>Max</strong>: " + utilities.format_number(max) + "</li>");
+        if (avg)
+            container.append("<li><strong>Average</strong>: " + utilities.format_number(avg) + "</li>");
         vutils.fix_height(config.vars.step);
     });
 };
@@ -50,17 +53,23 @@ var load_first_page = function() {
         $(config.selectors.results_not_ready).hide();
         view.results.show_total(count);
         if (count > 0) {
+            $(".results_container_box").show();
+            $("#results_export").show();
             model.set_attributes(images[0]);
             graphs.set_charts_attribute_list();
             search.set_search_attribute_list();
             $("#"+config.selectors.sample_image_div).empty();
             $("#"+config.selectors.sample_image_div).append(vutils.display_object(images[0], 0));
+        } else {
+            $(".results_container_box").hide();
+            $("#results_export").hide();
         }
         vutils.fix_height(config.vars.step);
     });
 };
 
 var refresh = function() {
+    vutils.clean_messages(config.vars.step_id);
     // Reload first page, to get new total
     load_first_page();
     // Reload pull and stars stats
@@ -80,8 +89,14 @@ var init = function() {
     load_first_page();
     results_overview();
     exporter.init();
+
+    $(config.selectors.reload_button).click(function(event) {
+        event.preventDefault();
+        refresh();
+    });
 };
 
 export {
-    init
+    init,
+    refresh
 }

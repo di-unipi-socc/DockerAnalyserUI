@@ -1,9 +1,10 @@
 import * as config from './config'
 import * as settings from '../common/settings'
+import * as vutils from '../common/viewutils'
 import * as model from '../common/model'
 import * as view from './view'
 
-// La validazione viene già fatta dal form, ma andrebbe ripetuta
+// La validazione viene già fatta dal form, ma idealmente andrebbe ripetuta
 var save_configuration = function() {
     $.each(config.form_fields, function(i, values) {
         let configuration = {
@@ -35,8 +36,7 @@ var post_configuration = function(data) {
                 view.show_error(response.msg);
         })
         .fail(function(xhr, status, error) {
-            var err = eval("(" + xhr.responseText + ")");
-            console.log(err.Message);
+            console.log(xhr.responseText);
             view.show_error(settings.msgs.error_server);
         }); 
 }
@@ -52,6 +52,11 @@ var get_configuration = function() {
         .fail(function() {
             view.show_error(settings.msgs.error_server);
         }); 
+};
+
+var refresh  = function() {
+    vutils.clean_messages(config.vars.step_id);
+    get_configuration();
 };
 
 var init = function() {
@@ -80,5 +85,7 @@ content-type: application/json
 */
 
 export {
-    init
+    init,
+    refresh,
+    save_configuration
 }

@@ -2,6 +2,7 @@ import * as config from './config'
 import * as modal from '../common/modals'
 import * as vutils from '../common/viewutils'
 import * as forms from '../common/forms'
+import * as settings from '../common/settings'
 
 var show_error = function(msg) {
     vutils.show_error(msg, config.vars.step_id);
@@ -116,7 +117,7 @@ var status = {
 
 var manage = {
     setup_scale_modal: function() {
-        let body = modal.setup(config.selectors.scale_modal, "Scale Scanners", null, null, false);
+        let body = modal.setup(config.selectors.scale_modal, "Scale Scanners", settings.help.scale_scanner, null, false);
         let form = forms.get_form(config.selectors.scale_form, true);
         let input = forms.get_input.text(config.selectors.scale_amount, "Number of Scanners", true);
         input.val(config.vars.scale_default);

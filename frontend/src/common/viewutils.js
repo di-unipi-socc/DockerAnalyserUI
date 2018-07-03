@@ -36,7 +36,11 @@ var show_error = function(msg, step_id) {
 }
 
 var show_info = function(msg, step_id) {
-    show_message("info", msg, step_id);
+    show_message("success", msg, step_id);
+}
+
+var clean_messages = function(step_id) {
+    $("#step-" + step_id + " .error-container").empty();
 }
 
 var get_close_button = function(dismiss) {
@@ -165,6 +169,7 @@ export {
     show_message,
     show_error,
     show_info,
+    clean_messages,
     get_close_button,
     get_help_icon,
     create_action_button,

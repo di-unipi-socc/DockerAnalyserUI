@@ -38,9 +38,6 @@ import * as vutils from './common/viewutils'
 
 $(document).ready(function () {
 
-    //$("header").load("header.html"); 
-    //$("footer").load("footer.html"); 
-
     // Inizializzazione Editor
     editor.init();
     uploader.init();
@@ -60,6 +57,38 @@ $(document).ready(function () {
         toolbarSettings: {toolbarPosition: "top"},
         anchorSettings: {enableAllAnchors: true}
     });
+
+    $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {
+        switch (stepNumber) {
+            case 0:  // editor
+                break;
+            case 1:  // config
+                configurator.refresh();
+                break;
+            case 2:  // manage
+                dashboard.refresh();
+                break;
+            case 3:  // results
+                results.refresh();
+                break;
+        }
+    });
+
+    $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
+        switch (stepNumber) {
+            case 0:  // editor
+                break;
+            case 1:  // config
+                configurator.save_configuration();
+                break;
+            case 2:  // manage
+                dashboard.stop_refresh();
+                break;
+            case 3:  // results
+                break;
+        }
+    });
+
 
     /*$("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {
         console.log("You are on step "+stepNumber+" now");

@@ -1,5 +1,6 @@
 import * as config from './config'
 import * as model from '../common/model'
+import * as modal from '../common/modals'
 import * as settings from '../common/settings'
 import * as vutils from '../common/viewutils'
 import * as view from './view'
@@ -15,7 +16,7 @@ var actions = [{
     style: "info",
     modal: null,
     action: function() {
-        docker_build();
+        upload_package();
     },
 }, {
     name: "start",
@@ -41,9 +42,7 @@ var actions = [{
     icon: "arrows-alt-v ",
     style: "info",
     modal: config.selectors.scale_modal,
-    action: function() {
-        docker_scale();
-    },
+    action: null
 }, {
     name: "drop",
     title: "Remove All Images",
@@ -55,9 +54,12 @@ var actions = [{
     },
 }];
 
+var interval = null;
+
 var upload_package = function() {
-    console.log("building");
     packager.create_zip(function(content, filename) {
+        var data = new FormData();
+        data.append("deploy-package", content);
         $.ajax({
             url: settings.urls.compose.upload,
             type: "POST",
@@ -65,47 +67,17 @@ var upload_package = function() {
             processData: false,  // Important!
             contentType: false,
             cache: false,
+            data: data,
             success: function(response) {
                 console.log("SUCCESS: ", response);
+                if (response.err == 0)
+                    docker_build();
             },
             error: function(e) {
                 console.log("ERROR:", e.responseText);
             }
         });
-
-        $.post(settings.urls.compose.upload, {"deploy-package": content})
-            .done(function(response) {
-                console.log("post success");
-                console.log(response);
-            })
-            .fail(function(xhr, status, error) {
-                var err = eval("(" + xhr.responseText + ")");
-                console.log(err.Message);
-            });
     });
-    //$(config.selectors.docker_up_button).show();
-    /*create_zip(function(content, zip_name) {
-        $.getJSON(settings.urls.compose.build, {"package": content})
-            .done(function(response) {
-                $(config.selectors.docker_build_up).show();
-            })
-            .fail(function() {
-                view.show_error(settings.msgs.error_generic);
-            });
-    });*/
-};
-
-var docker_build = function() {
-    console.log("building");
-    /*create_zip(function(content, zip_name) {
-        $.getJSON(settings.urls.compose.build, {"package": content})
-            .done(function(response) {
-                $(config.selectors.docker_build_up).show();
-            })
-            .fail(function() {
-                view.show_error(settings.msgs.error_generic);
-            });
-    });*/
 };
 
 var docker_command = function(url, service, callback) {
@@ -126,12 +98,21 @@ var docker_command = function(url, service, callback) {
 };
 
 var docker_up = function(service) {
-    docker_command(settings.urls.compose.up, service, docker_status);
+    docker_command(settings.urls.compose.up, service, function(response) { docker_status(); });
 };
 
 var docker_stop = function(service) {
-    docker_command(settings.urls.compose.stop, service, docker_status);
+    docker_command(settings.urls.compose.stop, service, function(response) { docker_status(); });
 };
+
+
+var docker_build = function() {
+    docker_command(settings.urls.compose.build, "scanner", function() {
+        vutils.show_info(settings.msgs.info_build, config.vars.step_id);
+        docker_status();
+    });
+};
+
 
 var docker_logs = function(service) {
     docker_command(settings.urls.compose.logs, service, function(data) {
@@ -139,7 +120,6 @@ var docker_logs = function(service) {
     });
 };
 
-// GET /compose/status
 var docker_status = function() {
     load_first_page();
     $.getJSON(settings.urls.compose.status)
@@ -154,7 +134,6 @@ var docker_status = function() {
         }); 
 };
 
-// GET /up?service=scanner&scale=3
 var docker_scale = function(service, scale) {
     console.log("called up");
     let data = {service: service, scale: scale};
@@ -163,9 +142,13 @@ var docker_scale = function(service, scale) {
             console.log("scale ok");
             if (response.err != 0)
                 view.show_error(response.msg);
+            else {
+                vutils.show_info(settings.msgs.info_scale, config.vars.step_id);
+                docker_status();
+            }
         })
         .fail(function() {
-            //view.show_error(settings.msgs.error_generic);
+            view.show_error(settings.msgs.error_generic);
         });
 };
 
@@ -175,9 +158,11 @@ var drop_images = function() {
             console.log("drop ok");
             if (response.err != 0)
                 view.show_error(response.msg);
+            else
+                view.manage.show_total(0);
         })
         .fail(function() {
-            //view.show_error(settings.msgs.error_generic);
+            view.show_error(settings.msgs.error_generic);
         });
 }
 
@@ -187,18 +172,35 @@ var load_first_page = function() {
     });
 };
 
-var init = function() {
-    vutils.setup_action_buttons(module_basename, actions);
+var refresh = function() {
+    console.log("refreshing");
+    vutils.clean_messages(config.vars.step_id);
     docker_status();
+    //if (interval == null)
+    //    interval = setInterval(function(){ refresh(); }, config.vars.reload_timeout*1000);
+}
+
+var stop_refresh = function() {
+    console.log("stop refreshing");
+    clearInterval(interval);
+    interval = null;
+}
+
+var init = function() {
+    docker_status();
+    vutils.setup_action_buttons(module_basename, actions);
     view.status.setup_service_modal();
     view.status.setup_logs_modal();
     view.manage.setup_scale_modal();
     $("#"+config.selectors.scale_form).submit(function(event) {
         event.preventDefault();
+        modal.hide(config.selectors.scale_modal);
         docker_scale("scanner", $("#"+config.selectors.scale_amount).val());
     });
 };
 
 export {
-    init
+    init,
+    refresh,
+    stop_refresh,
 }

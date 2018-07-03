@@ -1,7 +1,8 @@
 var vars = {
     step: 2,
     step_id: "manage",
-    scale_default: 5
+    scale_default: 1,
+    reload_timeout: 10  // seconds
 }
 
 var selectors = {

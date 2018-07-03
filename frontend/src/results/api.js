@@ -13,7 +13,10 @@ var get_page = function(page, callback, url, params) {
         callback(data.images, data.count, data.pages);
     })
     .fail(function() {
-        view.show_error(settings.msgs.error_generic);
+        view.show_error(settings.msgs.error_server);
+        $(config.selectors.results_container).hide();
+        $(config.selectors.results_not_ready).show();
+        
     });
 };
 
@@ -27,7 +30,7 @@ var get_stats = function(attribute, callback) {
         callback(data.min, data.max, data.avg, output);
     })
     .fail(function() {
-        view.show_error(settings.msgs.error_generic);
+        view.show_error(settings.msgs.error_server);
     }); 
 };
 

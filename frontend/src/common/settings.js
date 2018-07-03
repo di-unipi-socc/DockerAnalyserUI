@@ -18,6 +18,7 @@ var urls = {
         build: backend_url + "/compose/build", 
         config: backend_url + "/compose/config",
         up: backend_url + "/compose/up",
+        scale: backend_url + "/compose/up",
         stop: backend_url + "/compose/stop",
         logs: backend_url + "/compose/logs",
         status: backend_url + "/compose/status"
@@ -28,7 +29,7 @@ var msgs = {
     error_generic: "An error occurred",
     error_server: "Unable to reach server",
     error_no_results: "No results found",
-    error_file_exists: "The file already exists",
+    error_file_exists: "File already exists",
     error_wrong_type: "Wrong File Type",
     error_req_not_found: "Libraries not found: ",
     error_validation: "Validation Error. Please check your analysis.py. code",
@@ -38,11 +39,14 @@ var msgs = {
     confirm_clear_requirements: "All inserted requirements will be removed!",
     confirm_clear_uploads: "All uploaded files will be removed",
     confirm_reset: "All your current work will be lost!",
-    confirm_drop_images: "All images will be removed!"
+    confirm_drop_images: "All images will be removed!",
+    info_scale: "Service scaled succesfully",
+    info_build: "Scanner built succesfully",
 };
 
 var help = {
-    add_file: "Please specify a name for the new file, including its extension"
+    add_file: "Please specify a name for the new file, including its extension",
+    scale_scanner: "Please specify the new total number of scanner instances"
 };
 
 export {
