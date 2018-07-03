@@ -1,6 +1,9 @@
 from django.conf import settings
 from django.http import JsonResponse
+from django.http import HttpResponse
+from wsgiref.util import FileWrapper
 from urllib.request import urlopen
+from io import StringIO
 import urllib.parse
 import json
 
@@ -48,4 +51,14 @@ def images_drop(request):
 
 
 def images_export(request):
-    return make_request(images_export_url, None)
+    export = urlopen(images_export_url)
+    content = export.read().decode('utf-8')
+    json_file = StringIO()
+    json_file.write(content)
+    json_file.seek(0)
+    response = HttpResponse(FileWrapper(json_file))
+    headers = export.getheaders()
+    for header in headers:
+        if header[0] in ['Content-Disposition', 'Content-Type']:
+            response[header[0]] = header[1]
+    return response

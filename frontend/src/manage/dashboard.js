@@ -52,6 +52,15 @@ var actions = [{
     action: function() {
         vutils.confirm(settings.msgs.confirm_drop_images, drop_images);
     },
+}, {
+    name: "refresh",
+    title: "Refresh",
+    icon: "sync",
+    style: "info",
+    modal: null,
+    action: function() {
+        refresh();
+    },
 }];
 
 var interval = null;

@@ -3,8 +3,7 @@ import * as utilities from './utilities'
 var files = {};
 var attributes = {};
 var search_attributes = {};  // {attribute: null, type: null, value: null}
-var charts = [];
-var configuration = {}
+var charts = {};
 
 /*var chart = {
     attribute: null,
@@ -195,21 +194,42 @@ let clear_search_attributes = function() {
     search_attributes = {};
 }
 
+let get_chart_id = function(attribute, type, approx) {
+    return attribute +  "_" + type + "_" + approx;
+};
+
 /**
  * Adds a new chart to the list
  * @param {Object} chart the new chart
+ * @returns {number} 1 if the chart was added, 0 otherwise
  */
 var add_chart = function(chart) {
-    charts.push(chart);
+    let id = get_chart_id(chart.attribute, chart.type, chart.approx);
+    if (!charts.hasOwnProperty(id)) {
+        chart.open = true;
+        charts[id] = chart;
+        return 1;
+    }
+    return 0;
 };
 
 /**
  * Removes an existing chart
  * @param {number} index index of the chart to remove
  */
-var remove_chart = function(index) {
-    if (index >= 0 && index < charts.length)
-        charts.splice(index, 1);
+var remove_chart = function(attribute, type, approx) {
+    let id = get_chart_id(attribute, type, approx);
+    delete charts[id];
+};
+
+var open_chart = function(attribute, type, approx) {
+    let id = get_chart_id(attribute, type, approx);
+    charts[id].open = true;
+};
+
+var close_chart = function(attribute, type, approx) {
+    let id = get_chart_id(attribute, type, approx);
+    charts[id].open = false;
 };
 
 /**
@@ -239,5 +259,7 @@ export {
     update_search_attributes,
     add_chart,
     remove_chart,
-    get_charts
+    get_charts,
+    open_chart,
+    close_chart
 };

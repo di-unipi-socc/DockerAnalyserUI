@@ -131,7 +131,7 @@ var setup_confirm_modal = function() {
     let footer = $("<div />");
     let submit = $("<button />").attr({
         "type": "button", 
-        "class": "btn btn-primary", 
+        "class": "btn btn-info", 
         "id": "confirm_button", 
         "data-dismiss": "modal"
     }).html("Confirm");

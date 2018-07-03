@@ -41,34 +41,35 @@ var is_searchable_field = function(type) {
     return ($.inArray(type, config.vars.not_acceped_fields) == -1);
 };
 
-var search = function() {
+var search = function(page) {
+    if (!page)
+        page = 1;
+    let len = model.len_search_attributes();
+    if (len == 0)
+        return;
     let attributes = model.get_search_attributes();
     var params = {};
-    console.log("search attributes", attributes);
     $.each(attributes, function(attribute, vals) {
         let value = null;
-        if (vals.type == "string")
+        if (vals.type == "string" || vals.type == "number")
             value = view.result_forms.get_value(attribute);
-        else if (vals.type == "number")  // Gestire tutti i casi
-            value = [view.result_forms.get_value(attribute+"_from"), view.result_forms.get_value(attribute+"_to")];
+        //else if (vals.type == "number")  // Gestire tutti i casi - Deactivated until ranges search is available
+        //    value = [view.result_forms.get_value(attribute+"_from"), view.result_forms.get_value(attribute+"_to")];
         else if (vals.type == "boolean")
             value = (view.result_forms.get_value(attribute) == 't');
         attributes[attribute].value = value;
-        console.log(attribute, value);
         if (value != null)
             params[attribute] = value;
     });
-    console.log("search params");
-    console.log(params);
+    console.log("search params", params);
     model.update_search_attributes(attributes);
     api.search(params, function(images, count, pages) {
-        view.results.show_results(images, count, pages);
+        view.results.show_results(images, count, pages, page, search);
         vutils.fix_height(config.vars.step);
-    });
+    }, page);
 };
 
 var set_search_attribute_list = function() {
-    console.log("called");
     let select = $(config.selectors.custom_search_form_select);
     let attribute_names = model.get_attribute_names();
     let attributes = model.get_attributes();

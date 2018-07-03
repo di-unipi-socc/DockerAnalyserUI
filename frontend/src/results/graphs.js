@@ -27,7 +27,12 @@ var setup_charts_form = function() {
     form.submit(function(event) {
         event.preventDefault();
         // Inserire validazione?
-        show_graph($("#select_types").val(), $("#select_attributes").val(), $("#select_approx").val());
+        let type = $("#select_types").val();
+        let attribute = $("#select_attributes").val();
+        let approx = $("#select_approx").val();
+        let added = model.add_chart({type: type, attribute: attribute, approx: approx});
+        if (added > 0)
+            show_graph(type, attribute, approx, true);
     });
 };
 
@@ -46,15 +51,22 @@ var set_charts_attribute_list = function() {
 };
 
 // Aggiunge un grafico
-var show_graph = function(type, attribute, approx) {
+var show_graph = function(type, attribute, approx, is_open) {
     api.get_stats(attribute, function(min, max, avg, output) {
-        let id = "graph_container_" + attribute + "_" + approx;
-        let card = view.results.get_chart_card(id, type, attribute, approx);
+        let id = "graph_container_" + attribute +  "_" + type + "_" + approx;
+        let card = view.results.get_chart_card(id, type, attribute, approx, is_open);
         $("#graph_container").append(card);
         view.charts.chart(type, "#"+id, output, attribute, approx);
         vutils.fix_height(config.vars.step);
     });
 };
+
+var refresh = function() {
+    $("#graph_container").empty();
+    $.each(model.get_charts(), function(idx, item) {
+        show_graph(item.type, item.attribute, item.approx, item.open);
+    });
+}
 
 var init = function(container) {
     setup_charts_form();
@@ -62,5 +74,6 @@ var init = function(container) {
 
 export {
     init,
+    refresh,
     set_charts_attribute_list
 }

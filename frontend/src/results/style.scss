@@ -99,3 +99,12 @@ label.capitalize {
 #custom_search_free input[type="text"] {
     width: 250px;
 }
+
+#results_search .form-check {
+    display: flex;
+    padding-left: 1.8rem;
+}
+
+.current_page {
+    font-weight: bold;
+}

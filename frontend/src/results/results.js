@@ -2,11 +2,11 @@ import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
 import * as vutils from '../common/viewutils'
+import * as settings from '../common/settings'
 import * as view from './view'
 import * as search from './search'
 import * as graphs from './graphs'
 import * as api from './api'
-import * as exporter from './exporter'
 
 var module_basename = "results";
 var actions = [{
@@ -25,6 +25,7 @@ var actions = [{
     style: "info",
     modal: null,
     action: function() {
+        //export_images();
     },
 }];
 
@@ -68,6 +69,59 @@ var load_first_page = function() {
     });
 };
 
+// https://stackoverflow.com/questions/16086162/handle-file-download-from-ajax-post
+var export_images = function() {
+    let url = settings.urls.images.export;
+    console.log(url);
+    let options = {
+        type: "GET",
+        data: {},
+        url: url,
+        processData: false,
+        contentType: false,
+        cache: false,
+        xhrFields: {responseType: 'arraybuffer'}
+    };
+    $.ajax(options).done(function(response, status, xhr) {
+        let type = xhr.getResponseHeader('Content-Type');
+        console.log(type);
+        /*var disposition = xhr.getResponseHeader('Content-Disposition');
+        if (disposition && disposition.indexOf('attachment') !== -1) {
+            var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            var matches = filenameRegex.exec(disposition);
+            if (matches != null && matches[1]) 
+                filename = matches[1].replace(/['"]/g, '');
+            console.log("filename", filename);
+        }*/
+        let filename = "docker-analyser-images.json";
+        var blob = new Blob([response], { type: type });
+
+        var URL = window.URL || window.webkitURL;
+        var downloadUrl = URL.createObjectURL(blob);
+        console.log(downloadUrl);
+
+        // use HTML5 a[download] attribute to specify filename
+        var a = document.createElement("a");
+        // safari doesn't support this yet
+        if (typeof a.download === 'undefined') {
+            window.location = downloadUrl;
+        } else {
+            console.log("dovrei essere qui");
+            a.href = downloadUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+        }
+    
+      })
+      .fail(function(xhr, status, error) {
+          console.log("ERROR");
+          console.log(xhr);
+          console.log(status);
+          console.log(error);
+      });
+}
+
 var refresh = function() {
     vutils.clean_messages(config.vars.step_id);
     // Reload first page, to get new total
@@ -75,8 +129,10 @@ var refresh = function() {
     // Reload pull and stars stats
     results_overview();
     // Reload charts
-    // Search form stays as it is
-    // We use the first image as template, so it cannot be changed
+    graphs.refresh();
+    // Search form stays as it is: we use the first image as template, so it cannot be changed
+    // Reload the search results
+    search.search();
 };
 
 var init = function() {
@@ -88,7 +144,6 @@ var init = function() {
     
     load_first_page();
     results_overview();
-    exporter.init();
 
     $(config.selectors.reload_button).click(function(event) {
         event.preventDefault();

@@ -267,6 +267,10 @@ body.loading .loading_img {
     cursor: pointer;
 }
 
+#confirm_button {
+    margin-right: 10px;
+}
+
 @import "../editor/style";
 @import "../configurator/style";
 @import "../manage/style";

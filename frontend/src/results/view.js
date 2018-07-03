@@ -72,8 +72,9 @@ var result_forms = {
     get_field: function(type, name) {
         let row_container = $("<div />").attr("class", "row no-gutters");
         if (type == "boolean")
-            row_container.addClass("form-check form-check-inline");
-        else
+            row_container.addClass("form-check");
+        //    row_container.addClass("form-check form-check-inline");
+        //else
             row_container.addClass("form-group row no-gutters");
         let container = $("<div />").attr("class", "col-11 row no-gutters");
         let id = result_forms.get_search_id(name);
@@ -94,7 +95,7 @@ var result_forms = {
         } else */
             result_forms.get_input(container, input_type, id, name, title);
         let remove_div = $("<div />").attr({"class": "col-1 text-center"});
-        let remove_button = $("<input />").attr({"type": "submit", "class": "btn btn-secondary btn-sm", "value": "-"});
+        let remove_button = $("<input />").attr({"type": "submit", "class": "btn btn-outline-danger btn-sm", "value": "-"});
         remove_button.click(function(event) {
             event.preventDefault();
             row_container.remove();
@@ -126,23 +127,28 @@ var results = {
     show_total: function(num) {
         $(config.selectors.num_images_id).html(num);
     },
-    get_pagination: function(pages) {
+    get_pagination: function(pages, current_page, search_function) {
         let nav = $("<nav />").attr({"aria-label": "Search Results Navigation"});
         let ul = $("<nav />").attr({"class": "pagination justify-content-end"});
-        let prev = $('<li class="page-item"><a class="page-link disabled" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>');
-        let next = $('<li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>');
-        ul.append(prev);
+        //let prev = $('<li class="page-item"><a class="page-link disabled" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>');
+        //let next = $('<li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>');
+        //ul.append(prev);
         for (let i=1; i<=pages; i++) {
-            let li = $('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
+            let li = $('<li class="page-item page-item-' + i +'"><a class="page-link" href="#">' + i + '</a></li>');
+            if (i == current_page)
+                li.addClass("current_page");
+            li.click(function(event) {
+                event.preventDefault();
+                search_function(i);
+            });
             ul.append(li);
         }
-        ul.append(next);
+        //ul.append(next);
         nav.append(ul);
         return nav;
     },
-    show_results: function(items, count, pages) {
-        let len = items.length;
-        let title = $("<h4 />").html(len + " results found");
+    show_results: function(items, count, pages, current_page, search_function) {
+        let title = $("<h4 />").html(count + " results found");
         $(config.selectors.results_list_id).empty();
         $(config.selectors.results_list_id).append(title);
         $.each(items, function(idx, item) {
@@ -167,6 +173,12 @@ var results = {
                 "aria-labelledby": header_id,
             });
             let body = $("<div />").attr({"class": "card-body"});
+            body.on('hidden.bs.collapse', function() {
+                vutils.fix_height(config.vars.step);
+            });
+            body.on('shown.bs.collapse', function() {
+                vutils.fix_height(config.vars.step);
+            });
             body.append(vutils.display_object(item, 0));
             body_container.append(body);
             div.append(header_container);
@@ -174,12 +186,12 @@ var results = {
             $(config.selectors.results_list_id).append(div);
         });
         if (items.length < count) {
-            let pagination = results.get_pagination(pages);
+            let pagination = results.get_pagination(pages, current_page, search_function);
             $(config.selectors.results_list_id).append(pagination);
         }
         $(config.selectors.results_list_id).show();
     },
-    get_chart_card: function(id, type, attribute, approximation) {
+    get_chart_card: function(id, type, attribute, approximation, is_open) {
         let title = type + " chart for <b>" + attribute + "</b> attribute with <i>" + approximation + "</i> approximation";
         let cnt = $("<div />").attr("class", "card");
         let header = $("<div />").attr("class", "card-header").html(utilities.capitalize(title));
@@ -187,6 +199,7 @@ var results = {
         button.click(function(event) {
             event.preventDefault();
             cnt.remove();
+            model.remove_chart(attribute, type, approximation);
             vutils.fix_height(config.vars.step);
         });
         header.append(button);
@@ -195,15 +208,19 @@ var results = {
         let div = $("<div />").attr("id", id).attr("class", "graph_container");
         body.append(div);
         body.on('hidden.bs.collapse', function() {
+            model.close_chart(attribute, type, approximation);
             vutils.fix_height(config.vars.step);
         });
         body.on('shown.bs.collapse', function() {
+            model.open_chart(attribute, type, approximation);
             vutils.fix_height(config.vars.step);
         });
         let min_button = get_reduce_button(body_id);
         header.append(min_button);
         cnt.append(header);
         cnt.append(body);
+        if (!is_open)
+            body.collapse('hide');
         return cnt;
     },
 };
@@ -281,8 +298,8 @@ var search = {
         });
         $.each(groups, function(type, attrs) {
             let cnt = $("<div />");
-            if (type == "boolean")
-                cnt.addClass("checkbox-container");
+            //if (type == "boolean")
+            //    cnt.addClass("checkbox-container");
             attrs.sort();
             $.each(attrs, function(idx, attr) {
                 search.add_field(attr, type);
@@ -382,7 +399,7 @@ var get_ranges = function(values, approximation) {
 
 var charts = {
     chart: function(type, container, values, attribute, approximation) {
-        let id = "chart_" + attribute + "_" + approximation;
+        let id = "chart_" + attribute + "_" + type + "_" + approximation;
         let canvas = $("<canvas />").attr({"id": id, "width": "200", "height": "200"});
         $(container).append(canvas);
         let labels = [];
