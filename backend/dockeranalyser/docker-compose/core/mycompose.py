@@ -36,8 +36,7 @@ class MyCompose:
         self._project = self._get_project(project_dir, project_name=self._name)
         self.compose = TopLevelCommand(self._project, project_dir=project_dir)
 
-    def reload_project():
-        print("Reloading the project")
+    def reload_project(self):
         self._project = self._get_project(self.project_dir, project_name=self._name)
         self.compose = TopLevelCommand(self._project, project_dir=self.project_dir )
 
@@ -74,6 +73,7 @@ class MyCompose:
         scale = scale if scale else []
         options = {
             'SERVICE': services,
+            'start': True,
             '--no-deps': False,
             '--always-recreate-deps': False,
             '--abort-on-container-exit': None,
