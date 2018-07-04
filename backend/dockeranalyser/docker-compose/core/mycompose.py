@@ -135,7 +135,7 @@ class MyCompose:
             l = list(group)
             service_per_container.append({'name': key,
                                           'num': len(l),
-                                          'container': l,
+                                          'containers': l,
                                           })
 
         return service_per_container
