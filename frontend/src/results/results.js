@@ -25,7 +25,7 @@ var actions = [{
     style: "info",
     modal: null,
     action: function() {
-        //export_images();
+        export_images();
     },
 }];
 
@@ -84,35 +84,24 @@ var export_images = function() {
     };
     $.ajax(options).done(function(response, status, xhr) {
         let type = xhr.getResponseHeader('Content-Type');
-        console.log(type);
-        /*var disposition = xhr.getResponseHeader('Content-Disposition');
+        var disposition = xhr.getResponseHeader('Content-Disposition');
+        let filename = "docker-analyser-images.zip";
         if (disposition && disposition.indexOf('attachment') !== -1) {
             var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
             var matches = filenameRegex.exec(disposition);
             if (matches != null && matches[1]) 
                 filename = matches[1].replace(/['"]/g, '');
-            console.log("filename", filename);
-        }*/
-        let filename = "docker-analyser-images.json";
+        }
         var blob = new Blob([response], { type: type });
-
         var URL = window.URL || window.webkitURL;
         var downloadUrl = URL.createObjectURL(blob);
-        console.log(downloadUrl);
-
+        
         // use HTML5 a[download] attribute to specify filename
         var a = document.createElement("a");
-        // safari doesn't support this yet
-        if (typeof a.download === 'undefined') {
-            window.location = downloadUrl;
-        } else {
-            console.log("dovrei essere qui");
-            a.href = downloadUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-        }
-    
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();    
       })
       .fail(function(xhr, status, error) {
           console.log("ERROR");

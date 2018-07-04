@@ -34,9 +34,7 @@ def upload(request):
         # POST /upload:
         #    deploy-package : DEPLOY-PACKAGE.zip
         if key not in request.FILES:
-            options = "Name:{} \t Bytes:{} \t Content-type:{}".format(
-                uploaded_file.name, uploaded_file.size, uploaded_file.content_type)
-            return JsonResponse({"err": 0, "msg": "NO {} key set into body request".format(key), "detail": options})
+            return JsonResponse({"err": 0, "msg": "NO {} key set into body request".format(key), "detail": ""})
         uploaded_file = request.FILES[key]  # deploy-pacakge: .zip file
         files_extracted = handle_uploaded_deploy_package(uploaded_file)
         if not files_extracted:
@@ -59,6 +57,7 @@ def upload(request):
                 file_zip), content_type='application/zip')
             response['Content-Disposition'] = 'attachment; filename={}'.format(
                 os.path.basename(file_zip.name))  # +file_name.replace(" ","_")+'.zip'
+            response['Access-Control-Expose-Headers'] = 'Content-Disposition'
         return response
 
 
