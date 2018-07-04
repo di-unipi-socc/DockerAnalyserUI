@@ -34,7 +34,7 @@ var status = {
                 "data-placement": "bottom",
                 "title": "Stop Service",
             });
-            if (item.container[0].is_running) {
+            if (item.containers[0].is_running) {
                 all_stopped = false;
                 div.addClass("service_up");
                 display.addClass("btn btn-outline-success");
