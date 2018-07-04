@@ -101,8 +101,9 @@ class MyCompose:
                    '--entrypoint': None}
         return self.compose.run(options)
 
-    def stop(self):
-        self.compose.stop({'SERVICE': self.get_service_names()})
+    def stop(self, services):
+        services = [services] if services else self.get_service_names()
+        self.compose.stop({'SERVICE': services})
         return self.get_service_names()
 
     def ps(self, services=None):

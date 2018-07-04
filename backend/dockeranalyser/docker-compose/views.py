@@ -174,9 +174,10 @@ def logs(request):
 
 def stop(request):
     # GET /stop
+    service = request.GET.get('service')
     try:
-        services = mycompose.stop()  # service_names=["scanner"]
-        return JsonResponse({"err": 0, "msg": "stop {} services".format(services)})
+        services = mycompose.stop(services=service)  # service_names=["scanner"]
+        return JsonResponse({"err": 0, "msg": "stop {} services".format(service)})
     except Exception as e:
         return JsonResponse({"err": 1, "msg": traceback.format_exc()})
 
