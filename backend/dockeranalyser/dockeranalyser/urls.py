@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
+from django.conf.urls import url
 
 
 urlpatterns = [
@@ -23,4 +25,5 @@ urlpatterns = [
     path('suggestions/', include('suggestions.urls')),
     path('compose/', include('docker-compose.urls')),
     path('images/', include('images.urls')),
+    url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
