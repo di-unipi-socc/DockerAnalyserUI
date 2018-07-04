@@ -7,11 +7,7 @@ import json
 import yaml
 import io
 from itertools import groupby
-
-#import yaml
-
 from operator import attrgetter
-
 
 def singleton(theClass):
     """ decorator for a class to make a singleton out of it """
@@ -41,6 +37,7 @@ class MyCompose:
         self.compose = TopLevelCommand(self._project, project_dir=project_dir)
 
     def reload_project():
+        print("Reloading the project")
         self._project = self._get_project(self.project_dir, project_name=self._name)
         self.compose = TopLevelCommand(self._project, project_dir=self.project_dir )
 

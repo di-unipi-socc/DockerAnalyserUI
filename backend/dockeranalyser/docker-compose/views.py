@@ -135,9 +135,14 @@ def config(request):
                         "only-automated": "--only-automated",
                         "only-official": "--only-official"}
 
-            crawler_user_args = ["{}={}".format(map_args[k], str(v)) if (k not in [
-                'only-automated', 'only-official']) else map_args[k] for k, v in user_args.items()]
 
+            crawler_user_args = [
+                "{}={}".format(map_args[k], str(v)) for k, v in user_args.items() if  (k not in [
+                'only-automated', 'only-official']) ]
+            if(user_args['only-automated']):
+                crawler_user_args.append(map_args['only-automated'])
+            if(user_args['only-official']):
+                crawler_user_args.append(map_args['only-official'])
             args = crawler_default_args + crawler_user_args
             try:
                 mycompose.config_command(service, command, args)
