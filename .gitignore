@@ -2,6 +2,7 @@ backend/bin
 backend/include
 backend/lib
 backend/.Python
+backend/dockeranalyser/static/
 pip-selfcheck.json
 .idea/
 .DS_Store
