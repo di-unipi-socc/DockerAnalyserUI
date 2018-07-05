@@ -1,11 +1,10 @@
 import * as config from './config'
-import * as model from '../common/model'
 import * as modal from '../common/modals'
 import * as settings from '../common/settings'
 import * as vutils from '../common/viewutils'
 import * as view from './view'
 import * as packager from '../editor/packager'
-import * as api from '../results/api'
+import * as api from '../common/images_api'
 
 var module_basename = "manage";
 var actions = [{
@@ -20,7 +19,7 @@ var actions = [{
     },
 }, {
     name: "start",
-    title: "Start Analyser",
+    title: "Start All Services",
     icon: "play",
     style: "info",
     modal: null,
@@ -29,7 +28,7 @@ var actions = [{
     },
 }, {
     name: "stop",
-    title: "Stop Analyser",
+    title: "Stop All Services",
     icon: "stop",
     style: "danger",
     modal: null,
@@ -114,14 +113,12 @@ var docker_stop = function(service) {
     docker_command(settings.urls.compose.stop, service, function(response) { docker_status(); });
 };
 
-
 var docker_build = function() {
     docker_command(settings.urls.compose.build, "scanner", function() {
         vutils.show_info(settings.msgs.info_build, config.vars.step_id);
         docker_status();
     });
 };
-
 
 var docker_logs = function(service) {
     docker_command(settings.urls.compose.logs, service, function(data) {
@@ -130,21 +127,24 @@ var docker_logs = function(service) {
 };
 
 var docker_status = function() {
+    view.manage.show_refresh_time();
     load_first_page();
     $.getJSON(settings.urls.compose.status)
         .done(function(response) {
+            vutils.show_body(config.vars.step_id);
             if (response.err == 0)
                 view.status.setup_icons(response.services, docker_up, docker_stop, docker_logs);
             else 
                 view.show_error(response.msg);
         })
         .fail(function() {
+            // Server is not responding of Interval Server Error
             view.show_error(settings.msgs.error_server);
+            vutils.hide_body(config.vars.step_id);
         }); 
 };
 
 var docker_scale = function(service, scale) {
-    console.log("called up");
     let data = {service: service, scale: scale};
     $.getJSON(settings.urls.compose.scale, data)
         .done(function(response) {
@@ -182,7 +182,6 @@ var load_first_page = function() {
 };
 
 var refresh = function() {
-    console.log("refreshing");
     vutils.clean_messages(config.vars.step_id);
     docker_status();
     //if (interval == null)
@@ -190,13 +189,13 @@ var refresh = function() {
 }
 
 var stop_refresh = function() {
-    console.log("stop refreshing");
-    clearInterval(interval);
+    if (interval != null)
+        clearInterval(interval);
     interval = null;
 }
 
 var init = function() {
-    docker_status();
+    refresh();
     vutils.setup_action_buttons(module_basename, actions);
     view.status.setup_service_modal();
     view.status.setup_logs_modal();

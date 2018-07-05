@@ -4,7 +4,29 @@ import * as vutils from '../common/viewutils'
 import * as model from '../common/model'
 import * as view from './view'
 
-// La validazione viene già fatta dal form, ma idealmente andrebbe ripetuta
+var module_basename = "config";
+var actions = [{
+    name: "reset",
+    title: "Reset Last Configuration",
+    icon: "undo",
+    style: "danger",
+    modal: null,
+    action: function() {
+        get_configuration();
+    },
+}, {
+    name: "refresh",
+    title: "Refresh",
+    icon: "sync",
+    style: "info",
+    modal: null,
+    action: function() {
+        refresh();
+    },
+}];
+
+
+// La validazione viene già fatta dal form, ma per scrupolo andrebbe ripetuta
 var save_configuration = function() {
     $.each(config.form_fields, function(i, values) {
         let configuration = {
@@ -32,57 +54,42 @@ var save_configuration = function() {
 var post_configuration = function(data) {
     $.post(settings.urls.compose.config, JSON.stringify(data))
         .done(function(response) {
-            if (response.err != 0)
+            if (response.err == 0) {
+                vutils.show_info(settings.msgs.info_config, config.vars.step_id);
+                get_configuration();    // Reload configuration to check success
+            } else
                 view.show_error(response.msg);
         })
         .fail(function(xhr, status, error) {
-            console.log(xhr.responseText);
             view.show_error(settings.msgs.error_server);
-        }); 
+        });
 }
 
 var get_configuration = function() {
     $.getJSON(settings.urls.compose.config)
         .done(function(response) {
+            $(config.selectors.config_form).show();
             if (response.err == 0)
                 view.configurator.setup_form(response, save_configuration);
-            else 
+            else
                 view.show_error(response.msg);
+            vutils.fix_height(config.vars.step);
         })
         .fail(function() {
             view.show_error(settings.msgs.error_server);
+            $(config.selectors.config_form).hide();
         }); 
 };
 
-var refresh  = function() {
+var refresh = function() {
     vutils.clean_messages(config.vars.step_id);
     get_configuration();
 };
 
 var init = function() {
-    get_configuration();
+    vutils.setup_action_buttons(module_basename, actions);
+    //get_configuration();
 };
-
-/*
-POST /compose/config
-content-type: application/json
-{
-    "service": "crawler",  
-    "command": "crawl",
-    "args": {
-            "force-page":true,
-            "si": 0,
-            "random": false,
-            "fp": 10,
-            "ps": 0,
-            "policy": "pulls_first",
-            "min-stars" : 0,
-            "min-pulls" : 0,
-            "only-automated": true,
-            "only-official": false    
-        }          
-    }
-*/
 
 export {
     init,

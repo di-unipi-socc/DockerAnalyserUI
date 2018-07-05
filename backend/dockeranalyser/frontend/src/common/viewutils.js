@@ -10,6 +10,14 @@ var get_main_box = function(id, title) {
     return div;
 };
 
+var show_body = function(step_id) {
+    $("#"+step_id+"_body_container").show();
+};
+
+var hide_body = function(step_id) {
+    $("#"+step_id+"_body_container").hide();
+};
+
 /**
  * Shows a general error message.
  * @param {string} msg the error message
@@ -165,6 +173,8 @@ var confirm = function(msg, callback, values) {
 
 export {
     get_main_box,
+    show_body,
+    hide_body,
     generate_message,
     show_message,
     show_error,

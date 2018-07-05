@@ -4,6 +4,17 @@ import * as vutils from '../common/viewutils'
 import * as forms from '../common/forms'
 import * as settings from '../common/settings'
 
+/**
+ * Made to be used by the sort function, compares two services based on their name.
+ * Usage example: services.sort(service_compare)
+ * @param {Object} a an object with a name field
+ * @param {Object} b an object with a name field
+ * @returns {number} depends on alphabetical order of the two names
+ */
+function service_compare(a, b){
+    return (a.name).localeCompare(b.name);
+}
+
 var show_error = function(msg) {
     vutils.show_error(msg, config.vars.step_id);
 }
@@ -12,8 +23,10 @@ var status = {
     setup_icons: function(services, start, stop, logs) {
         let container = $(config.selectors.status_icons);
         container.empty();
-        let all_started = true;
+        let all_running = true;
         let all_stopped = true;
+        // Order services alphabetically, for coherence in visualization
+        services.sort(service_compare);
         $.each(services, function(idx, item) {
             if (item.name == "scanner")
                 $("#"+config.selectors.scale_amount).val(item.num);
@@ -21,7 +34,6 @@ var status = {
             let display = $("<div />").attr("class", "service_display rounded");
             let details = $("<div />").attr("class", "service_details");
             let name = $("<div />").attr("class", "service_name").html(item.name);
-            let action = $("<div />").attr("class", "service_action");
             let icon_play = $("<i />").attr({
                 "class": "fas fa-play service_start",
                 "data-toggle": "tooltip",
@@ -34,14 +46,35 @@ var status = {
                 "data-placement": "bottom",
                 "title": "Stop Service",
             });
-            if (item.containers[0].is_running) {
+            // Check if all containers are running and determine status accordingly
+            let all_cnt_running = true;
+            let all_cnt_stopped = true;
+            let cnt_box_container = $("<div />").attr({"class": "service_instance_box_container"});
+            $.each(item.containers, function(i, cnt) {
+                let cnt_box = $("<div />").attr({"class": "service_instance_box"});
+                if (cnt.is_running) {
+                    all_cnt_stopped = false;
+                    cnt_box.addClass("instance_up");
+                } else {
+                    all_cnt_running = false;
+                    cnt_box.addClass("instance_down");
+                }
+                cnt_box_container.append(cnt_box);
+            });
+            display.append(cnt_box_container);
+            if (item.containers.length < 2) {
+                display.children(".service_instance_box_container").hide();
+            }
+            if (all_cnt_running) {
                 all_stopped = false;
                 div.addClass("service_up");
                 display.addClass("btn btn-outline-success");
-            } else {
-                all_started = false;
+            } else if (all_cnt_stopped) {
+                all_running = false;
                 div.addClass("service_down");
                 display.addClass("btn btn-outline-danger");
+            } else {
+                display.addClass("btn btn-outline-warning");
             }
             let icon_info = $("<i />").attr({
                 "class": "fas fa-info service_info",
@@ -72,13 +105,11 @@ var status = {
             details.append(icon_play);
             details.append(icon_stop);
             display.append(name);
-            //display.append(action);
-            //details.append(icon_info);
             div.append(display);
             div.append(details);
             container.append(div);
             // If all are running, there's no point in using the start button
-            if (all_started)
+            if (all_running)
                 $("#manage_start").addClass("disabled");
             else
                 $("#manage_start").removeClass("disabled");
@@ -128,6 +159,8 @@ var manage = {
     },
     show_total: function(num) {
         $(config.selectors.num_images_id).html(num);
+    },
+    show_refresh_time: function() {
         var d = new Date();
         $(config.selectors.timestamp_id).html(d.toLocaleString());
     },

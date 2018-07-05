@@ -21,6 +21,30 @@ $service_height: 90px;
     display: inline-block;
     width: $service_width;
     height: $service_height;
+    position: relative;
+}
+
+.service_instance_box_container {
+    position: absolute;
+    bottom: 1px;
+    left: 7px;
+}
+
+.service_instance_box {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 3px;
+    display: inline-block;
+    opacity: .8;
+}
+
+.instance_up {
+    background: $green;
+}
+
+.instance_down {
+    background: $red;
 }
 
 .service_container .btn-outline-success:hover {
@@ -47,7 +71,7 @@ $service_height: 90px;
 .service_details i {
     padding: 10px;
     cursor: pointer;
-    color: #1d3e54;
+    color: $main-color;
 }
 
 .service_name {

@@ -52,8 +52,8 @@ $(document).ready(function () {
         theme: "dots", 
         autoAdjustHeight: true, 
         keyNavigation: false,
-        useURLhash: false, 
-        showStepURLhash: false,
+        useURLhash: true, 
+        showStepURLhash: true,
         toolbarSettings: {toolbarPosition: "top"},
         anchorSettings: {enableAllAnchors: true}
     });

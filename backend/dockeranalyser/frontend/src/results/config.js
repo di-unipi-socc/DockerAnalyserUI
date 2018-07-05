@@ -4,8 +4,6 @@ var vars = {
     step_id: "visual",
     action_btn_class: "btn btn-sm action_button",
     uploaded_editing_class: "uploaded_editing",
-    base_zip_name: "deploy-package-",
-    page_size: 20,
     max_chart_groups: 10,
     not_acceped_fields: [null, undefined, "undefined", "null", "array", "date_string"],
 };
@@ -27,6 +25,8 @@ var selectors = {
     custom_search_form_free_input: "#add_custom_input",
     results_search_form: "#results_search",
     add_chart_form: "#add_chart",
+    chart_attributes_select: "#select_attributes",
+    graph_container: "#graph_container",
     export_menu: ".export-dropdown-menu",
     error_container: ".error-container",
     confirm_modal_id: "#confirm_modal",

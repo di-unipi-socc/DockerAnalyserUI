@@ -16,6 +16,8 @@ images_stats_url = settings.IMAGES_SERVER_URL + "/stats/"
 images_drop_url = images_service_url + "/drop"
 images_export_url = images_service_url + "/export"
 
+server_down_msg = "Image Server is down"
+
 
 def get_params(request):
     data = {}
@@ -27,7 +29,10 @@ def get_params(request):
 def make_request(url, params):
     if params:
         url = url + "?" + urllib.parse.urlencode(params)
-    response = urlopen(url)
+    try:
+        response = urlopen(url)
+    except:
+        return JsonResponse({"err": 1, "msg": server_down_msg})
     content = response.read().decode("utf-8")
     content = json.loads(content)
     return JsonResponse(content)
@@ -58,7 +63,10 @@ def images_export(request):
     base_filename = "docker-analyser-images-" + now.strftime("%Y%m%d-%H%M%S")
     json_filename = base_filename + ".json"
     zip_filename = base_filename + ".zip"
-    export = urlopen(images_export_url)
+    try:
+        export = urlopen(images_export_url)
+    except:
+        return JsonResponse({"err": 1, "msg": server_down_msg})
     content = export.read().decode("utf-8")
     tmp = open(json_filename, "w")
     tmp.write(content)

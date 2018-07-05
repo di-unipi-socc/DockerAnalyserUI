@@ -3,7 +3,7 @@ import * as utilities from './utilities'
 import * as model from '../common/model'
 import * as vutils from '../common/viewutils'
 import * as view from './view'
-import * as api from './api'
+import * as api from '../common/images_api'
 
 var module_basename = "search";
 var actions = [{
@@ -66,6 +66,8 @@ var search = function(page) {
     api.search(params, function(images, count, pages) {
         view.results.show_results(images, count, pages, page, search);
         vutils.fix_height(config.vars.step);
+    }, function() {  // error_callback
+        view.show_error(settings.msgs.error_server);
     }, page);
 };
 

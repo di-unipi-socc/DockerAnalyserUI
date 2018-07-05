@@ -135,12 +135,12 @@ var configurator = {
             });
         });
         let submit_button = forms.get_submit_button("update_config", "Update Configuration", "info");
-        let clear_button = forms.get_submit_button("default_config", "Reset Defaults", "danger");
+        /*let clear_button = forms.get_submit_button("default_config", "Reset Defaults", "danger");
         clear_button.click(function(event) {
             event.preventDefault();
             configurator.setup_form(defaults, save_configuration);
         });
-        form.append(clear_button);
+        form.append(clear_button);*/
         form.append(submit_button);
         form.submit(function(event) {
             event.preventDefault();

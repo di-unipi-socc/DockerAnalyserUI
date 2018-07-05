@@ -1,5 +1,9 @@
 var backend_url = "http://127.0.0.1:8000";
 
+var vars = {
+    page_size: 20,
+};
+
 var urls = {
     requirements: backend_url + "/requirements/search",
     requirements_validate: backend_url + "/requirements/validate",
@@ -40,6 +44,7 @@ var msgs = {
     confirm_clear_uploads: "All uploaded files will be removed",
     confirm_reset: "All your current work will be lost!",
     confirm_drop_images: "All images will be removed!",
+    info_config: "Configuration updated succesfully",
     info_scale: "Service scaled succesfully",
     info_build: "Scanner built succesfully",
 };
@@ -50,6 +55,7 @@ var help = {
 };
 
 export {
+    vars,
     urls,
     msgs,
     help

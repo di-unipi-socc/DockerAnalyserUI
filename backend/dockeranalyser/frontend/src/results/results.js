@@ -6,19 +6,10 @@ import * as settings from '../common/settings'
 import * as view from './view'
 import * as search from './search'
 import * as graphs from './graphs'
-import * as api from './api'
+import * as api from '../common/images_api'
 
 var module_basename = "results";
 var actions = [{
-    name: "refresh",
-    title: "Refresh",
-    icon: "sync",
-    style: "info",
-    modal: null,
-    action: function() {
-        refresh();
-    },
-}, {
     name: "export",
     title: "Export",
     icon: "download",
@@ -26,6 +17,15 @@ var actions = [{
     modal: null,
     action: function() {
         export_images();
+    },
+}, {
+    name: "refresh",
+    title: "Refresh",
+    icon: "sync",
+    style: "info",
+    modal: null,
+    action: function() {
+        refresh();
     },
 }];
 
@@ -40,6 +40,8 @@ var show_results_overview = function(attribute, container_id) {
         if (avg)
             container.append("<li><strong>Average</strong>: " + utilities.format_number(avg) + "</li>");
         vutils.fix_height(config.vars.step);
+    }, function() {  // error_callback
+        view.show_error(settings.msgs.error_server);
     });
 };
 
@@ -66,6 +68,10 @@ var load_first_page = function() {
             $("#results_export").hide();
         }
         vutils.fix_height(config.vars.step);
+    }, function() {  // error_callback
+        view.show_error(settings.msgs.error_server);
+        $(config.selectors.results_container).hide();
+        $(config.selectors.results_not_ready).show();
     });
 };
 

@@ -398,6 +398,33 @@ var get_ranges = function(values, approximation) {
 }
 
 var charts = {
+    setup_charts_form: function() {
+        let form = $(config.selectors.add_chart_form);
+        $.each(config.graphs, function(key, vals) {
+            let id = "select_" + key;
+            let select = $("<select />").attr({"name": id, "id": id, "class": "custom-select", "required": "required"});
+            let option = $("<option />").attr({"value": ""}).html(vals.label+":");
+            select.append(option);
+            $.each(vals.options, function(idx, val) {
+                let option_id = "option_" + key + "_" + val.value.toLowerCase();
+                option = $("<option />").attr({"value": val.value, "id": option_id}).html(val.label);
+                select.append(option);
+            });
+            form.append(select);
+        });
+        let input = $("<input />").attr({"type": "submit", "class": "btn btn-info", "value": "Create"});
+        form.append(input);
+        form.submit(function(event) {
+            event.preventDefault();
+            // Inserire validazione?
+            let type = $("#select_types").val();
+            let attribute = $("#select_attributes").val();
+            let approx = $("#select_approx").val();
+            let added = model.add_chart({type: type, attribute: attribute, approx: approx});
+            if (added > 0)
+                show_graph(type, attribute, approx, true);
+        });
+    },
     chart: function(type, container, values, attribute, approximation) {
         let id = "chart_" + attribute + "_" + type + "_" + approximation;
         let canvas = $("<canvas />").attr({"id": id, "width": "200", "height": "200"});

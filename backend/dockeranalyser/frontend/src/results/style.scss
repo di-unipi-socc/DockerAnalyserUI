@@ -1,5 +1,9 @@
 $subdict_space: 20px;
 
+#results_not_ready {
+    display: none;
+}
+
 #results_list .card {
     margin-bottom: 2px;
 }
