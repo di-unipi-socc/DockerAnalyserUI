@@ -52,8 +52,8 @@ $(document).ready(function () {
         theme: "dots", 
         autoAdjustHeight: true, 
         keyNavigation: false,
-        useURLhash: true, 
-        showStepURLhash: true,
+        useURLhash: false, 
+        showStepURLhash: false,
         toolbarSettings: {toolbarPosition: "top"},
         anchorSettings: {enableAllAnchors: true}
     });
@@ -89,11 +89,6 @@ $(document).ready(function () {
         }
     });
 
-
-    /*$("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection) {
-        console.log("You are on step "+stepNumber+" now");
-        vutils.fix_height(stepNumber);
-     });*/
     $('[data-toggle="tooltip"]').tooltip();
     $('[data-toggle="popover"]').popover({trigger: "hover"});
 

@@ -9,6 +9,13 @@ import * as requirements from './requirements'
 
 var module_basename = "uploads";
 var actions = [{
+        name: "add_new",
+        title: "Add Empty File",
+        icon: "plus",
+        style: "info",
+        modal: config.selectors.add_file_modal,
+        action: null,
+    },{
         name: "add",
         title: "Upload Files",
         icon: "upload",
@@ -153,6 +160,14 @@ var init = function() {
         }
     );
     $(config.selectors.uploaded_show_list).hide();
+
+    // NEW EMPTY FILE
+    view.editor.setup_newfile_modal();
+    $("#"+config.selectors.add_file_form).submit(function(event) {
+        event.preventDefault();
+        editor.add_empty_file();
+    });
+    
 };
 
 export {

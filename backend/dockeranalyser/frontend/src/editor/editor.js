@@ -60,19 +60,13 @@ var add_empty_file = function() {
  * Initialises the editor loading the analysis file.
  */
 var init = function() {
-    view.editor.setup_newfile_modal();
+    /*view.editor.setup_newfile_modal();
     view.editor.add_tab("+", function() {
         modal.show(config.selectors.add_file_modal);
-    });
+    });*/
     let file = config.analysis_file;
     model.add_item(file.name, file.type, file.content, false, true);
     add_item(file.name, file.type, file.content);
-    
-    $("#"+config.selectors.add_file_form).submit(function(event) {
-        event.preventDefault();
-        add_empty_file();
-    });
-    
 };
 
 /**
@@ -90,5 +84,6 @@ var reset = function() {
 export {
     init, 
     add_item,
-    remove_item
+    remove_item,
+    add_empty_file
 };

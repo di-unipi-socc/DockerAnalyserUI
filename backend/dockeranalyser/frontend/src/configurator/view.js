@@ -20,11 +20,11 @@ var forms = {
         let div = $("<div />").attr({"class": "row"});
         let is_checkbox = (field.type == "checkbox");
         //let is_number = (type == "number");
-        let input_class = "col-sm-4";
+        let input_class = "col-sm-6";
         let label_class = "col-sm-2";
-        let help_class =  "col-sm-6";
+        let help_class =  "col-sm-4";
         if (is_checkbox) {
-            input_class = "col-sm-6";
+            input_class = "col-sm-8";
             label_class = "";
         }
         let input_container = $("<div />").attr({"class": input_class});
@@ -135,6 +135,7 @@ var configurator = {
             });
         });
         let submit_button = forms.get_submit_button("update_config", "Update Configuration", "info");
+        submit_button.addClass("offset-sm-3");
         /*let clear_button = forms.get_submit_button("default_config", "Reset Defaults", "danger");
         clear_button.click(function(event) {
             event.preventDefault();

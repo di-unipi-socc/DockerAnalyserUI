@@ -62,6 +62,10 @@ $editor-height: 600px;
     border-color: $main-color;
 }
 
+.sw-theme-dots .step-content {
+    background-color: transparent;
+}
+
 /* BUTTONS */
 
 .btn-outline-info {
@@ -260,6 +264,9 @@ body.loading .loading_img {
 .modal h5 .help_icon {
     font-size: 80%;
     margin-left: 10px;
+}
+
+.help_icon {
     color: darken($secondary-color, 5%);
 }
 

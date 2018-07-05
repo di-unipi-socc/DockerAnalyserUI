@@ -61,7 +61,6 @@ var search = function(page) {
         if (value != null)
             params[attribute] = value;
     });
-    console.log("search params", params);
     model.update_search_attributes(attributes);
     api.search(params, function(images, count, pages) {
         view.results.show_results(images, count, pages, page, search);

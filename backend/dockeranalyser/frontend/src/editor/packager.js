@@ -14,6 +14,13 @@ var FileSaver = require('file-saver');
 
 var module_basename = "package";
 var actions = [{
+        name: "suggestions",
+        title: "Available Methods",
+        icon: "list",
+        style: "info",
+        modal: config.selectors.suggestions_modal,
+        action: null,
+    },{
         name: "import",
         title: "Upload Package",
         icon: "upload",
@@ -111,13 +118,11 @@ var export_zip = function() {
 };
 
 var load_from_zip = function(data) {
-    console.log("load_from_zip");
     var new_zip = new JSZip();
     new_zip.loadAsync(data).then(function(zip) {
         zip.forEach(function (relativePath, file){
             if (!file.dir) {
                 let filename = utilities.get_filename(relativePath);
-                console.log(filename);
                 let file_type = utilities.get_filetype(filename);
                 if (utilities.is_editable(file_type)) {
                     file.async("string").then(function(content) {
@@ -183,11 +188,22 @@ var get_package = function() {
       });
 }
 
+var setup_suggestions = function() {
+    $.getJSON(settings.urls.suggestions)
+        .done(function(data) {
+            view.packager.setup_suggestions_modal(data.results);
+        })
+        .fail(function() {
+            modal.error(config.selectors.suggestions_modal, settings.msgs.error_server);
+        });
+};
+
 /**
  * Initialises the package manager.
  */
 var init = function() {
     get_package();
+    setup_suggestions();
     view.packager.setup_export_modal();
     vutils.setup_action_buttons(module_basename, actions);
 

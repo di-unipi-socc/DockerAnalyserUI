@@ -264,7 +264,7 @@ var requirements = {
         $("#"+config.selectors.req_preview_div).html(lines.join("<br>"));
     },
     setup_search_modal: function() {
-        let body = modal.setup(config.selectors.req_modal_id, "Search Python Dependencies", null, null, true);
+        let body = modal.setup(config.selectors.req_modal_id, "Search Python Dependencies", settings.help.requirements, null, true);
         let form = forms.get_form(config.selectors.req_add_form, true);
         let input = forms.get_input.text(config.selectors.req_title, "Package Name", true);
         let submit = forms.get_button.submit(config.selectors.req_add_form + "_button", "Search");
@@ -283,7 +283,7 @@ var requirements = {
 
 var packager = {
     setup_export_modal: function() {
-        let body = modal.setup(config.selectors.export_modal, "Export", null, null, false);
+        let body = modal.setup(config.selectors.export_modal, "Export", settings.help.package_export, null, false);
         let form = forms.get_form(config.selectors.export_form, true);
         let input = forms.get_input.text(config.selectors.export_name, "Analyser Name", true);
         let submit = forms.get_button.submit(config.selectors.export_form + "_button", "Export");
@@ -291,6 +291,19 @@ var packager = {
         form.append(submit);
         body.append(form);
     },
+    setup_suggestions_modal: function(suggestions) {
+        let body = modal.setup(config.selectors.suggestions_modal, "Available Methods", settings.help.suggestions, null, true);
+        let div = $("<ul />").attr({"id": config.selectors.suggestions_div});
+        $.each(suggestions, function(idx, item) {
+            let txt = "<b>" + item.name + "(" + item.args.join() + ")</b>";
+            if (item.comment != "")
+                txt = txt + "<br><small>" + item.comment + "</small>";
+            let li = $("<li />").html(txt);
+            div.append(li);
+        });
+        body.append(div);
+        $('[data-toggle="popover"]').popover({trigger: "hover"});
+    }
 }
 
 export {

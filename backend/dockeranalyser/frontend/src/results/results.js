@@ -78,7 +78,6 @@ var load_first_page = function() {
 // https://stackoverflow.com/questions/16086162/handle-file-download-from-ajax-post
 var export_images = function() {
     let url = settings.urls.images.export;
-    console.log(url);
     let options = {
         type: "GET",
         data: {},

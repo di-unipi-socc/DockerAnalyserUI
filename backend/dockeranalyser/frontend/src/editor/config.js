@@ -41,8 +41,8 @@ var selectors = {
     confirm_modal_id: "#confirm_modal",
     confirm_msg_id: "#confirm_msg",
     confirm_button_id: "#confirm_button",
-    docker_build_button: "#docker_compose_build",
-    docker_up_button: "#package_up"
+    suggestions_modal: "#suggestions_modal",
+    suggestions_div: "#available_methods"
 };
 
 var req_file = {
