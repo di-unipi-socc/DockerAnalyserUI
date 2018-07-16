@@ -47,6 +47,7 @@ var msgs = {
     info_config: "Configuration updated succesfully",
     info_scale: "Service scaled succesfully",
     info_build: "Scanner built succesfully",
+    info_drop: "Images removed succesfully"
 };
 
 var help = {
@@ -54,7 +55,7 @@ var help = {
     suggestions: "Methods available on context['images']",
     package_export: "Please specify a name for your analyser",
     add_file: "Please specify a name for the new file, including its extension",
-    scale_scanner: "Please specify the new total number of scanner instances"
+    scale_scanner: "Please specify the new total number of scanner instances",
 };
 
 export {

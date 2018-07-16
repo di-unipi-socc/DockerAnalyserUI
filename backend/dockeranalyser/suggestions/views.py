@@ -46,7 +46,8 @@ def validate_code(request):
     code = request.GET.get("code", None)
     code = json.loads(code)
     #functions = get_images_service_methods()
-    analysis = "def analysis(image_json, context):"
+    #analysis = "def analysis(image_json, context):"
+    analysis = "def analysis"
     # def analysis(images_json, context):
     analysis_found = False
     return_found = False

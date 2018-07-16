@@ -1,3 +1,9 @@
+/**
+ * Configurator module.
+ * @module configurator/configurator
+ */
+
+
 import * as config from './config'
 import * as settings from '../common/settings'
 import * as vutils from '../common/viewutils'

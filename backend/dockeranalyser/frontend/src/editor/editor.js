@@ -1,3 +1,8 @@
+/**
+ * Editor module.
+ * @module editor/editor
+ */
+
 import * as config from './config'
 import * as model from '../common/model'
 import * as view from './view'

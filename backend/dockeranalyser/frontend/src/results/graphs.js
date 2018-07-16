@@ -46,7 +46,7 @@ var refresh = function() {
 }
 
 var init = function(container) {
-    view.charts.setup_charts_form();
+    view.charts.setup_charts_form(show_graph);
 };
 
 export {

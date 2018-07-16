@@ -164,11 +164,12 @@ var docker_scale = function(service, scale) {
 var drop_images = function() {
     $.getJSON(settings.urls.images.drop)
         .done(function(response) {
-            console.log("drop ok");
             if (response.err != 0)
                 view.show_error(response.msg);
-            else
+            else {
                 view.manage.show_total(0);
+                vutils.show_info(settings.msgs.info_drop, config.vars.step);
+            }
         })
         .fail(function() {
             view.show_error(settings.msgs.error_generic);

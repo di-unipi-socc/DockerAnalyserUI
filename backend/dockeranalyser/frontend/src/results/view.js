@@ -164,7 +164,7 @@ var results = {
                 "aria-expanded": "false",
                 "aria-controls": body_id,
             });
-            button.html('<i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i> ' + item["repo_name"]);
+            button.html('<i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i> ' + item["name"]);
             header.append(button);
             header_container.append(header);
             let body_container = $("<div />").attr({
@@ -398,7 +398,7 @@ var get_ranges = function(values, approximation) {
 }
 
 var charts = {
-    setup_charts_form: function() {
+    setup_charts_form: function(show_graph) {
         let form = $(config.selectors.add_chart_form);
         $.each(config.graphs, function(key, vals) {
             let id = "select_" + key;

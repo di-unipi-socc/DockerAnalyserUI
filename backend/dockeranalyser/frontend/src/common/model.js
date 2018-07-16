@@ -1,20 +1,9 @@
 import * as utilities from './utilities'
 
-var files = {};
-var attributes = {};
-var search_attributes = {};  // {attribute: null, type: null, value: null}
-var charts = {};
-
-/*var chart = {
-    attribute: null,
-    type: null,
-    labels: null,
-    values: null,
-    bg_colors: null,
-    border_colors: null,
-    approximation: null,
-}*/
-
+var files = {};              // files[filename] = {type: mimetype, content: "", uploaded: false, editor: null}
+var attributes = {};         // attributes[attribute] = type;
+var search_attributes = {};  // search_attributes[attribute] = {attribute: attribute, type: "string", value: ""}
+var charts = {};             // chart[id] = {type: "pie", attribute: attribute, approx: "others", open: true}
 
 /**
  * Adds a file to the list or overwrites an existing file.

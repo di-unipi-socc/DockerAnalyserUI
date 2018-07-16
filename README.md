@@ -45,3 +45,8 @@ Or, to auto-build after each save:
 ```sh
 npm run watch
 ```
+
+Generate documentation with:
+```sh
+jsdoc -r -c jsdoc-conf.json -d docs
+```

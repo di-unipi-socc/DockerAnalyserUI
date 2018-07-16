@@ -1,3 +1,8 @@
+/**
+ * Packager module.
+ * @module editor/packager
+ */
+
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
