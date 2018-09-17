@@ -1,4 +1,13 @@
-var form_fields = [{
+/**
+ * Configurator configuration constants.
+ * @module configurator/config
+ */
+
+/**
+ * Used to generate the configuration form.
+ * @type {Array} 
+ */
+ var form_fields = [{
     "name": "crawler",
     "title": "Crawling Options",
     "command": "crawl",
@@ -75,12 +84,21 @@ var form_fields = [{
     ]}, */
 ]
 
-
+/**
+ * Misc variables.
+ * @type {Object}
+ * @property {number} step the numeric id of this secion
+ * @property {string} step_id the text id of this secion
+ */
 var vars = {
     step: 1,
     step_id: "config",
 }
 
+/**
+ * Misc CSS selectors (ids, classes).
+ * @type {Object} 
+ */
 var selectors = {
     config_form: "#config_form"
 }

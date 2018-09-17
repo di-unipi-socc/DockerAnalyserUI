@@ -1,16 +1,28 @@
+/**
+ * Results view module.
+ * @module results/view
+ */
+
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
 import * as modal from '../common/modals'
-import * as forms from '../common/forms'
 import * as vutils from '../common/viewutils'
 import * as search_module from './search'
 import Chart from 'chart.js';
 
+/**
+ * Shows a general error message.
+ * @param {string} msg the error message
+ */
 var show_error = function(msg) {
     vutils.show_error(msg, config.vars.step_id);
 }
 
+/**
+ * Returns a new button that removes a div.
+ * @returns {jQuery} the jQuery object rapresenting the new button
+ */
 var get_close_button = function() {
     let icon = $("<span />").attr({"aria-hidden": "true"}).html("&times;");
     let button = $("<button />").attr({"type": "button", "class": "close", "aria-label": "Close"});
@@ -18,6 +30,11 @@ var get_close_button = function() {
     return button;
 };
 
+/**
+ * Returns a new button that collapses a specific div.
+ * @param {string} id the div id
+ * @returns {jQuery} the jQuery object rapresenting the new button
+ */
 var get_reduce_button = function(id) {
     let button = $("<button />").attr({
         "class": "close reduce_button", 
@@ -31,13 +48,30 @@ var get_reduce_button = function(id) {
     return button;
 };
 
+/**
+ * Handles generation of the custom search form.
+ * @namespace
+ */
 var result_forms = {
+    /**
+     * Returns a proper id for a search field, replacing unwanted characters with underscores.
+     * @param {string} name the field name
+     * @returns {string} the correct id
+     */
     get_search_id: function(name) {
         return "search_" + name.replace(/[.]/g, "_");
     },
+    /**
+     * Generates an input field and adds it to a specified container.
+     * @param {string} container the container selector
+     * @param {string} type the field type
+     * @param {string} id the field id
+     * @param {string} name  the field name
+     * @param {string} title the field label
+     */
     get_input: function(container, type, id, name, title) {
         let is_checkbox = (type == "checkbox");
-        //let is_number = (type == "number");   // Deactivated until ranges search is available
+        // let is_number = (type == "number");   // Deactivated until ranges search is available
         let is_number = false;
         let input_class = "col-sm-10";
         let label_class = "col-sm-2";
@@ -69,12 +103,16 @@ var result_forms = {
             $(container).append(div);
         }
     },
+    /**
+     * Generates a new form row, including an input, its label and its remove button.
+     * @param {string} type the field type
+     * @param {string} name the field name
+     * @returns {jQuery} the full row element
+     */
     get_field: function(type, name) {
         let row_container = $("<div />").attr("class", "row no-gutters");
         if (type == "boolean")
             row_container.addClass("form-check");
-        //    row_container.addClass("form-check form-check-inline");
-        //else
             row_container.addClass("form-group row no-gutters");
         let container = $("<div />").attr("class", "col-11 row no-gutters");
         let id = result_forms.get_search_id(name);
@@ -108,31 +146,64 @@ var result_forms = {
         row_container.append(remove_div);
         return row_container;
     },
+    /**
+     * Gets the value from a specific field.
+     * @param {string} name the field id
+     * @returns {string} the field current value
+     */
     get_value: function(name) {
         let id = result_forms.get_search_id(name);
         return $("#"+id).val();
     },
+    /**
+     * Generates a text input.
+     * @param {string} name the field name, will be used as id too
+     * @param {string} placeholder the field placeholder
+     * @returns {jQuery} the new input element
+     */
     get_txt_input: function(name, placeholder) {
         return $("<input />").attr({"type": "text", "class": "form-control", "name": name, "id": name, "placeholder": placeholder});
     },
+    /**
+     * Generates a new select.
+     * @param {string} id the field id
+     * @returns {jQuery} the new select element
+     */
     get_select: function(id) {
         return $("<select />").attr({"class": "custom-select", "name": id, "id": id});
     },
+    /**
+     * Generates a submit button.
+     * @param {string} id the field id
+     * @param {string} value the label for the button
+     * @returns {jQuery} the new button element
+     */
     get_submit_button: function(id, value) {
         return $("<input />").attr({"type": "submit", "class": "btn btn-info", "value": value, "id": id});
     }
 };
 
+/**
+ * @namespace 
+ */
 var results = {
+    /**
+     * Shows the new images total count.
+     * @param {number} num the numer to show
+     */
     show_total: function(num) {
         $(config.selectors.num_images_id).html(num);
     },
+    /**
+     * Generates the results pagination links.
+     * @param {number} pages the total number of pages 
+     * @param {number} current_page the current page shown
+     * @param {function(integer)} search_function the function called when a different page is clicked 
+     * @returns {jQuery} a nav element containing the full page list
+     */
     get_pagination: function(pages, current_page, search_function) {
         let nav = $("<nav />").attr({"aria-label": "Search Results Navigation"});
         let ul = $("<nav />").attr({"class": "pagination justify-content-end"});
-        //let prev = $('<li class="page-item"><a class="page-link disabled" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>');
-        //let next = $('<li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>');
-        //ul.append(prev);
         for (let i=1; i<=pages; i++) {
             let li = $('<li class="page-item page-item-' + i +'"><a class="page-link" href="#">' + i + '</a></li>');
             if (i == current_page)
@@ -143,10 +214,17 @@ var results = {
             });
             ul.append(li);
         }
-        //ul.append(next);
         nav.append(ul);
         return nav;
     },
+    /**
+     * Shows one page of search results, including pagination.
+     * @param {array} items one page of results
+     * @param {number} count the total number of results found
+     * @param {number} pages the total number of pages 
+     * @param {number} current_page the current page shown
+     * @param {function(integer)} search_function the function called when a different page is clicked 
+     */
     show_results: function(items, count, pages, current_page, search_function) {
         let title = $("<h4 />").html(count + " results found");
         $(config.selectors.results_list_id).empty();
@@ -191,6 +269,15 @@ var results = {
         }
         $(config.selectors.results_list_id).show();
     },
+    /**
+     * Generates the container for a chart.
+     * It includes a title and button to close/remove the chart.
+     * @param {string} id the chart id
+     * @param {string} type the attribute type
+     * @param {string} attribute the attribute name
+     * @param {string} approximation the chosen approximation type
+     * @param {booelan} is_open true if the chart should be shown open
+     */
     get_chart_card: function(id, type, attribute, approximation, is_open) {
         let title = type + " chart for <b>" + attribute + "</b> attribute with <i>" + approximation + "</i> approximation";
         let cnt = $("<div />").attr("class", "card");
@@ -225,9 +312,17 @@ var results = {
     },
 };
 
+/**
+ * Handles custom search form generation.
+ * @namespace
+ */
 var search = {
+    /**
+     * Setups the custom search form generator form.
+     * @param {string} the container selector or the container element 
+     */
     setup: function(container) {
-        let div = vutils.get_main_box("results_search_container", "Image Search");  // Spostare in config o in variabili
+        let div = vutils.get_main_box(config.vars.search_form_cnt_id, config.vars.search_form_label);
         // Search Form generator setup
         let custom_form = $("<form />").attr({"class": "form-inline", "name": config.selectors.custom_search_form, "id": config.selectors.custom_search_form});
         // Custom form first row
@@ -276,9 +371,15 @@ var search = {
         div.append(results);
         $(container).append(div);
     },
+    /**
+     * Removes all fields from the custom search form 
+     */
     empty_search_form: function() {
         $(config.selectors.results_search_form + " fieldset").empty();
     },
+    /**
+     * Decides if the custom search form should be show (if there are any fields). 
+     */
     search_form_visibility: function() {
         let len = model.len_search_attributes();
         if (len > 0)
@@ -287,25 +388,30 @@ var search = {
             $(config.selectors.results_search_form).hide();
         vutils.fix_height(config.vars.step);
     },
+    /**
+     * Setups a search form with all attributes. 
+     */
     setup_search_form: function() {
-        // Al momento non si ricerca per data e per range
+        // Date and range search are not available at the moment
         let attributes = model.get_attributes();
         let groups = {"string": [], "number": [], "boolean": []};
-        // Raggruppo i campi per tipo, per renderli più leggibili e gradevoli visivamente
+        // Fields are grouped by type, to make them more readable and graceful
         $.each(attributes, function(attribute, type) {
             if (type == "string" || type == "number" || type == "boolean")
                 groups[type].push(attribute);
         });
         $.each(groups, function(type, attrs) {
-            let cnt = $("<div />");
-            //if (type == "boolean")
-            //    cnt.addClass("checkbox-container");
             attrs.sort();
             $.each(attrs, function(idx, attr) {
                 search.add_field(attr, type);
             });
         });
     },
+    /**
+     * Adds a new field to the custom search form
+     * @param {string} name the field name 
+     * @param {string} name the field type
+     */
     add_field: function(name, type) {
         if (type == null) {
             type = model.get_attribute_type(name);
@@ -317,6 +423,9 @@ var search = {
             search.search_form_visibility();
         }
     },
+    /**
+     * Setups the Sample Image modal. 
+     */
     setup_sample_modal: function() {
         let body = modal.setup(config.selectors.sample_image_modal, "Sample Image", null, null, true);
         let div = $("<div />").attr({"id": config.selectors.sample_image_div});
@@ -324,50 +433,58 @@ var search = {
     }
 };
 
+/**
+ * Generates the colors (and a lighter variation of each) used on a graph.
+ * @param {number} num the total number of colors
+ * @returns {Array} the generated colors
+ */
 var get_colors = function(num) {
     let colors = [];
     let colors2 = []
     for (let i=1; i<=num; i++) {
         let c = utilities.rainbow(num, i);
-        let cl = utilities.LightenDarkenColor(c, 2);
+        let cl = utilities.lighten(c, 2);
         colors.push(c);
         colors2.push(cl);
     }
     return [colors, colors2];
 };
 
+/**
+ * Takes the values to show in a graph and divides the in ranges, based on the requested approximation:
+ * - "none" does nothing
+ * - "ranges" gropus results in <max_chart_groups> groups defining ranges (can be used only on numeric values)
+ * - "others" keeps the <max_chart_groups> more significative values and groups the others under the label "others"
+ * @see results/config.vars.max_chart_groups
+ * @param {Object} values original values
+ * @param {string} approximation the type of approximation desired (none, ranges, others)
+ * @returns {Object} the approximated values or the original ones if no approximation was made
+ */
 var get_ranges = function(values, approximation) {
-    // Se ho troppi valori, dovrei dividere i risultati in dei range
-    // approximation può essere "ranges" o "others"
-    // "none" non fa nulla
-    // "ranges" raggruppa i risultati in X gruppi definendo dei ranges, è possibile per i campi numerici
-    // "others" mantiene gli X risultati più significativi e raggruppa gli altri in "others"
     let keys = Object.keys(values);
-    let len = keys.length;
     let max = config.vars.max_chart_groups;
     let results = {};
     if (approximation == "none" || keys.length <= max)
         return values;
     if (approximation == "ranges") {
-        // Le chiavi devono essere intere
+        // Keys must be integers
         let intkeys = utilities.array_to_int(keys);
         intkeys.sort((a, b) => a - b);   // ES6 Arrow Function
         let max_val = intkeys[intkeys.length-1];
         if (max_val % max != 0)
-            max_val = max*(Math.floor((max_val+max)/max));  // Ottengo il prossimo multiplo di max
+            max_val = max*(Math.floor((max_val+max)/max));  // Get next multiple of max
         let step = max_val/max;
         let tmp = [];
         for (let i=0; i<max; i++) {
             tmp[i] = 0;
         }
-        let m = 0;
         $.each(intkeys, function(idx, key) {
             let index = Math.floor(key/step);
             if (index == max)
-                index = index-1;  // Nel caso in cui l'ultimo coincida col massimo
+                index = index-1;  // If the last one corresponds to the max
             tmp[index] += values[""+key];
         });
-        let j=0;
+        let j = 0;
         for (let i=0; i<max_val; i=i+step) {
             let label = (i+1) + " - " + (i+step);
             results[label] = tmp[j];
@@ -397,7 +514,18 @@ var get_ranges = function(values, approximation) {
     return results;
 }
 
+/**
+ * Handles chart generation.
+ * Uses the Chart.js library {@link https://www.chartjs.org}
+ * @namespace
+ */
 var charts = {
+    /**
+     * Setups the chart generation form using the values found in the graphs variable (in config.js).
+     * When the form is submitted, it adds the new chart to the model and calls a function to create the chart itself.
+     * @see results/config.graphs
+     * @param {function(string, string, string, boolean)} show_graph a function called when the form is submitted
+     */
     setup_charts_form: function(show_graph) {
         let form = $(config.selectors.add_chart_form);
         $.each(config.graphs, function(key, vals) {
@@ -416,7 +544,6 @@ var charts = {
         form.append(input);
         form.submit(function(event) {
             event.preventDefault();
-            // Inserire validazione?
             let type = $("#select_types").val();
             let attribute = $("#select_attributes").val();
             let approx = $("#select_approx").val();
@@ -425,18 +552,28 @@ var charts = {
                 show_graph(type, attribute, approx, true);
         });
     },
+    /**
+     * Creates a new chart and adds it to the page.
+     * It manipulates the provided values based on the number of different values and the approximation method.
+     * @see {@link https://www.chartjs.org}
+     * @param {string} type chart type
+     * @param {string} container selector of the container element
+     * @param {string} values complete list of values 
+     * @param {string} attribute name of the selected attribute
+     * @param {string} approximation name of the selected approximation method
+     */
     chart: function(type, container, values, attribute, approximation) {
         let id = "chart_" + attribute + "_" + type + "_" + approximation;
         let canvas = $("<canvas />").attr({"id": id, "width": "200", "height": "200"});
         $(container).append(canvas);
         let labels = [];
         let vals = [];
+        // If I have too many different values, I should divide them in ranges
         values = get_ranges(values, approximation);
         $.each(values, function(key, item) {
             labels.push(key);
             vals.push(item);
         });
-        // Se ho troppi valori, dovrei dividere i risultati in dei range
         var ctx = $("#"+id);
         var colors = get_colors(vals.length);
         var scales = {};
@@ -491,28 +628,12 @@ var charts = {
     }
 };
 
-var exporter = {
-    setup_formats: function(formats) {
-        let menu = $(config.selectors.export_menu);
-        $.each(formats, function(idx, item) {
-            let menu_item = $("<a />").attr({"class": "dropdown-item", "href": "#"});
-            menu_item.html(item.name);
-            menu_item.click(function(event) {
-                event.preventDefault();
-                item.action();
-            });
-            menu.append(menu_item);
-        });
-    }
-}
-
 export {
     show_error,
     confirm,
     get_text_button,
     get_button,
     results,
-    exporter,
     charts,
     search,
     result_forms

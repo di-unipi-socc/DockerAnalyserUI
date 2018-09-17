@@ -1,5 +1,21 @@
+/**
+ * Modals module.
+ * Functions for setup and handling of modals.
+ * @module common/modals
+ */
+
 import * as vutils from './viewutils'
 
+/**
+ * Creates a new modal.
+ * It will be appended to the body and hidden, ready to be used.
+ * @see {@link https://getbootstrap.com/docs/4.1/components/modal/}
+ * @param {string} id the modal id
+ * @param {string} title the modal title
+ * @param {string} help the modal help text
+ * @param {jQuery} footer_buttons buttons to be shown in the modal footer
+ * @param {boolean} large true if the modal should be large
+ */
 var setup = function(id, title, help, footer_buttons, large) {
     if (id[0] == "#")
         id = id.slice(1);
@@ -49,28 +65,49 @@ var setup = function(id, title, help, footer_buttons, large) {
     return body;
 };
 
+/**
+ * Returns the body element of a specific modal.
+ * @param {string} id the modal id (including #) or other selector
+ * @returns {object} the element corresponting to the the object body
+ */
 var get_body = function(id) {
     return $(id + " .modal-body");
 };
 
+/**
+ * Shows a specific modal.
+ * @param {string} id the modal id (including #) or other selector
+ */
 var show = function(id) {
     $(id).modal("show");
 };
 
+/**
+ * Hides a specific modal.
+ * @param {string} id the modal id (including #) or other selector
+ */
 var hide = function(id) {
     $(id).modal("hide");
 };
 
+/**
+ * Shows an error message in a specific modal.
+ * @param {string} id the modal id (including #) or other selector
+ * @param {string} msg the error message
+ */
 var error = function(id, msg) {
     let error = vutils.generate_message("danger", msg);
     clear_errors(id);
     $(id + " .error-container").append(error);
 };
 
+/**
+ * Removes all error messages from a specific modal.
+ * @param {string} id the modal id (including #) or other selector
+ */
 var clear_errors = function(id) {
     $(id + " .error-container").empty();
 };
-
 
 export {
     setup,

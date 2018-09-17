@@ -4,6 +4,7 @@ import json
 
 
 def search_package(request):
+    """ Full-text search of a package name in PyPI."""
     name = request.GET.get("name", None)
     if not name:
         return JsonResponse({"error": "Please provide a name to search"})
@@ -23,6 +24,7 @@ def search_package(request):
 
 
 def validate_requirements(request):
+    """ Verifies that a group of packages (with specific versions) exists on PyPI."""
     reqs = request.GET.get("requirements", None)
     reqs = json.loads(reqs)
     index = PackageIndex()

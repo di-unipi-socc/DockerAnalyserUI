@@ -1,3 +1,7 @@
+/* GLOBAL STYLES - Section styles included at the end */
+
+/* VARIABLES */
+
 $main-color: #1d3e54;
 $secondary-color: #0084af;
 $tab-border-color: #dee2e6;
@@ -10,7 +14,7 @@ $popover-bg: lighten($yellow, 8%);
 $red: #dc3545;
 $green: #218838;
 
-$docker-font: 'Comfortaa', cursive;
+$docker-font: 'Comfortaa', cursive;  // included in index.html via Google Fonts
 
 $logo-height: 90px;
 $editor-height: 600px;
@@ -104,12 +108,8 @@ $editor-height: 600px;
 .bs-popover-left .arrow::after {
     border-left-color: $popover-bg !important;
 }
-/* TITLES */
 
-/*h1 {
-    color: $main-color;
-    font-family: $docker-font;   
-}*/
+/* TITLES */
 
 h1 {
     margin-bottom: 1.5rem;
@@ -136,14 +136,10 @@ h1, h2, h3, h4 {
 }
 
 .main-header {
-    //background-color: $main-color;
-    //background-image: radial-gradient(circle, $secondary-color 0, $main-color 100%);
-    //background: lighten($tab-border-color, 5%);
     background-image: radial-gradient(circle, lighten($tab-border-color, 10%) 0, $tab-border-color 100%);
     border-bottom: 1px solid $tab-border-color;
     margin-bottom: 20px;
     padding: 20px 0;
-    //@at-roottext-align: center;
     width: 100%;
 }
 
@@ -239,10 +235,6 @@ body.loading .loading_img {
     border-top: none;
 }
 
-/*.table tr:last-child td {
-    border-bottom: 1px solid #dee2e6;
-}*/
-
 .table-sm th, .table-sm td {
     padding: 0.2rem;
 }
@@ -251,7 +243,7 @@ body.loading .loading_img {
     text-transform: capitalize;
 }
 
-// ERRORS
+/* ERRORS */
 
 .alert {
     padding: .5rem 1rem;

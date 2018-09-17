@@ -1,3 +1,8 @@
+/**
+ * Results module.
+ * @module results/graphs
+ */
+
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
@@ -29,6 +34,11 @@ var actions = [{
     },
 }];
 
+/**
+ * Shows Min/Max/Average values for a specific attribute.
+ * @param {string} attribute the attribute name
+ * @param {string} container_id selector of the container element
+ */
 var show_results_overview = function(attribute, container_id) {
     api.get_stats(attribute, function(min, max, avg, output) {
         let container = $(container_id);
@@ -45,11 +55,18 @@ var show_results_overview = function(attribute, container_id) {
     });
 };
 
+/**
+ * Displays 2 boxex containing an overview of values for the star_count and pull_count attributes.
+ */
 var results_overview = function() {
     show_results_overview("star_count", "#stars_results ul");
     show_results_overview("pull_count", "#pulls_results ul");
 };
 
+/**
+ * Loads one page of analysed images to get a sample image and setup 
+ * the attributes list where needed.
+ */
 var load_first_page = function() {
     api.get_page(1, function(images, count, pages) {
         $(config.selectors.results_container).show();
@@ -75,7 +92,10 @@ var load_first_page = function() {
     });
 };
 
-// https://stackoverflow.com/questions/16086162/handle-file-download-from-ajax-post
+/**
+ * Gets the .zip file of all analysed images from the server and returns it to the user for download.
+ * @see {@link https://stackoverflow.com/questions/16086162/handle-file-download-from-ajax-post}
+ */
 var export_images = function() {
     let url = settings.urls.images.export;
     let options = {
@@ -109,13 +129,13 @@ var export_images = function() {
         a.click();    
       })
       .fail(function(xhr, status, error) {
-          console.log("ERROR");
-          console.log(xhr);
-          console.log(status);
-          console.log(error);
+          view.show_error(settings.msgs.error_generic);
       });
 }
 
+/**
+ * Reloads the results section.
+ */
 var refresh = function() {
     vutils.clean_messages(config.vars.step_id);
     // Reload first page, to get new total
@@ -129,10 +149,12 @@ var refresh = function() {
     search.search();
 };
 
+/**
+ * Initialises the results section.
+ */
 var init = function() {
     $(config.selectors.results_container).hide();
     vutils.setup_action_buttons(module_basename, actions);
-    //$("#results_stop").hide();
     search.init(config.selectors.results_container);
     graphs.init(config.selectors.results_container);
     

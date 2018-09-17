@@ -1,11 +1,33 @@
+/**
+ * Configurator view module.
+ * @module configurator/view
+ */
+
 import * as config from './config'
 import * as vutils from '../common/viewutils'
 
+/**
+ * Shows a general error message.
+ * @param {string} msg the error message
+ */
 var show_error = function(msg) {
     vutils.show_error(msg, config.vars.step_id);
 }
 
+/**
+ * Handles the form generation of the configuration section.
+ * The configuration form is generated based on the form_fields variable
+ * @see configurator/config.form_fields
+ * @namespace
+ */
 var forms = {
+    /**
+     * Creates a new fieldset for the configuration form, including a legend.
+     * If a container selector is provided, the new element will be automatically added to that container.
+     * @param {string} label text for the fieldset legend
+     * @param {string} container the container selector
+     * @returns {jQuery} the jQuery object rapresenting the new fieldset
+     */
     add_fieldset: function(label, container) {
         let fieldset = $("<fieldset />").attr({"class": "container"});
         let legend = $("<legend />").html(label);
@@ -14,12 +36,26 @@ var forms = {
             $(container).append(fieldset);
         return fieldset;
     },
+    /**
+     * Generates a new input field for a form (including its label and help text).
+     * If a container element is provided, the field will be also added to it.
+     * @see configurator/config.form_fields
+     * @param {Object} field the object rapresenting the field, as defined in form_fields
+     * @param {string} field.name field name, will populate the name attribute
+     * @param {string} field.type the field type, will be used to decide the input type (text, checkbox, number, radio)
+     * @param {string} field.label label for the field
+     * @param {string} field.help help text for the field
+     * @param {string} field.placeholder text placeholder for the field
+     * @param {Array} field.values pairs of value/label used to populate a radio input
+     * @param {jQuery|string} container the container object or the container selector (may be a form, a fieldset, a div)
+     * @param {string|number|boolean} default_value the field default value, if available
+     * @returns {jQuery} the jQuery object rapresenting the new field
+     */
     add_field: function(field, container, default_value) {
         if (!default_value)
             default_value = "";
         let div = $("<div />").attr({"class": "row"});
         let is_checkbox = (field.type == "checkbox");
-        //let is_number = (type == "number");
         let input_class = "col-sm-6";
         let label_class = "col-sm-2";
         let help_class =  "col-sm-4";
@@ -78,7 +114,6 @@ var forms = {
             }
         }
         let help_container = $("<div />").attr({"class": help_class});
-        //let help = $("<small />").attr({"class": "form-text text-muted"}).html(field.help);
         let help = vutils.get_help_icon(field.help);
         help_container.append(help);
         div.append(input_container);
@@ -87,33 +122,39 @@ var forms = {
             $(container).append(div);
         return div;
     },
+    /**
+     * Generates a submit button for a form.
+     * @param {string} id the button id
+     * @param {string} value the button text
+     * @param {string} btn_class the button class (primary, secondary, success, danger, warning, info, light, dark)
+     * @returns {jQuery} the jQuery object rapresenting the new button
+     */
     get_submit_button: function(id, value, btn_class) {
         return $("<input />").attr({"type": "submit", "class": "btn btn-"+btn_class, "value": value, "id": id});
     }
 }
 
+/**
+ * @namespace
+ */
 var configurator = {
-    /*get_args: function(defaults, service) {
-        let args = null;
-        $.each(defaults, function(idx, item) {
-            if (item.service == service) {
-                args = item.args;
-                return false;
-            }
-        });
-        return args;
-    },*/
+    /**
+     * Given a string rappresenting the last configuration values, parses it to generate
+     * an Object containing the same values.
+     * @param {string} defaults the string containing the JSON rappresentation of the last configuration values
+     * @param {string} service the involved service
+     * @returns {Object} an Object containing all form arguments and their value
+     */
     get_args: function(defaults, service) {
-        let detail = defaults.detail;
-        detail = detail.replace(/None/g, "null");
-        detail = detail.replace(/'/g, '"');
-        detail = JSON.parse(detail);
-        let command = detail[service].command;
+        defaults = defaults.replace(/None/g, "null");
+        defaults = defaults.replace(/'/g, '"');
+        defaults = JSON.parse(defaults);
+        let command = defaults[service].command;
         let args = {};
         $.each(command, function(idx, arg) {
             let parts = arg.split("=");
             let name = parts[0].replace("--", "")
-            let value = true;  // If present, is set
+            let value = true;  // If present, it is set
             if (parts.length > 1) 
                 value = parts[1];
             if (value == "True")
@@ -124,6 +165,11 @@ var configurator = {
         });
         return args;
     },
+    /**
+     * Setups the whole configuration form, filling it with the last available configutration.
+     * @param {string} defaults the string containing the JSON rappresentation of the last configuration values
+     * @param {function} save_configuration the function used to save the new configuration
+     */
     setup_form: function(defaults, save_configuration) {
         let form = $(config.selectors.config_form);
         form.empty();
@@ -136,12 +182,6 @@ var configurator = {
         });
         let submit_button = forms.get_submit_button("update_config", "Update Configuration", "info");
         submit_button.addClass("offset-sm-3");
-        /*let clear_button = forms.get_submit_button("default_config", "Reset Defaults", "danger");
-        clear_button.click(function(event) {
-            event.preventDefault();
-            configurator.setup_form(defaults, save_configuration);
-        });
-        form.append(clear_button);*/
         form.append(submit_button);
         form.submit(function(event) {
             event.preventDefault();

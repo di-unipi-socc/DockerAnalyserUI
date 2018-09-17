@@ -1,3 +1,10 @@
+/**
+ * Dashboard module.
+ * Show the current status of all services and 
+ * handles all interactions with the other DockerAnalyser components.
+ * @module manage/dashboard
+ */
+
 import * as config from './config'
 import * as modal from '../common/modals'
 import * as settings from '../common/settings'
@@ -64,6 +71,10 @@ var actions = [{
 
 var interval = null;
 
+/**
+ * Generates the .zip file corresponding to the last version of the deploy package
+ * and sends it to the server.
+ */
 var upload_package = function() {
     packager.create_zip(function(content, filename) {
         var data = new FormData();
@@ -77,17 +88,23 @@ var upload_package = function() {
             cache: false,
             data: data,
             success: function(response) {
-                console.log("SUCCESS: ", response);
                 if (response.err == 0)
                     docker_build();
             },
             error: function(e) {
-                console.log("ERROR:", e.responseText);
+                view.show_error(settings.msgs.error_generic);
             }
         });
     });
 };
 
+/**
+ * Sends a request to the server to execute a specific Docker command 
+ * on a specific service (or all of them).
+ * @param {string} url url of the desired command
+ * @param {string} service the name of the service involved
+ * @param {function} callback the function called if the command is successful
+ */
 var docker_command = function(url, service, callback) {
     let data = {};
     if (service)
@@ -105,14 +122,25 @@ var docker_command = function(url, service, callback) {
         });  
 };
 
+/**
+ * Starts a specific service, or all of them if a service is not specified.
+ * @param {string} service the name of the service
+ */
 var docker_up = function(service) {
     docker_command(settings.urls.compose.up, service, function(response) { docker_status(); });
 };
 
+/**
+ * Stops a specific service, or all of them if a service is not specified.
+ * @param {string} service the name of the service
+ */
 var docker_stop = function(service) {
     docker_command(settings.urls.compose.stop, service, function(response) { docker_status(); });
 };
 
+/**
+ * Builds the scanner service using the last uploaded package and realoads the status.
+ */
 var docker_build = function() {
     docker_command(settings.urls.compose.build, "scanner", function() {
         vutils.show_info(settings.msgs.info_build, config.vars.step_id);
@@ -120,12 +148,23 @@ var docker_build = function() {
     });
 };
 
+/**
+ * Shows the logs for a specific service.
+ * @param {string} service the name of the service
+ */
 var docker_logs = function(service) {
     docker_command(settings.urls.compose.logs, service, function(data) {
         view.status.show_logs(data.services[0].log);
     });
 };
 
+/**
+ * Loads the full status of Docker Analyser, including:
+ * - the status (up/down) of all services
+ * - the number of instances active for each service
+ * - the total number of images analysed
+ * - the date and time of the last refresh
+ */
 var docker_status = function() {
     view.manage.show_refresh_time();
     load_first_page();
@@ -138,12 +177,18 @@ var docker_status = function() {
                 view.show_error(response.msg);
         })
         .fail(function() {
-            // Server is not responding of Interval Server Error
+            // Server is not responding or Interval Server Error
             view.show_error(settings.msgs.error_server);
             vutils.hide_body(config.vars.step_id);
         }); 
 };
 
+/**
+ * Scales a service to a specific number of instances.
+ * Reloads the status when done.
+ * @param {string} service the name of the service
+ * @param {number} scale the total number of instances
+ */
 var docker_scale = function(service, scale) {
     let data = {service: service, scale: scale};
     $.getJSON(settings.urls.compose.scale, data)
@@ -161,6 +206,9 @@ var docker_scale = function(service, scale) {
         });
 };
 
+/**
+ * Removes all analysed images from the Image Database.
+ */
 var drop_images = function() {
     $.getJSON(settings.urls.images.drop)
         .done(function(response) {
@@ -176,12 +224,19 @@ var drop_images = function() {
         });
 }
 
+/**
+ * Loads the first page of the analysed images and shows the total
+ * amout of images analysed until that moment.
+ */
 var load_first_page = function() {
     api.get_page(1, function(images, count, pages) {
         view.manage.show_total(count);
     });
 };
 
+/**
+ * Reloads the current status and setups an automatic reload (deactivated at the moment).
+ */
 var refresh = function() {
     vutils.clean_messages(config.vars.step_id);
     docker_status();
@@ -189,12 +244,19 @@ var refresh = function() {
     //    interval = setInterval(function(){ refresh(); }, config.vars.reload_timeout*1000);
 }
 
+/**
+ * Stops the automatic status reaload, if set.
+ */
 var stop_refresh = function() {
     if (interval != null)
         clearInterval(interval);
     interval = null;
 }
 
+/**
+ * Initialises the dashboard.
+ * Loads the system status, setups modals and the scale form.
+ */
 var init = function() {
     refresh();
     vutils.setup_action_buttons(module_basename, actions);

@@ -1,9 +1,19 @@
-var backend_url = "http://127.0.0.1:8000";
+/**
+ * Gloabl configuration constants.
+ * Includes server urls, help and error messages.
+ * @module common/settings
+ */
 
-var vars = {
-    page_size: 20,
-};
+/**
+ * Backend base url.
+ * @type {string} 
+ */
+var backend_url = "http://localhost:8000";
 
+/**
+ * URLs of backend services.
+ * @type {Object} 
+ */
 var urls = {
     requirements: backend_url + "/requirements/search",
     requirements_validate: backend_url + "/requirements/validate",
@@ -29,6 +39,19 @@ var urls = {
     }
 };
 
+/**
+ * Misc variables.
+ * @type {Object}
+ * @property {number} page_size number of analysed images per page
+ */
+var vars = {
+    page_size: 20,
+};
+
+/**
+ * Error and Info messages.
+ * @type {Object} 
+ */
 var msgs = {
     error_generic: "An error occurred",
     error_server: "Unable to reach server",
@@ -50,6 +73,10 @@ var msgs = {
     info_drop: "Images removed succesfully"
 };
 
+/**
+ * Help messages.
+ * @type {Object} 
+ */
 var help = {
     requirements: "Search libraries you need to import",
     suggestions: "Methods available on context['images']",

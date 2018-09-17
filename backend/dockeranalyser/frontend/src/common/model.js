@@ -1,9 +1,38 @@
+/**
+ * Global model, maintains the status of the whole application.
+ * @module common/model
+ */
+
 import * as utilities from './utilities'
 
-var files = {};              // files[filename] = {type: mimetype, content: "", uploaded: false, editor: null}
-var attributes = {};         // attributes[attribute] = type;
-var search_attributes = {};  // search_attributes[attribute] = {attribute: attribute, type: "string", value: ""}
-var charts = {};             // chart[id] = {type: "pie", attribute: attribute, approx: "others", open: true}
+/**
+ * Complete list of files added to the package.
+ * It includes the analysis file, the requirements file and all user-uploaded files.
+ * @type {Object}
+ * @example files[filename] = {type: mimetype, content: "", uploaded: false, editor: null}
+ */
+var files = {};
+
+/**
+ * Image attributes found on the sample image.
+ * @type {Object} 
+ * @example attributes[attribute] = type;
+ */
+var attributes = {};
+
+/**
+ * Attributes selected for the custom search form.
+ * @type {Object} 
+ * @example search_attributes[attribute] = {attribute: attribute, type: "string", value: ""}
+ */
+var search_attributes = {};
+
+/**
+ * Custom charts created by the user.
+ * @type {Object}
+ * @example chart[id] = {type: "pie", attribute: attribute, approx: "others", open: true}
+ */
+var charts = {};
 
 /**
  * Adds a file to the list or overwrites an existing file.
@@ -74,27 +103,12 @@ var get_items = function() {
 }
 
 /**
- * Returns to an empty state. UNUSED
- */
-var reset = function() {
-    files = {};
-};
-
-// NOTA: quando, dopo il refresh, ricostruisco il form di ricerca, devo verificare che gli attributi 
-// che utilizzavo siano ancora presenti e che i tipi coincidano. Cosa faccio se trovo una discrepanza?
-// Se l'attributo non c'è più, non lo inserisco; se il tipo è diverso, potrei gestire separatamente 
-// tutti i casi, oppure decidere di inserirlo vuoto e lasciare la gestione all'utente
-
-/**
- * Checks the type of each attribute.
+ * Checks the type of each attribute from a sample image.
  * @param {Object} image a sample image
  */
-// Si potrebbe migliorare prendendo un campione di immagini da analizzare
-// per cercare di evitare il caso in cui un campo sia nullo nella specifica immagine analizzata
-// Come gestisco i null? Si potrebbe ignorarli e fare più chiamate su immagini diverse per cercare di riempirli?
 var set_attributes = function(image) {
     $.each(image, function(key, value) {
-        // Non consideriamo i campi che iniziano con un underscore, che supponiamo essere privati
+        // If an attribute starts with an underscore, we consider it private and ignore it
         if (key[0] == "_")
             return true;  // continue
         let type = $.type(value);
@@ -105,7 +119,7 @@ var set_attributes = function(image) {
 };
 
 /**
- * Return all attributes and their type.
+ * Returns all attributes and their type.
  * @returns {Object} all attributes, with their type
  */
 var get_attributes = function() {
@@ -113,24 +127,30 @@ var get_attributes = function() {
 };
 
 /**
- * Return all attributes names.
+ * Returns all attributes names.
  * @returns {Object} all attribute names
  */
 var get_attribute_names = function() {
     return Object.keys(attributes);
 };
 
+/**
+ * Returns the type of a single attribute.
+ * @param {string} name the attribute name
+ * @returns {string} the attribute type
+ */
 var get_attribute_type = function(name) {
     return attributes[name];
 }
 
 /**
- * Adds a new search attribute to the list, if not already present
+ * Adds a new search attribute to the list, if not already present.
  * @param {string} attribute the new search attribute
+ * @param {string} type the attribute type
  * @returns {number} 1 if the attribute was added, 0 otherwise
  */
 var add_search_attribute = function(attribute, type) {
-    // Se l'attributo che sto cercando di aggiungere è già presente, non lo aggiungo
+    // If the attribute is already on the list, we skip it
     if (!search_attributes.hasOwnProperty(attribute)) {
         search_attributes[attribute] = {type: type, value: null};
         return 1;
@@ -159,7 +179,6 @@ var get_search_attributes = function() {
     return search_attributes;
 };
 
-
 /**
  * Returns the number of search attributes
  * @returns {number} the number of search attributes
@@ -183,6 +202,13 @@ let clear_search_attributes = function() {
     search_attributes = {};
 }
 
+/**
+ * Generates a unique id for a new chart.
+ * @param {string} attribute the selected attribute
+ * @param {string} type the chart type
+ * @param {string} approx the approximation method
+ * @returns {string} the new chart id
+ */
 let get_chart_id = function(attribute, type, approx) {
     return attribute +  "_" + type + "_" + approx;
 };
@@ -204,18 +230,32 @@ var add_chart = function(chart) {
 
 /**
  * Removes an existing chart
- * @param {number} index index of the chart to remove
+ * @param {string} attribute the chart attribute
+ * @param {string} type the chart type
+ * @param {string} approx the chart approximation method
  */
 var remove_chart = function(attribute, type, approx) {
     let id = get_chart_id(attribute, type, approx);
     delete charts[id];
 };
 
+/**
+ * Sets a specific chart as open
+ * @param {string} attribute the chart attribute
+ * @param {string} type the chart type
+ * @param {string} approx the chart approximation method
+ */
 var open_chart = function(attribute, type, approx) {
     let id = get_chart_id(attribute, type, approx);
     charts[id].open = true;
 };
 
+/**
+ * Sets a specific chart as closed
+ * @param {string} attribute the chart attribute
+ * @param {string} type the chart type
+ * @param {string} approx the chart approximation method
+ */
 var close_chart = function(attribute, type, approx) {
     let id = get_chart_id(attribute, type, approx);
     charts[id].open = false;

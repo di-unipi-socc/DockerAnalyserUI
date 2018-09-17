@@ -1,13 +1,31 @@
+/**
+ * Results configuration constants.
+ * @module results/config
+ */
 
+ /**
+ * Misc variables.
+ * @type {Object}
+ * @property {number} step the numeric id of this secion
+ * @property {string} step_id the text id of this secion
+ * @property {number} max_chart_groups the maximum number of different values in each chart
+ * @property {Array} not_acceped_fields type of attributes not accepted as searchable
+ * @property {string} search_form_cnt_id id for the search form section
+ * @property {string} search_form_label title of the search form secion
+ */
 var vars = {
     step: 3,
     step_id: "visual",
-    action_btn_class: "btn btn-sm action_button",
-    uploaded_editing_class: "uploaded_editing",
     max_chart_groups: 10,
     not_acceped_fields: [null, undefined, "undefined", "null", "array", "date_string"],
+    search_form_cnt_id: "results_search_container", 
+    search_form_label: "Image Search",
 };
 
+/**
+ * Misc CSS selectors (ids, classes).
+ * @type {Object} 
+ */
 var selectors = {
     endpoint_modal_id: "#endpoint_modal",
     endpoint_url_input: "#endpoint_url",
@@ -37,6 +55,10 @@ var selectors = {
     reload_button: "#reload",
 };
 
+/**
+ * Used to generate dinamically the "new chart" form.
+ * @type {Object} 
+ */
 var graphs = {
     attributes: {
         label: "Attribute",

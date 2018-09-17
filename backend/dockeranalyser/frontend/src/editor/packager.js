@@ -56,8 +56,10 @@ var actions = [{
 
 /**
  * Checks if the analysis.py source code is valid. 
+ * If an error is found, it will display an error message, otherwise 
+ * it will execute the callback provided.
  * @param {string} content the python source code
- * @returns {boolean} true if code is valid, false otherwise
+ * @param {function} callback the function called if the validation is successful
  */
 var validate = function(content, callback) {
     $.getJSON(settings.urls.code_validate, {"code": JSON.stringify(content)})
@@ -87,13 +89,13 @@ var reset = function() {
 
 /**
  * Creates a zip with all files.
+ * @param {function(string, string)} callback the function called if the zip creation is successful
  */
 var create_zip = function(callback) {
     let zip = new JSZip();
     let zip_name = config.vars.base_zip_name + utilities.normalise($("#"+config.selectors.export_name).val());
     let folder = zip.folder(zip_name);
     let files = model.get_items();
-    let error = false;
     let analysis_content;
     $.each(files, function(key, values){
         let file_content = values.content;
@@ -122,6 +124,11 @@ var export_zip = function() {
     });
 };
 
+/**
+ * Opens a .zip file and loads its contained files in the work area.
+ * If a file is recognised as editable, it will be possible to modify in the editor.
+ * @param {string} data the .zip content
+ */
 var load_from_zip = function(data) {
     var new_zip = new JSZip();
     new_zip.loadAsync(data).then(function(zip) {
@@ -144,7 +151,7 @@ var load_from_zip = function(data) {
 }
 
 /**
- * Resets the work area and uploads a full package provided in a .zip file.
+ * Uploads a full package provided in a .zip file, showing its content in the work area.
  */
 var upload_package = function() {
     var uploaded_files = $("#"+config.selectors.upload_package_input).prop("files");  // FileList object
@@ -170,6 +177,10 @@ var upload_package = function() {
     reader.readAsBinaryString(uploaded_file);
 };
 
+/**
+ * Gets the last uploaded .zip package, if available.
+ * If not available, server will return the default package.
+ */
 var get_package = function() {
     let options = {
         url: settings.urls.compose.upload,
@@ -189,10 +200,13 @@ var get_package = function() {
         load_from_zip(data);
       })
       .fail(function(xhr, status, error) {
-          console.log(xhr.responseText);
+        vutils.show_error(settings.msgs.error_server, config.vars.step_id);
       });
 }
 
+/**
+ * Setups the suggestions modal, showing the available context['images'] methods.
+ */
 var setup_suggestions = function() {
     $.getJSON(settings.urls.suggestions)
         .done(function(data) {

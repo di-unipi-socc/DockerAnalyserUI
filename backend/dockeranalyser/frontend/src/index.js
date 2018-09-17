@@ -20,11 +20,6 @@ require("ace-builds/src-noconflict/mode-html");
 require("ace-builds/src-noconflict/mode-css");
 require("ace-builds/src-noconflict/mode-sh");
 
-/*$.each(config.languages, function(key, val) {
-    let mode = "ace-builds/src-noconflict/mode-"+val.value;
-    require(mode);
-});*/
-
 import './common/style.scss';
 
 import * as uploader from './editor/uploader'
@@ -38,7 +33,7 @@ import * as vutils from './common/viewutils'
 
 $(document).ready(function () {
 
-    // Inizializzazione Editor
+    // Sections setup
     editor.init();
     uploader.init();
     requirements.init();
@@ -92,7 +87,7 @@ $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
     $('[data-toggle="popover"]').popover({trigger: "hover"});
 
-    // Gestione loading
+    // Loading
     $(document).on({
         ajaxStart: function() { $("body").addClass("loading"); },
         ajaxStop: function() { $("body").removeClass("loading"); }    

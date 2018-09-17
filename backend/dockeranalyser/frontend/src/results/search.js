@@ -1,3 +1,8 @@
+/**
+ * Results search module.
+ * @module results/graphs
+ */
+
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
@@ -20,8 +25,6 @@ var actions = [{
     style: "info",
     modal: null,
     action: function() {
-        // NOTA: se svuoto rimuovo anche i potenziali campi custom gia' aggiunti
-        //view.search.empty_search_form();
         view.search.setup_search_form();
     },
 }, {
@@ -37,10 +40,19 @@ var actions = [{
     }
 }];
 
+/**
+ * Verifies if some type of attribute is searchable.
+ * @see results/config.vars.not_acceped_fields
+ * @param {string} type the attribute type
+ */
 var is_searchable_field = function(type) {
     return ($.inArray(type, config.vars.not_acceped_fields) == -1);
 };
 
+/**
+ * Searches between the analysed images.
+ * @param {number} page the page that should be shown
+ */
 var search = function(page) {
     if (!page)
         page = 1;
@@ -53,8 +65,8 @@ var search = function(page) {
         let value = null;
         if (vals.type == "string" || vals.type == "number")
             value = view.result_forms.get_value(attribute);
-        //else if (vals.type == "number")  // Gestire tutti i casi - Deactivated until ranges search is available
-        //    value = [view.result_forms.get_value(attribute+"_from"), view.result_forms.get_value(attribute+"_to")];
+        // else if (vals.type == "number")  // Deactivated until ranges search is available
+        //     value = [view.result_forms.get_value(attribute+"_from"), view.result_forms.get_value(attribute+"_to")];
         else if (vals.type == "boolean")
             value = (view.result_forms.get_value(attribute) == 't');
         attributes[attribute].value = value;
@@ -70,8 +82,13 @@ var search = function(page) {
     }, page);
 };
 
+/**
+ * Updates the available search attributes select using the attributes
+ * found in the sample image.
+ */
 var set_search_attribute_list = function() {
     let select = $(config.selectors.custom_search_form_select);
+    select.empty();
     let attribute_names = model.get_attribute_names();
     let attributes = model.get_attributes();
     attribute_names.sort();
@@ -85,6 +102,11 @@ var set_search_attribute_list = function() {
     });
 };
 
+/**
+ * Verifies if an attribute is an object.
+ * @param {string} attribute the attribute name
+ * @returns {booelan} true if the attribute is an object
+ */
 var has_subfield = function(attribute) {
     if (attribute && attribute != "") {
         let type = model.get_attribute_type(attribute);
@@ -93,7 +115,12 @@ var has_subfield = function(attribute) {
     return false;
 };
 
-// Valida e inserisce
+/**
+ * Adds a field to the search form.
+ * If the attribute is an object, the user can type a custom subfield.
+ * @param {string} attribute the attribute name
+ * @param {string} subfield the attribute subfield
+ */
 var add_selected_field = function(attribute, subfield) {
     attribute = $.trim(attribute);
     if (attribute && attribute != "") {
@@ -101,7 +128,7 @@ var add_selected_field = function(attribute, subfield) {
         if (type == "object") {
             subfield = $.trim(subfield);
             if (subfield && subfield != "") {
-                // Validazione: il nome non deve contenere spazi e può contenere solo punti o underscore
+                // Attribute name validation
                 if (utilities.acceptable_field_name(subfield)) {
                     attribute = attribute + "." + subfield;
                     type = "string";
@@ -117,12 +144,14 @@ var add_selected_field = function(attribute, subfield) {
     }
 }
 
-// Valida e inserisce
+/**
+ * Adds a totally custom field to the search form.
+ * @param {string} attribute the attribute name
+ */
 var add_custom_field = function(attribute) {
     attribute = $.trim(attribute);
-    // Validare: non deve contenere spazi e può contenere solo punti o underscore
+    // Attribute name validation
     if (attribute && attribute != "" && utilities.acceptable_field_name(attribute)) {
-        let type = model.get_attribute_type(attribute);
         // Verificare che il nome non coincida con quello di un attributo esistente?
         view.search.add_field(attribute, "string");
     } else {
@@ -130,8 +159,10 @@ var add_custom_field = function(attribute) {
     }
 }
 
+/**
+ * Initialises the search section.
+ */
 var init = function(container) {
-    //view.search.setup(container);
     // Subfield selection 
     vutils.setup_action_buttons(module_basename, actions);
     view.search.setup_sample_modal();

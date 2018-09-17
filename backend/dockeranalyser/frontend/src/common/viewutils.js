@@ -1,6 +1,18 @@
+/**
+ * View Utils module.
+ * Misc view utilities.
+ * @module common/viewutils
+ */
+
 import * as config from './config'
 import * as modal from './modals'
 
+/**
+ * Generates a box for a sub-section.
+ * @param {string} id the box id
+ * @param {string} title the box title
+ * @returns {jQuery} the element representing the box
+ */
 var get_main_box = function(id, title) {
     let div = $("<div />").attr({"id": id, "class": "border rounded results_container_box"});
     if (title) {
@@ -10,17 +22,28 @@ var get_main_box = function(id, title) {
     return div;
 };
 
+/**
+ * Shows the content of a specific section.
+ * @param {string} step_id the step textual id
+ */
 var show_body = function(step_id) {
     $("#"+step_id+"_body_container").show();
 };
 
+/**
+ * Hides the content of a specific section.
+ * @param {string} step_id the step textual id
+ */
 var hide_body = function(step_id) {
     $("#"+step_id+"_body_container").hide();
 };
 
 /**
- * Shows a general error message.
- * @param {string} msg the error message
+ * Generates an alert message. 
+ * @see {@link https://getbootstrap.com/docs/4.1/components/alerts/}
+ * @param {string} type the messge type (primary, secondary, success, danger, warning, info, light, dark)
+ * @param {string} msg the message
+ * @returns {jQuery} the element representing the alert message, with the proper style
  */
 var generate_message = function(type, msg) {
     let div = $("<div />").attr({"role": "alert", "class": "alert alert-" + type + " alert-dismissible fade show"});
@@ -32,6 +55,12 @@ var generate_message = function(type, msg) {
     return div;
 };
 
+/**
+ * Shows a general alert message in a specific section.
+ * @param {string} type the message type 
+ * @param {string} msg the message
+ * @param {string} step_id the step textual id
+ */
 var show_message = function(type, msg, step_id) {
     let error = generate_message(type, msg);
     let container = $("#step-" + step_id + " .error-container");
@@ -39,18 +68,37 @@ var show_message = function(type, msg, step_id) {
     container.append(error);
 }
 
+/**
+ * Shows an error message in a specific section.
+ * @param {string} msg the error message
+ * @param {string} step_id the step textual id
+ */
 var show_error = function(msg, step_id) {
     show_message("danger", msg, step_id);
 }
 
+/**
+ * Shows an info message in a specific section.
+ * @param {string} msg the error message
+ * @param {string} step_id the step textual id
+ */
 var show_info = function(msg, step_id) {
     show_message("success", msg, step_id);
 }
 
+/**
+ * Removes all messages from a specific section.
+ * @param {string} step_id the step textual id
+ */
 var clean_messages = function(step_id) {
     $("#step-" + step_id + " .error-container").empty();
 }
 
+/**
+ * Generates a "close" button that dismisses an element.
+ * @param {string} dismiss the id of the element to dismiss
+ * @returns {jQuery} the element representing the button
+ */
 var get_close_button = function(dismiss) {
     let button = $("<button />").attr({"type": "button", "class": "close", "data-dismiss": dismiss, "aria-label": "Close"});
     let icon = $("<span />").attr({"aria-hidden": "true"}).html("&times;");
@@ -58,6 +106,11 @@ var get_close_button = function(dismiss) {
     return button;
 };
 
+/**
+ * Generates an help icon with a popover help text.
+ * @param {string} txt the help text
+ * @returns {jQuery} the element representing the help icon 
+ */
 var get_help_icon = function(txt) {
     let help_icon = $("<i/>").attr({
         "class": "fas fa-question-circle help_icon",
@@ -68,6 +121,19 @@ var get_help_icon = function(txt) {
     return help_icon;
 }
 
+/**
+ * Generates a button that, when clicked, performs a specific action 
+ * (calls a function or opens a modal).
+ * @param {string} basename the section text id
+ * @param {Object} values the object representing the action
+ * @param {string} values.name the action id
+ * @param {string} values.title the action full name (will be shown in a popover)
+ * @param {string} values.icon the FontAwesome icon name
+ * @param {string} values.style the icon style (info, danger)
+ * @param {string} values.modal if the action must open a modal, the modal id
+ * @param {function} values.action if the action must call a function
+ * @returns {jQuery} the element representing the action button 
+ */
 var create_action_button = function(basename, values) {
     let button_attributes = {
         "type": "button",
@@ -90,6 +156,11 @@ var create_action_button = function(basename, values) {
     return button;
 }
 
+/**
+ * Given a list of actions, generates the corresponding buttons.
+ * @param {string} basename the section text id
+ * @param {Array} actions the actions array
+ */
 var setup_action_buttons = function(basename, actions) {
     var section_selector = "#"+basename+"_actions";
     var container = $(section_selector);
@@ -99,13 +170,20 @@ var setup_action_buttons = function(basename, actions) {
     });
 }
 
+/**
+ * Displays all attributes (and attribute content) of an arbitrary object. 
+ * If a field is a nested object, it will be displayed recursively with lv+1 
+ * @param {Object} item the object you want to display
+ * @param {number} lv the current number of nested levels
+ * @returns {jQuery} the element representing the object, inside a div
+ */
 var display_object = function(item, lv) {
     let cnt = $("<div />");
     $.each(item, function(key, val) {
-        // Non mostriamo i campi che iniziano con un underscore
+        // If an attribute starts with an underscore, it is considered privete and will not be shown
         if (key[0] == "_")
             return true;  // continue
-        // Se il campo contiene un oggetto, lo rappresentiamo ricorsivamente
+        // If a field contains an object, it will be shown recursively
         let type = $.type(val);
         let has_children = (type == "object" || type == "array");
         if (has_children)
@@ -125,6 +203,10 @@ var display_object = function(item, lv) {
     return cnt;
 };
 
+/**
+ * Fixes the height of a specific section after its content is fully loaded.
+ * @param {number} idx the section numeric id
+ */
 var fix_height = function(idx) {
     let main = $('#smartwizard');
     let nav = main.children('ul');
@@ -135,6 +217,9 @@ var fix_height = function(idx) {
     container.finish().animate({ minHeight: height }, 400, function(){});
 }
 
+/**
+ * Setups the confirmation modal.
+ */
 var setup_confirm_modal = function() {
     let footer = $("<div />");
     let submit = $("<button />").attr({
@@ -158,9 +243,9 @@ var setup_confirm_modal = function() {
 /**
  * Shows a confirmation modal with the message provided.
  * If the user confirms, it calls the callback provided with the values provided.
- * @param {string} msg file mime type
- * @param {function} callback file mime type
- * @param {Object} values file mime type
+ * @param {string} msg the text message
+ * @param {function} callback function called if the user confirms
+ * @param {Object} values values to be passed to the callback
  */
 var confirm = function(msg, callback, values) {
     $(config.selectors.confirm_msg_id).html(msg);

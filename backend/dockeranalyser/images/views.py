@@ -20,6 +20,9 @@ server_down_msg = "Image Server is down"
 
 
 def get_params(request):
+    """ Gets parameters from the request and returns them 
+        and their values in a dictionary.
+    """
     data = {}
     for key in request.GET.keys():
         data[key] = request.GET.get(key, None)
@@ -27,6 +30,10 @@ def get_params(request):
 
 
 def make_request(url, params):
+    """ Acts as a proxy for the Images Server.
+        Given a url and the parameters dict, 
+        makes the request to the server and returns the JSON response.
+    """
     if params:
         url = url + "?" + urllib.parse.urlencode(params)
     try:
@@ -39,26 +46,33 @@ def make_request(url, params):
 
 
 def images_list(request):
+    """ Returns all analysed images."""
     params = get_params(request)
     return make_request(images_service_url, params)
 
 
 def images_search(request):
+    """ Performs a search within the analysed images."""
     params = get_params(request)
     return make_request(images_search_url, params)
 
 
 def images_stats(request):
+    """ Returns the stats for a specific attribute."""
     attribute = request.GET.get("attribute", None)
     url = images_stats_url + attribute
     return make_request(url, None)
 
 
 def images_drop(request):
+    """ Removes all analysed images."""
     return make_request(images_drop_url, None)
 
 
 def images_export(request):
+    """ Gets the full JSON export of the analysed images and returns it
+        to the user inside a zip file, named including the current date and time.
+    """
     now = datetime.now()
     base_filename = "docker-analyser-images-" + now.strftime("%Y%m%d-%H%M%S")
     json_filename = base_filename + ".json"
@@ -75,16 +89,9 @@ def images_export(request):
     zip.write(json_filename)
     zip.close()
     file_zip = open(zip_filename, "rb")
-    #json_file = StringIO()
-    #json_file.write(content)
-    #json_file.seek(0)
     response = HttpResponse(FileWrapper(file_zip), content_type="application/zip")
     response["Content-Disposition"] = "attachment; filename=" + zip_filename
     response["Access-Control-Expose-Headers"] = "Content-Disposition"
-    #headers = export.getheaders()
-    #for header in headers:
-    #    if header[0] in ['Content-Disposition', 'Content-Type']:
-    #        response[header[0]] = header[1]
     os.remove(json_filename)
     os.remove(zip_filename)
     return response

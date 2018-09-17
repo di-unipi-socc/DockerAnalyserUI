@@ -1,3 +1,8 @@
+/**
+ * Manage view module.
+ * @module manage/view
+ */
+
 import * as config from './config'
 import * as modal from '../common/modals'
 import * as vutils from '../common/viewutils'
@@ -15,17 +20,31 @@ function service_compare(a, b){
     return (a.name).localeCompare(b.name);
 }
 
+/**
+ * Shows a general error message.
+ * @param {string} msg the error message
+ */
 var show_error = function(msg) {
     vutils.show_error(msg, config.vars.step_id);
 }
 
+/**
+ * @namespace
+ */
 var status = {
+    /**
+     * Creates the service display and setups actions on each of them.
+     * @param {Array} services an array of objects rappresenting each service attributes
+     * @param {function(string)} start function called when the start button is pressed for a specific service
+     * @param {function(string)} stop function called when the stop button is pressed for a specific service
+     * @param {function(string)} logs function called when the log button is pressed for a specific service
+     */
     setup_icons: function(services, start, stop, logs) {
         let container = $(config.selectors.status_icons);
         container.empty();
         let all_running = true;
         let all_stopped = true;
-        // Order services alphabetically, for coherence in visualization
+        // Orders services alphabetically, for coherence in visualization
         services.sort(service_compare);
         $.each(services, function(idx, item) {
             if (item.name == "scanner")
@@ -46,7 +65,7 @@ var status = {
                 "data-placement": "bottom",
                 "title": "Stop Service",
             });
-            // Check if all containers are running and determine status accordingly
+            // Checks if all containers are running and determine status accordingly
             let all_cnt_running = true;
             let all_cnt_stopped = true;
             let cnt_box_container = $("<div />").attr({"class": "service_instance_box_container"});
@@ -124,21 +143,35 @@ var status = {
         });
         $(config.selectors.status_icons + ' [data-toggle="tooltip"]').tooltip();
     },
+    /**
+     * Shows the details modal for the reqeusted service.
+     * @param {string} service the requested service
+     */
     show_status_details: function(service) {
         $("#"+config.selectors.service_detail_div).empty();
         $("#"+config.selectors.service_detail_div).append(vutils.display_object(service, 0));
         modal.show(config.selectors.service_detail_modal);
     },
+    /**
+     * Shows the logs modal including the last log text for the reqeusted service.
+     * @param {string} txt the full log text
+     */
     show_logs: function(txt) {
         txt = txt.replace(/\n/g, "<br />");
         $("#"+config.selectors.service_logs_div).html(txt);
         modal.show(config.selectors.service_logs_modal);
     },
+    /**
+     * Setups the service detail modal.
+     */
     setup_service_modal: function() {
         let body = modal.setup(config.selectors.service_detail_modal, "Service Details", null, null, true);
         let div = $("<div />").attr({"id": config.selectors.service_detail_div});
         body.append(div);
     },
+    /**
+     * Setups the logs modal.
+     */
     setup_logs_modal: function() {
         let body = modal.setup(config.selectors.service_logs_modal, "Service Log", null, null, true);
         let div = $("<div />").attr({"id": config.selectors.service_logs_div});
@@ -146,7 +179,13 @@ var status = {
     }
 }
 
+/**
+ * @namespace
+ */
 var manage = {
+    /**
+     * Setups the modal with the service scale form.
+     */
     setup_scale_modal: function() {
         let body = modal.setup(config.selectors.scale_modal, "Scale Scanners", settings.help.scale_scanner, null, false);
         let form = forms.get_form(config.selectors.scale_form, true);
@@ -157,9 +196,16 @@ var manage = {
         form.append(submit);
         body.append(form);
     },
+    /**
+     * Updates the total number of analysed images.
+     * @param {number} num the total number of images
+     */
     show_total: function(num) {
         $(config.selectors.num_images_id).html(num);
     },
+    /**
+     * Shows the date and time when the page was last refreshed, in the local time style.
+     */
     show_refresh_time: function() {
         var d = new Date();
         $(config.selectors.timestamp_id).html(d.toLocaleString());

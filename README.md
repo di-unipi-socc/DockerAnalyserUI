@@ -30,6 +30,7 @@ python manage.py runserver
 
 ## Frontend Setup
 Just open index.html, dist folder already contains compiled files.
+If backend is running, go to http://localhost:8000
 
 To edit, first install dependecies:
 ```sh

@@ -1,5 +1,6 @@
 /**
  * Editor module.
+ * Uses ACE Editor {@link https://ace.c9.io}.
  * @module editor/editor
  */
 
@@ -7,8 +8,6 @@ import * as config from './config'
 import * as model from '../common/model'
 import * as view from './view'
 import * as settings from '../common/settings'
-import * as forms from '../common/forms'
-import * as vutils from '../common/viewutils'
 import * as modal from '../common/modals'
 import * as utilities from './utilities'
 import * as uploader from './uploader'
@@ -28,7 +27,6 @@ var add_item = function(filename, type, content) {
         // Create new editor and update model with editor reference
         let editor = view.editor.add_element(filename, type, content);
         model.update_item(filename, {"editor": editor, "content": content});
-        let item = model.get_item(filename);
     }
 };
 
@@ -44,6 +42,9 @@ var remove_item = function(filename) {
     }
 };
 
+/**
+ * Adds a new empty tab to the editor.
+ */
 var add_empty_file = function() {
     let filename = $.trim($("#"+config.selectors.add_file_name).val());
     if (filename == "") {
@@ -65,25 +66,9 @@ var add_empty_file = function() {
  * Initialises the editor loading the analysis file.
  */
 var init = function() {
-    /*view.editor.setup_newfile_modal();
-    view.editor.add_tab("+", function() {
-        modal.show(config.selectors.add_file_modal);
-    });*/
     let file = config.analysis_file;
     model.add_item(file.name, file.type, file.content, false, true);
     add_item(file.name, file.type, file.content);
-};
-
-/**
- * Removes all open editors. UNUSED
- */
-var reset = function() {
-    var files = model.get_items();
-    $.each(files, function(filename, values) {
-        if (values.editor) {
-            remove_item(filename);
-        }
-    });
 };
 
 export {

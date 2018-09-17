@@ -1,7 +1,25 @@
+/**
+ * Editor configuration constants.
+ * @module editor/config
+ */
+
 var mimetype = require('mimetype');
 
+/**
+ * This is used only as a backup if server is unavailable
+ * @type {string} 
+ */
 var analysis_content = "def analysis(image_json, context):\n    logger = context['logger']\n    client_images = context['images']\n    logger.info('Received image from rabbitMQ: {}'.format(image_json))\n    client_images.post_image(image_json)\n    return True"
 
+/**
+ * Misc variables.
+ * @type {Object}
+ * @property {number} step the numeric id of this secion
+ * @property {string} step_id the text id of this secion
+ * @property {string} action_btn_class default class for the action button
+ * @property {string} uploaded_editing_class class added to an uploaded file open in the editor
+ * @property {string} base_zip_name base name for the downloadable .zip package
+ */
 var vars = {
     step: 0,
     step_id: "edit",
@@ -10,6 +28,10 @@ var vars = {
     base_zip_name: "deploy-package-",
 }
 
+/**
+ * Misc CSS selectors (ids, classes).
+ * @type {Object} 
+ */
 var selectors = {
     tab_container_id: "#file_list_tabs",
     tab_content_container_id: "#file_list_tabs_content",
@@ -45,17 +67,34 @@ var selectors = {
     suggestions_div: "#available_methods"
 };
 
+/**
+ * Attributes of the requirements file.
+ * @type {Object}
+ * @property {string} name name of the file
+ * @property {string} type mimetype of the file
+ */
 var req_file = {
     name: "requirements.txt",
     type: "text/plain"
 };
 
+/**
+ * Attributes of the analysis file.
+ * @type {Object}
+ * @property {string} name name of the file
+ * @property {string} type mimetype of the file
+ * @property {string} content file default content
+ */
 var analysis_file = {
     name: "analysis.py",
     type: "text/x-python-script",
     content: analysis_content
 };
 
+/**
+ * Supported languages
+ * @type {Object}
+ */
 var languages = {
     "text/plain": {name: "Plain Text", value: "plain_text"},
     "text/x-python": {name: "Python", value: "python"},
@@ -68,6 +107,7 @@ var languages = {
     "application/x-sh": {name: "Shell Script", value: "sh"}
 };
 
+// Languages not already included in the mimetype recognition module
 mimetype.set(".py", "text/x-python-script");
 mimetype.set(".md", "text/markdown"); 
 

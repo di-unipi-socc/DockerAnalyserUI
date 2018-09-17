@@ -1,3 +1,8 @@
+/**
+ * Editor utilities.
+ * @module editor/utilities
+ */
+
 import * as config from './config'
 var mimetype = require('mimetype');
 

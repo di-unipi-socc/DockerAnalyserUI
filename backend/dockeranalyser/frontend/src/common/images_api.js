@@ -1,9 +1,15 @@
+/**
+ * Images API module.
+ * Interacts with the backend to retrieve the analysed images.
+ * @module common/images_api
+ */
+
 import * as settings from '../common/settings'
 
 /**
  * Retrives one page of results from the image server
  * @param {number} page the requested page, 1 if undefined
- * @param {function} callback function to call in case of success
+ * @param {function(array, number, number)} callback function to call in case of success
  * @param {function} error_callback function to call in case of error
  * @param {string} url different url to call
  * @param {object} params additional parameters to send to the server

@@ -1,3 +1,9 @@
+/**
+ * Requirements module.
+ * Handles the Python requirements search and validation.
+ * @module editor/requirements
+ */
+
 import * as config from './config'
 import * as utilities from './utilities'
 import * as settings from '../common/settings'
@@ -5,10 +11,9 @@ import * as model from '../common/model'
 import * as vutils from '../common/viewutils'
 import * as modal from '../common/modals'
 import * as view from './view'
-import * as editor from './editor'
 
 var module_basename = "requirements";
-var items = {};  // {"pika": "2.0.5"}
+var items = {};  // example: {"pika": "2.0.5"}
 var versions_cache = {};
 var actions = [{
         name: "search",
@@ -48,25 +53,22 @@ var actions = [{
     }
 ];
 
-var update_length = function() {
-    let keys = Object.keys(items);
-    let len = keys.length;
-    $(config.selectors.req_list_len).html(len);
-    if (len == 0)
-        $(config.selectors.req_show_list).hide();
-    else
-        $(config.selectors.req_show_list).show();
+/**
+ * @returns {Object} the object containing the selected libraries and their version
+ */
+var get_items = function() {
+    return items;
 };
 
-var remove_item = function(name) {
-    delete items[name];
-    view.requirements.remove_item(name);
-    update_length();
-};
-
+/**
+ * Adds a new library to the selected dependencies. 
+ * Updates the view showing the new library and the corresponding available actions.
+ * @param {string} name the library name
+ * @param {string} version the library version
+ */
 var add_item = function(name, version) {
-    // Se è già presente, la versione viene sovrascritta e non devo aggiungerlo nel DOM
-    // Devo però potenzialmente modificare la versione visualizzata
+    // If the library was already in the list, it should not be added 
+    // (in both the list and the DOM) but only the corresponding version must be updated
     if (items.hasOwnProperty(name)) {
         items[name] = version;
         view.requirements.replace_selected_version(name, version);
@@ -83,19 +85,33 @@ var add_item = function(name, version) {
         versions_button.remove();
     });
     view.requirements.add_item(name, version, versions_button, remove_button);
-    update_length();
+    view.requirements.update_length(items);
 };
 
-var get_items = function() {
-    return items;
+/**
+ * Removes a selected dependency from the list and updates the DOM accordingly.
+ * @param {string} name the library name
+ */
+var remove_item = function(name) {
+    delete items[name];
+    view.requirements.remove_item(name);
+    view.requirements.update_length(items);
 };
 
+/**
+ * Gets all available versions for a specific library and orders them.
+ * Versions obtained and ordered are maintained in an object called versions_cache.
+ * The request is forwarded to the server only if the requested library is not found in the versions_cache.
+ * @param {string} libname the library name
+ * @param {function(string[])} callback the function called after the versions are obtained
+ */
 var get_versions = function(libname, callback) {
+    // libname was found on the versions cache
     if (versions_cache.hasOwnProperty(libname)) {
         callback(versions_cache[libname]);
         return;
     }
-    
+    // libname was not found on the versions cache and is requested to the server
     $.getJSON(settings.urls.versions.replace("LIB", libname))
         .done(function(data){
             var versions = [];
@@ -105,7 +121,6 @@ var get_versions = function(libname, callback) {
                     upload = val[0]["upload_time"];
                 versions.push({"version": ver, "upload_time": upload});
             });
-            //versions.sort(natsort({ desc: true }));
             versions.sort(utilities.version_compare);
             var results = [];
             $.each(versions, function(idx, item) {
@@ -119,12 +134,27 @@ var get_versions = function(libname, callback) {
         });
 };
 
+/**
+ * Replaces the existing selected version for a library with the select input  
+ * containing the list of all available versions for the same library.
+ * Called when the "versions" button is clicked for a specific library.
+ * @param {string} libname the library name
+ * @param {function(string[])} callback the function called after the versions are obtained
+ */
 var replace_versions = function(libname, last_version, in_list, callback) {
     get_versions(libname, function(versions) {
         view.requirements.replace_versions(libname, versions, last_version, in_list, callback);
     });
 };
 
+/**
+ * Full-text search of a library given its name (or part of it).
+ * 
+ * Results are displayed under the search form with the possibility to add
+ * the corresponding library of show other versions available (making an
+ * additional request to the server for each library).
+ * @param {string} name the library name
+ */
 var search = function(name) {
     modal.clear_errors(config.selectors.req_modal_id);
     $.getJSON(settings.urls.requirements, {"name": name})
@@ -156,6 +186,14 @@ var search = function(name) {
         });
 };
 
+/**
+ * Imports requirements from an existing file.
+ * 
+ * Given the content of a requirements.txt file, checks if all included libraries
+ * exist and are included with a proper version. Only correct libraries are automatically
+ * included in the requirements list and a message error is generated for the incorrect ones.
+ * @param {string} content the requirements.txt file content
+ */
 var from_file = function(content) {
     var lines = content.split("\n");
     var tmp = [];
@@ -169,11 +207,11 @@ var from_file = function(content) {
         .done(function(data) {
             var errors = data.errors;
             $.each(tmp, function(idx, item) {
-                if (errors.indexOf(item.name) < 0) {  // Non ha generato un errore
+                if (errors.indexOf(item.name) < 0) {  // No errors found
                     add_item(item.name, item.version);
                 }
             });
-            if (errors.length > 0) {
+            if (errors.length > 0) {  // Some errors found (library or version not found)
                 let full_error_msg = settings.msgs.error_req_not_found + errors.join();
                 modal.error(config.selectors.uploads_modal, full_error_msg);
             }
@@ -183,34 +221,44 @@ var from_file = function(content) {
         });
 };
 
+/**
+ * For all selected dependencies, concatenates the library name with the version name,
+ * preparing the content for the requirements.txt file.
+ * @returns {string[]} an array containing the lines of the requirements.txt file
+ */
 var generate_file_content = function() {
     var lines = [];
     $.each(items, function(pkg, ver) {
         let line = pkg + "==" + ver;
         lines.push(line);
-        //txt = txt + line;
     })
     return lines;
 };
 
+/**
+ * Generates the requirements.txt file using the selected dependencies and their versions.
+ * The generated file is added to the model.
+ */
 var generate_file = function() {
-    var keys = Object.keys(items);
-    /*if (keys.length == 0)
-        return;*/
     let content = generate_file_content().join("\n");
     let req = config.req_file;
     model.add_item(req.name, req.type, content, false, true);
-    //editor.add_item(req.name, req.type, content);
 };
 
+/**
+ * Removes all selected requirements.
+ */
 var reset = function() {
     $.each(items, function(name, version) {
         remove_item(name);
     });
-    editor.remove_item(config.req_file.name);
     model.remove_item(config.req_file.name);
 };
 
+/**
+ * Initialises the requirements manager.
+ * Setups modals and form actions.
+ */
 var init = function() {
     view.requirements.setup_search_modal();
     view.requirements.setup_view_modal();
