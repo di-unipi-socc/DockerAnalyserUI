@@ -44,6 +44,7 @@ var status = {
         container.empty();
         let all_running = true;
         let all_stopped = true;
+        let scalable_running = false;
         // Orders services alphabetically, for coherence in visualization
         services.sort(service_compare);
         $.each(services, function(idx, item) {
@@ -74,6 +75,8 @@ var status = {
                 if (cnt.is_running) {
                     all_cnt_stopped = false;
                     cnt_box.addClass("instance_up");
+                    if (item.name == "scanner")
+                        scalable_running = true;
                 } else {
                     all_cnt_running = false;
                     cnt_box.addClass("instance_down");
@@ -140,6 +143,11 @@ var status = {
                 $("#manage_stop").removeClass("disabled");
                 $("#manage_scale").removeClass("disabled");
             }
+            // The scale button should be available only if the scanner is running
+            if (scalable_running)
+                $("#manage_scale").removeClass("disabled");
+            else 
+                $("#manage_scale").addClass("disabled");
         });
         $(config.selectors.status_icons + ' [data-toggle="tooltip"]').tooltip();
     },

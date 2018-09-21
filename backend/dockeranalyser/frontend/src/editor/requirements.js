@@ -21,7 +21,9 @@ var actions = [{
         icon: "search",
         style: "info",
         modal: config.selectors.req_modal_id,
-        action: null,
+        action: function() {
+            view.requirements.empty_modal_container();
+        },
     }, {
         name: "upload",
         title: "Upload Dependencies File",
@@ -176,7 +178,6 @@ var search = function(name) {
                     });
                     view.requirements.add_modal_item(val.name, val.version, [select_button, versions_button]);
                 });
-                view.requirements.show_modal();
             } else {
                 modal.error(config.selectors.req_modal_id, settings.msgs.error_no_results);
             }

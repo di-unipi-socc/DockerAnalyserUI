@@ -39,6 +39,7 @@
     "jquery": "^3.3.1",
     "jszip": "^3.1.5",
     "mimetype": "0.0.8",
+    "paginationjs": "^2.1.4",
     "popper.js": "^1.14.3",
     "smartwizard": "^4.3.1"
   }

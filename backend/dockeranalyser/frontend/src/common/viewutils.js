@@ -150,7 +150,7 @@ var create_action_button = function(basename, values) {
     let button = $("<button />").attr(button_attributes);
     button.append(icon);
     if (values.modal)
-        button.click(function(){ $(values.modal).modal("show"); });
+        button.click(function(){ modal.show(values.modal); });
     if (values.action)
         button.click(function(){ values.action(); });
     return button;

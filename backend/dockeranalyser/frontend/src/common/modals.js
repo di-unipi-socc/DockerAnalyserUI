@@ -79,6 +79,8 @@ var get_body = function(id) {
  * @param {string} id the modal id (including #) or other selector
  */
 var show = function(id) {
+    clear_errors(id);
+    clear_forms(id);
     $(id).modal("show");
 };
 
@@ -107,6 +109,17 @@ var error = function(id, msg) {
  */
 var clear_errors = function(id) {
     $(id + " .error-container").empty();
+};
+
+/**
+ * Removes all previous user input in forms.
+ * @param {string} id the modal id (including #) or other selector
+ */
+var clear_forms = function(id) {
+    let forms = $(id + " .modal-body form");
+    $.each(forms, function(idx, form) {
+        form.reset();
+    });
 };
 
 export {

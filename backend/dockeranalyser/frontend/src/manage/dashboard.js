@@ -1,7 +1,7 @@
 /**
  * Dashboard module.
- * Show the current status of all services and 
- * handles all interactions with the other DockerAnalyser components.
+ * Show the current status of all services and handles all interactions with the other DockerAnalyser components.
+ * This section included an auto-refresh function but it was disabled as it seemed to create some server troubles.
  * @module manage/dashboard
  */
 
@@ -76,7 +76,7 @@ var interval = null;
  * and sends it to the server.
  */
 var upload_package = function() {
-    packager.create_zip(function(content, filename) {
+    packager.create_zip(function(content, filename) {  // success callback
         var data = new FormData();
         data.append("deploy-package", content);
         $.ajax({
@@ -95,6 +95,9 @@ var upload_package = function() {
                 view.show_error(settings.msgs.error_generic);
             }
         });
+    }, function(error_msg) {  // error callback
+        let full_error = "An error was found in the analysis function: " + error_msg;
+        view.show_error(full_error);
     });
 };
 

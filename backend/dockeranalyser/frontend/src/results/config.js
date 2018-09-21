@@ -53,6 +53,7 @@ var selectors = {
     sample_image_modal: "#sample_image_modal",
     sample_image_div: "sample_image_container",
     reload_button: "#reload",
+    pagination_container: "pagination_container"
 };
 
 /**

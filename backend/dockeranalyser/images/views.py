@@ -25,7 +25,8 @@ def get_params(request):
     """
     data = {}
     for key in request.GET.keys():
-        data[key] = request.GET.get(key, None)
+        if key != '_':  # Fix for pagination.js plugin
+            data[key] = request.GET.get(key, None)
     return data
 
 

@@ -3,6 +3,7 @@
  * @module results/view
  */
 
+import * as settings from '../common/settings'
 import * as config from './config'
 import * as utilities from './utilities'
 import * as model from '../common/model'
@@ -10,6 +11,7 @@ import * as modal from '../common/modals'
 import * as vutils from '../common/viewutils'
 import * as search_module from './search'
 import Chart from 'chart.js';
+import pagination from 'paginationjs';
 
 /**
  * Shows a general error message.
@@ -32,16 +34,17 @@ var get_close_button = function() {
 
 /**
  * Returns a new button that collapses a specific div.
+ * It contains both buttons to open and close the div. Only one is show at a time, via CSS.
  * @param {string} id the div id
  * @returns {jQuery} the jQuery object rapresenting the new button
  */
-var get_reduce_button = function(id) {
+var get_reduce_button = function(id, is_open) {
     let button = $("<button />").attr({
         "class": "close reduce_button", 
         "type": "button",
         "data-toggle": "collapse",
         "data-target": "#"+id,
-        "aria-expanded": "true",
+        "aria-expanded": is_open ? "true" : "false",
         "aria-controls": id,
     });
     button.html('<i class="fas fa-window-minimize" aria-hidden="true"></i><i class="far fa-window-maximize" aria-hidden="true"></i>');
@@ -195,79 +198,66 @@ var results = {
         $(config.selectors.num_images_id).html(num);
     },
     /**
-     * Generates the results pagination links.
-     * @param {number} pages the total number of pages 
-     * @param {number} current_page the current page shown
-     * @param {function(integer)} search_function the function called when a different page is clicked 
-     * @returns {jQuery} a nav element containing the full page list
-     */
-    get_pagination: function(pages, current_page, search_function) {
-        let nav = $("<nav />").attr({"aria-label": "Search Results Navigation"});
-        let ul = $("<nav />").attr({"class": "pagination justify-content-end"});
-        for (let i=1; i<=pages; i++) {
-            let li = $('<li class="page-item page-item-' + i +'"><a class="page-link" href="#">' + i + '</a></li>');
-            if (i == current_page)
-                li.addClass("current_page");
-            li.click(function(event) {
-                event.preventDefault();
-                search_function(i);
-            });
-            ul.append(li);
-        }
-        nav.append(ul);
-        return nav;
-    },
-    /**
-     * Shows one page of search results, including pagination.
-     * @param {array} items one page of results
-     * @param {number} count the total number of results found
-     * @param {number} pages the total number of pages 
-     * @param {number} current_page the current page shown
-     * @param {function(integer)} search_function the function called when a different page is clicked 
-     */
-    show_results: function(items, count, pages, current_page, search_function) {
-        let title = $("<h4 />").html(count + " results found");
-        $(config.selectors.results_list_id).empty();
-        $(config.selectors.results_list_id).append(title);
-        $.each(items, function(idx, item) {
-            let div = $("<div />").attr({"class": "card"});
-            let header_id = "header_"+idx;
-            let body_id = "body_"+idx;
-            let header_container = $("<div />").attr({"class": "card-header", "id": header_id});
-            let header = $("<h5 />").attr({"class": "mb-0"});
-            let button = $("<button />").attr({
-                "class": "btn btn-link image-id", 
-                "data-toggle": "collapse",
-                "data-target": "#"+body_id,
-                "aria-expanded": "false",
-                "aria-controls": body_id,
-            });
-            button.html('<i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i> ' + item["name"]);
-            header.append(button);
-            header_container.append(header);
-            let body_container = $("<div />").attr({
-                "id": body_id,
-                "class": "collapse",
-                "aria-labelledby": header_id,
-            });
-            let body = $("<div />").attr({"class": "card-body"});
-            body.on('hidden.bs.collapse', function() {
+    * Shows the paginated results list.
+    * @see {@link http://pagination.js.org}
+    * @param {string} url the search url, including the search parameters
+    */
+    setup_pagination: function(url) {
+        $("#"+config.selectors.pagination_container).empty();
+        $("#"+config.selectors.pagination_container).pagination({
+            dataSource: url,
+            totalNumberLocator: function(response) {
+                return response.count;
+            },
+            locator: "images",
+            pageSize: settings.vars.page_size,
+            alias: {
+                pageNumber: "page",
+                pageSize: "limit"
+            },
+            classPrefix: "paginationjs",  // or paginationjs-theme-blue
+            callback: function(data, pagination) {
+                let title = $("<h4 />").html(pagination.totalNumber + " results found");
+                $(config.selectors.results_list_id).empty();
+                $(config.selectors.results_list_id).append(title);
+                $.each(data, function(idx, item) {
+                    let div = $("<div />").attr({"class": "card"});
+                    let header_id = "header_"+idx;
+                    let body_id = "body_"+idx;
+                    let header_container = $("<div />").attr({"class": "card-header", "id": header_id});
+                    let header = $("<h5 />").attr({"class": "mb-0"});
+                    let button = $("<button />").attr({
+                        "class": "btn btn-link image-id", 
+                        "data-toggle": "collapse",
+                        "data-target": "#"+body_id,
+                        "aria-expanded": "false",
+                        "aria-controls": body_id,
+                    });
+                    button.html('<i class="fas fa-caret-right"></i><i class="fas fa-caret-down"></i> ' + item["name"]);
+                    header.append(button);
+                    header_container.append(header);
+                    let body_container = $("<div />").attr({
+                        "id": body_id,
+                        "class": "collapse",
+                        "aria-labelledby": header_id,
+                    });
+                    let body = $("<div />").attr({"class": "card-body"});
+                    div.on('hidden.bs.collapse', function() {
+                        vutils.fix_height(config.vars.step);
+                    });
+                    div.on('shown.bs.collapse', function() {
+                        vutils.fix_height(config.vars.step);
+                    });
+                    body.append(vutils.display_object(item, 0));
+                    body_container.append(body);
+                    div.append(header_container);
+                    div.append(body_container);
+                    $(config.selectors.results_list_id).append(div);
+                });
+                $(config.selectors.results_list_id).show();
                 vutils.fix_height(config.vars.step);
-            });
-            body.on('shown.bs.collapse', function() {
-                vutils.fix_height(config.vars.step);
-            });
-            body.append(vutils.display_object(item, 0));
-            body_container.append(body);
-            div.append(header_container);
-            div.append(body_container);
-            $(config.selectors.results_list_id).append(div);
+            }
         });
-        if (items.length < count) {
-            let pagination = results.get_pagination(pages, current_page, search_function);
-            $(config.selectors.results_list_id).append(pagination);
-        }
-        $(config.selectors.results_list_id).show();
     },
     /**
      * Generates the container for a chart.
@@ -294,15 +284,15 @@ var results = {
         let body = $("<div />").attr({"class": "card-body collapse show", "id": body_id});
         let div = $("<div />").attr("id", id).attr("class", "graph_container");
         body.append(div);
-        body.on('hidden.bs.collapse', function() {
+        cnt.on('hidden.bs.collapse', function() {
             model.close_chart(attribute, type, approximation);
             vutils.fix_height(config.vars.step);
         });
-        body.on('shown.bs.collapse', function() {
+        cnt.on('shown.bs.collapse', function() {
             model.open_chart(attribute, type, approximation);
             vutils.fix_height(config.vars.step);
         });
-        let min_button = get_reduce_button(body_id);
+        let min_button = get_reduce_button(body_id, is_open);
         header.append(min_button);
         cnt.append(header);
         cnt.append(body);

@@ -44,7 +44,8 @@ module.exports = {
     new BundleTracker({filename: './webpack-stats.json'}),
     new webpack.ProvidePlugin({
       $: 'jquery',
-      jQuery: 'jquery'
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery'
     })    
   ],
   output: {

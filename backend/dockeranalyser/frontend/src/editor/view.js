@@ -334,7 +334,7 @@ var requirements = {
      * Shows the add requirement modal.
      */
     show_modal: function() {
-        $(config.selectors.req_modal_id).modal("show");
+        modal.show(config.selectors.req_modal_id);
     },
     /**
      * Empties the add requirement modal.

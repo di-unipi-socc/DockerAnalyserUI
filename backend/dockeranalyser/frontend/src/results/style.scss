@@ -114,3 +114,19 @@ label.capitalize {
 .current_page {
     font-weight: bold;
 }
+
+/* PAGINATION */
+
+@import "pagination";
+
+#pagination_container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.paginationjs {
+    width: auto;
+    text-align: center;
+    margin: 0 auto;
+    display: inline-block;
+}

@@ -61,14 +61,18 @@ var actions = [{
  * @param {string} content the python source code
  * @param {function} callback the function called if the validation is successful
  */
-var validate = function(content, callback) {
+var validate = function(content, callback, error_callback) {
     $.getJSON(settings.urls.code_validate, {"code": JSON.stringify(content)})
         .done(function(data) {
             var errors = data.errors;
             if (errors.length > 0) {
                 let full_error_msg = errors.join("<br>");
-                errors.push(full_error_msg);
-                modal.error(config.selectors.export_modal, settings.msgs.error_validation);
+                if (error_callback)
+                    error_callback(full_error_msg);
+                else {
+                    errors.push(full_error_msg);
+                    modal.error(config.selectors.export_modal, settings.msgs.error_validation);
+                }
             } else {
                 callback();
             }
@@ -91,7 +95,7 @@ var reset = function() {
  * Creates a zip with all files.
  * @param {function(string, string)} callback the function called if the zip creation is successful
  */
-var create_zip = function(callback) {
+var create_zip = function(callback, error_callback) {
     let zip = new JSZip();
     let zip_name = config.vars.base_zip_name + utilities.normalise($("#"+config.selectors.export_name).val());
     let folder = zip.folder(zip_name);
@@ -112,7 +116,7 @@ var create_zip = function(callback) {
         zip.generateAsync({type: "blob"}).then(function(content) {
             callback(content, zip_name);
         });
-    });
+    }, error_callback);
 };
 
 /**
