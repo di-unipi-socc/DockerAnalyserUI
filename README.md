@@ -1,6 +1,6 @@
 **********************************************
         !!!  ATTENZIONE  !!!
-**************************************
+ 
 This repo is deprecated.
 
 The code of DockerAnalyserUI has been merged with DockerAnalyser (https://github.com/di-unipi-socc/DockerAnalyser)
